@@ -9,11 +9,11 @@ import {
   useSpring,
   useTransform,
 } from "motion/react";
-import { Bot, Camera, Clapperboard, Code, Megaphone, Music, Palette, Search, ShoppingBag, Truck, Workflow } from "lucide-react";
+import { Bot, Camera, Code, Megaphone, Music, Palette, Search, ShoppingBag, Sparkles, Truck, Workflow } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
 const SKILLS = [
-  { Icon: Clapperboard, track: "Creator", label: "Video & Film" },
+  { Icon: Sparkles, track: "Exambites", label: "AI Skills That Pay" },
   { Icon: Palette, track: "Creator", label: "Graphics" },
   { Icon: Music, track: "Creator", label: "Music" },
   { Icon: Megaphone, track: "Marketer", label: "Social & Ads" },
