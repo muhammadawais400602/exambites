@@ -215,7 +215,7 @@ export function Trailer() {
         </div>
 
         <a
-          href="#curriculum"
+          href="#courses"
           className="mt-12 inline-flex items-center gap-2 font-label text-xs font-bold uppercase tracking-[0.2em] text-ink-soft transition-colors hover:text-brand-700"
         >
           {trailer.scrollCue}
