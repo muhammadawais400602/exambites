@@ -4,7 +4,7 @@ export const tracks = ["Creator", "Marketer", "Builder", "Commerce"] as const;
 export type Track = (typeof tracks)[number];
 
 export const hero = {
-  headline: ["EARN", "WITH", "AI"],
+  headline: ["CRACK", "WITH", "AI"],
   tagline: {
     before: "turn ai skills into ",
     highlight: "real client income",
