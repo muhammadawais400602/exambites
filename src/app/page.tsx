@@ -1,3 +1,4 @@
+import { Community } from "@/components/home/Community";
 import { Courses } from "@/components/home/Courses";
 import { Hero } from "@/components/home/Hero";
 import { Marquee } from "@/components/home/Marquee";
@@ -10,7 +11,8 @@ export default function Home() {
       <Trailer />
       <Marquee />
       <Courses />
-      {/* Next: community, mastery, pricing, FAQ, enroll (#enroll) */}
+      <Community />
+      {/* Next: mastery, pricing, FAQ, enroll (#enroll) */}
     </main>
   );
 }
