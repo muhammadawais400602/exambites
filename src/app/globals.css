@@ -60,6 +60,18 @@ body {
   color: transparent;
 }
 
+/* Slow diagonal light sweep for highlighted cards. */
+.sheen {
+  background-image: linear-gradient(115deg, var(--color-brand-100) 0%, var(--color-brand-50) 38%, #fff 50%, var(--color-brand-50) 62%, var(--color-brand-100) 100%);
+  background-size: 250% 250%;
+  animation: sheen 7s ease-in-out infinite;
+}
+
+@keyframes sheen {
+  0%, 100% { background-position: 100% 100%; }
+  50% { background-position: 0% 0%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *:not([data-motion-safe]), *::before, *::after {
     animation-duration: 0.01ms !important;
