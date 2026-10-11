@@ -93,7 +93,7 @@ export const inside = {
   subtitle: "A real community, learning and earning together",
   badge: "Exambites Community",
   card: {
-    title: "Exambites AI Academy",
+    title: "Exambites Creative Academy",
     body: "Private · members-only courses, live workshops and client vault",
     stats: [
       { value: "1,200+", label: "Members" },
@@ -133,4 +133,79 @@ export const twoPaths = {
     ],
     outcome: "Average outcome: first paid client within 90 days",
   },
+};
+
+export const brand = {
+  name: "Exambites Creative Academy",
+  short: "Exambites",
+  // Copyright year. Static on purpose: the page is prerendered, so reading the clock here fails the build.
+  year: 2026,
+};
+
+export const enroll = {
+  title: { lead: "Ready to build your", highlight: "AI business?" },
+  body: "Join 1,200+ students building, scaling, and earning in dollars today.",
+  // Replace with the real checkout / payment link when it exists.
+  cta: { label: "Get instant access", price: "Rs. 4,800", href: "#enroll" },
+  note: ["Lifetime access", "No monthly subscription"],
+};
+
+// Answers marked TODO describe a policy only you can confirm. Check them before launch.
+export const faq = [
+  {
+    q: "Do I need any experience?",
+    a: "No. Every course starts from zero, with screen recordings and copy-paste prompts. If you can use a phone and a browser, you can follow along.",
+  },
+  {
+    q: "Are the AI tools included?",
+    a: "The courses teach free and free-tier tools first, so you can start without paying for subscriptions. Where a paid tool is worth it, we show you exactly when to upgrade and what it costs.",
+  },
+  {
+    q: "Are the 90-day earnings realistic?",
+    a: "They are possible, not guaranteed. Students who finish a track, build a portfolio and do the outreach steps land clients fastest. Your results depend on the time and effort you put in.",
+  },
+  {
+    q: "Why is it only Rs. 4,800?",
+    a: "We want AI skills to be affordable for every student in Pakistan, not just those who can pay for expensive bootcamps. The launch price rises to Rs. 9,999 later.",
+  },
+  {
+    q: "Do I need to show my face?",
+    a: "No. Many of the skills, like AI video, design, automation and stores, never need you on camera. Where a face helps, you learn to use AI avatars instead.",
+  },
+  {
+    // TODO: confirm the bonus ebook's title and contents.
+    q: "What's the free bonus ebook?",
+    a: "Every member gets our AI starter ebook: the prompt library, client outreach scripts and pricing templates we use, ready to copy.",
+  },
+  {
+    q: "How do I receive USD in Pakistan?",
+    a: "We walk you through Payoneer, Wise and freelance platforms like Fiverr and Upwork, and how to withdraw dollars into a Pakistani bank account legally.",
+  },
+  {
+    // TODO: confirm how and when access is delivered.
+    q: "When do I get access after payment?",
+    a: "Right away. Once your payment is confirmed you get your login and community invite, usually within minutes.",
+  },
+  {
+    // TODO: replace with your actual refund policy.
+    q: "Is there a refund policy?",
+    a: "Yes. If the academy isn't right for you, contact us within 7 days of joining for a full refund.",
+  },
+  {
+    // TODO: confirm when the price changes.
+    q: "Is the price really increasing?",
+    a: "Yes. Rs. 4,800 is the launch price. It moves to Rs. 9,999 once the launch period ends; members who join now keep lifetime access.",
+  },
+  {
+    q: "Can I watch on my phone?",
+    a: "Yes. Every lesson works on phone, tablet and laptop, and your progress syncs across devices.",
+  },
+];
+
+export const footer = {
+  links: [
+    { label: "Courses", href: "#courses" },
+    { label: "Community", href: "#community" },
+    { label: "FAQ", href: "#faq" },
+  ],
 };
