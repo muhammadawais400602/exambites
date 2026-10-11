@@ -159,7 +159,7 @@ function PostCard({ post, active }: { post: Post; active: boolean }) {
     <article
       className={`rounded-2xl border p-5 transition-colors duration-500 sm:p-6 ${
         active
-          ? "border-white bg-white text-ink shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
+          ? "border-white bg-white text-night shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
           : "cursor-pointer border-white/5 bg-night-card text-white/70"
       }`}
     >
@@ -169,19 +169,19 @@ function PostCard({ post, active }: { post: Post; active: boolean }) {
         </span>
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`truncate text-sm font-bold ${active ? "text-ink" : "text-white/80"}`}>{post.name}</span>
+            <span className={`truncate text-sm font-bold ${active ? "text-night" : "text-white/80"}`}>{post.name}</span>
             {post.pro && (
               <span className="rounded-md bg-brand-100 px-1.5 py-0.5 font-label text-[10px] font-bold text-brand-900">Pro</span>
             )}
           </div>
-          <span className={`text-xs ${active ? "text-muted" : "text-white/40"}`}>
+          <span className={`text-xs ${active ? "text-night/50" : "text-white/40"}`}>
             {post.ago} · {post.channel}
           </span>
         </div>
       </header>
 
-      <h3 className={`mt-4 text-[15px] font-bold leading-snug ${active ? "text-ink" : "text-white/80"}`}>{post.title}</h3>
-      <p className={`mt-2 line-clamp-2 text-sm leading-relaxed ${active ? "text-ink-soft" : "text-white/45"}`}>{post.body}</p>
+      <h3 className={`mt-4 text-[15px] font-bold leading-snug ${active ? "text-night" : "text-white/80"}`}>{post.title}</h3>
+      <p className={`mt-2 line-clamp-2 text-sm leading-relaxed ${active ? "text-night/70" : "text-white/45"}`}>{post.body}</p>
 
       {post.media && (
         <div className={`mt-4 transition-opacity duration-500 ${active ? "" : "opacity-50"}`}>
@@ -191,7 +191,7 @@ function PostCard({ post, active }: { post: Post; active: boolean }) {
 
       <footer
         className={`mt-4 flex items-center gap-5 border-t pt-3 text-xs ${
-          active ? "border-ink/10 text-ink-soft" : "border-white/5 text-white/40"
+          active ? "border-night/10 text-night/70" : "border-white/5 text-white/40"
         }`}
       >
         <span className="inline-flex items-center gap-1.5">
@@ -228,20 +228,20 @@ function Media({ post }: { post: Post }) {
           </span>
           Payment received · {m.via}
         </div>
-        <p className="mt-2 font-display text-3xl font-black tracking-tight text-ink">{m.amount}</p>
-        <p className="mt-0.5 text-xs text-ink-soft">from {m.from}</p>
+        <p className="mt-2 font-display text-3xl font-black tracking-tight text-night">{m.amount}</p>
+        <p className="mt-0.5 text-xs text-night/70">from {m.from}</p>
       </div>
     );
   }
 
   const scene =
     post.track === "Creator"
-      ? "from-[#3b1f0a] via-[#7c2d12] to-[#f59e0b]"
+      ? "from-night via-brand-800 to-brand-500"
       : post.track === "Builder"
-        ? "from-[#111827] via-[#3b2a10] to-[#eab308]"
+        ? "from-night via-brand-900 to-brand-400"
         : post.track === "Commerce"
-          ? "from-[#1c1208] via-[#92400e] to-[#fbbf24]"
-          : "from-[#1a0f05] via-[#9a3412] to-[#fb923c]";
+          ? "from-night-card via-brand-800 to-brand-400"
+          : "from-night via-brand-700 to-brand-500";
 
   return (
     <div className={`relative aspect-[16/10] overflow-hidden rounded-xl bg-gradient-to-br ${scene}`}>

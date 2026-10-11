@@ -20,7 +20,7 @@ export function Enroll() {
         aria-hidden
         animate={{ x: ["-10%", "10%", "-10%"], scale: [1, 1.1, 1] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[min(900px,120vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(254,240,138,0.6),rgba(254,243,199,0.3)_50%,transparent)]"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] dark:opacity-25 w-[min(900px,120vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-brand-200)_60%,transparent),color-mix(in_srgb,var(--color-brand-100)_30%,transparent)_50%,transparent)]"
       />
 
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
@@ -36,7 +36,7 @@ export function Enroll() {
         <motion.div {...rise(0.2)} className="mt-9">
           <MagneticButton
             href={enroll.cta.href}
-            className="rounded-full bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 px-9 py-4 font-label text-sm font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-10px_rgba(217,119,6,0.6)] transition-shadow hover:shadow-[0_24px_50px_-10px_rgba(217,119,6,0.75)]"
+            className="rounded-full bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 px-9 py-4 font-label text-sm font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-10px_color-mix(in_srgb,var(--color-brand-600)_60%,transparent)] transition-shadow hover:shadow-[0_24px_50px_-10px_color-mix(in_srgb,var(--color-brand-600)_75%,transparent)]"
           >
             {enroll.cta.label}
             <span aria-hidden className="h-4 w-px bg-white/60" />

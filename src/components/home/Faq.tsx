@@ -11,7 +11,7 @@ export function Faq() {
   const id = useId();
 
   return (
-    <section id="faq" className="relative bg-white px-4 py-20 md:py-28">
+    <section id="faq" className="relative bg-surface-card px-4 py-20 md:py-28">
       <div className="mx-auto max-w-3xl">
         <h2 className="text-brand-gradient text-center font-display text-[clamp(2.6rem,8vw,5rem)] font-black uppercase leading-none tracking-[-0.045em]">
           FAQ

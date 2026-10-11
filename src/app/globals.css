@@ -1,7 +1,11 @@
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
 
-/* Brand tokens (amber edition). Swap here to re-theme the whole site. */
+/* dark: utilities follow the toggle (data-theme on <html>), not just the OS setting. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Brand tokens (amber edition, light). Dark mode and the violet palette
+   override these variables below, so components only ever use tokens. */
 @theme {
   --color-surface: #fbf9f5;
   --color-surface-low: #f5f3ef;
@@ -11,10 +15,12 @@
   --color-muted: #8a8378;
 
   --color-brand-900: #78350f;
+  --color-brand-800: #92400e;
   --color-brand-700: #b45309;
   --color-brand-600: #d97706;
   --color-brand-500: #f59e0b;
   --color-brand-400: #eab308;
+  --color-brand-300: #fde047;
   --color-brand-200: #fef08a;
   --color-brand-100: #fef3c7;
   --color-brand-50: #fef9c3;
@@ -33,6 +39,54 @@
 @keyframes marquee {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(-50%, 0, 0); }
+}
+
+/* Amber, dark */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-surface: #0f0d0b;
+  --color-surface-low: #171411;
+  --color-surface-card: #1c1916;
+  --color-ink: #f5f1ea;
+  --color-ink-soft: #c9c0b4;
+  --color-muted: #948b80;
+  --color-night: #080706;
+  --color-night-card: #14110e;
+}
+
+/* Violet palette (DESIGN.md "Aether"), light */
+[data-palette="violet"] {
+  --color-surface: #fafafa;
+  --color-surface-low: #f4f4f5;
+  --color-surface-card: #ffffff;
+  --color-ink: #18181b;
+  --color-ink-soft: #484456;
+  --color-muted: #797488;
+  --color-brand-900: #1d0061;
+  --color-brand-800: #3a00a8;
+  --color-brand-700: #4a00d9;
+  --color-brand-600: #6332f6;
+  --color-brand-500: #7c4dff;
+  --color-brand-400: #a855f7;
+  --color-brand-300: #cbbeff;
+  --color-brand-200: #ddb7ff;
+  --color-brand-100: #ede5ff;
+  --color-brand-50: #f6f2ff;
+  --color-night: #09090b;
+  --color-night-card: #131316;
+  --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Violet palette, dark */
+[data-theme="dark"] [data-palette="violet"] {
+  --color-surface: #09090b;
+  --color-surface-low: #111114;
+  --color-surface-card: #131316;
+  --color-ink: #f4f4f5;
+  --color-ink-soft: #c4bfd4;
+  --color-muted: #8b86a0;
+  --color-night: #050507;
+  --color-night-card: #0e0e11;
 }
 
 html {
@@ -65,6 +119,15 @@ body {
   background-image: linear-gradient(115deg, var(--color-brand-100) 0%, var(--color-brand-50) 38%, #fff 50%, var(--color-brand-50) 62%, var(--color-brand-100) 100%);
   background-size: 250% 250%;
   animation: sheen 7s ease-in-out infinite;
+}
+
+[data-theme="dark"] .sheen {
+  background-image: linear-gradient(115deg, color-mix(in srgb, var(--color-brand-900) 45%, var(--color-surface-card)) 0%, var(--color-surface-card) 38%, color-mix(in srgb, var(--color-brand-700) 30%, var(--color-surface-card)) 50%, var(--color-surface-card) 62%, color-mix(in srgb, var(--color-brand-900) 45%, var(--color-surface-card)) 100%);
+}
+
+/* Deep brand text is built for light backgrounds; lift it on dark ones. */
+[data-theme="dark"] .text-brand-700 {
+  color: var(--color-brand-400);
 }
 
 @keyframes sheen {

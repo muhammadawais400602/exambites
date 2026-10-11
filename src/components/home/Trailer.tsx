@@ -101,7 +101,7 @@ export function Trailer() {
         <div className="mt-14 w-full max-w-5xl" style={{ perspective: 1400 }}>
           <motion.div
             style={{ rotateX, scale, y: frameY, transformOrigin: "50% 100%" }}
-            className="rounded-[28px] bg-night p-2.5 shadow-[0_50px_100px_-30px_rgba(20,18,16,0.55),0_30px_60px_-30px_rgba(217,119,6,0.35)] sm:p-3"
+            className="rounded-[28px] bg-night p-2.5 shadow-[0_50px_100px_-30px_rgba(20,18,16,0.55),0_30px_60px_-30px_color-mix(in_srgb,var(--color-brand-600)_35%,transparent)] sm:p-3"
           >
             <div
               ref={frameRef}
@@ -158,7 +158,7 @@ export function Trailer() {
               >
                 <motion.span
                   animate={{ scale: hovering ? 1.08 : 1 }}
-                  className="relative grid size-20 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-[0_12px_40px_rgba(217,119,6,0.6)] sm:size-24"
+                  className="relative grid size-20 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-[0_12px_40px_color-mix(in_srgb,var(--color-brand-600)_60%,transparent)] sm:size-24"
                 >
                   {!playing && (
                     <span className="absolute inset-0 animate-ping rounded-full bg-brand-500/40 [animation-duration:2s]" />

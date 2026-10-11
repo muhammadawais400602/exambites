@@ -209,3 +209,13 @@ export const footer = {
     { label: "FAQ", href: "#faq" },
   ],
 };
+
+export const nav = {
+  links: [
+    { label: "Curriculum", href: "#courses" },
+    { label: "Testimonials", href: "#community" },
+  ],
+  cta: { label: "Enroll now", href: "#enroll" },
+  // No login yet; points at enrollment until accounts exist.
+  account: { label: "Account", href: "#enroll" },
+};

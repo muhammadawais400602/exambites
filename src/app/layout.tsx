@@ -33,12 +33,19 @@ export const metadata: Metadata = {
     "AI courses for students: Creator, Marketer, Builder and Commerce tracks. Learn the tools, land clients, and earn with AI in 90 days.",
 };
 
+// Runs before first paint so the saved (or system) theme never flashes.
+const themeScript = `try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       className={`${montserrat.variable} ${jakarta.variable} ${grotesk.variable} ${jetbrains.variable} antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-dvh bg-surface font-sans text-ink overflow-x-hidden">
         <Providers>{children}</Providers>
       </body>

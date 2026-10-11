@@ -12,10 +12,10 @@ const STICKY_TOP = 96;
 
 // Each track gets its own glow inside the card visual.
 const TRACK_GLOW: Record<Track, string> = {
-  Creator: "rgba(245,158,11,0.55)",
-  Marketer: "rgba(234,88,12,0.5)",
-  Builder: "rgba(234,179,8,0.5)",
-  Commerce: "rgba(217,119,6,0.55)",
+  Creator: "color-mix(in srgb, var(--color-brand-500) 55%, transparent)",
+  Marketer: "color-mix(in srgb, var(--color-brand-700) 50%, transparent)",
+  Builder: "color-mix(in srgb, var(--color-brand-400) 50%, transparent)",
+  Commerce: "color-mix(in srgb, var(--color-brand-600) 55%, transparent)",
 };
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -89,7 +89,7 @@ export function Courses() {
                 className={`rounded-full border px-4 py-2 font-label text-xs font-bold uppercase tracking-[0.14em] transition-colors ${
                   on
                     ? "border-brand-600 bg-brand-600 text-white"
-                    : "border-brand-600/25 bg-white text-brand-900 hover:border-brand-600/60"
+                    : "border-brand-600/25 bg-surface-card text-brand-900 dark:text-brand-200 hover:border-brand-600/60"
                 }`}
               >
                 {t} <span className={on ? "text-white/70" : "text-muted"}>· {count}</span>
@@ -157,7 +157,7 @@ function CourseCard({ course, index, next, afterNext }: CardProps) {
       style={{ top: STICKY_TOP, scale, y, opacity, transformOrigin: "50% 0%" }}
       className={`sticky ${last ? "mb-0" : "mb-[24vh] md:mb-[30vh]"}`}
     >
-      <div className="relative overflow-hidden rounded-3xl border border-ink/10 bg-white p-5 shadow-[0_30px_60px_-30px_rgba(120,53,15,0.35)] sm:p-7">
+      <div className="relative overflow-hidden rounded-3xl border border-ink/10 bg-surface-card p-5 shadow-[0_30px_60px_-30px_color-mix(in_srgb,var(--color-brand-900)_35%,transparent)] sm:p-7">
         <div className="grid items-center gap-6 md:grid-cols-[1.25fr_1fr] md:gap-10">
           {/* Text */}
           <div className="order-2 md:order-1">
@@ -193,7 +193,7 @@ function CourseCard({ course, index, next, afterNext }: CardProps) {
                   aria-hidden
                   className="absolute inset-0"
                   style={{
-                    background: `radial-gradient(90% 80% at 70% 30%, ${TRACK_GLOW[course.track]}, transparent 60%), radial-gradient(120% 100% at 0% 100%, #2a1d0e, #0e0c0a 70%)`,
+                    background: `radial-gradient(90% 80% at 70% 30%, ${TRACK_GLOW[course.track]}, transparent 60%), radial-gradient(120% 100% at 0% 100%, color-mix(in srgb, var(--color-brand-900) 35%, var(--color-night)), var(--color-night) 70%)`,
                   }}
                 />
                 <div
@@ -207,7 +207,7 @@ function CourseCard({ course, index, next, afterNext }: CardProps) {
                   {pad(index)}
                 </span>
                 <motion.div style={{ y: iconY, rotate: iconRotate }} className="absolute inset-0 grid place-items-center">
-                  <span className="grid size-20 place-items-center rounded-3xl border border-brand-400/40 bg-white/[0.06] text-brand-200 shadow-[0_0_60px_rgba(245,158,11,0.45)] backdrop-blur-sm sm:size-24">
+                  <span className="grid size-20 place-items-center rounded-3xl border border-brand-400/40 bg-white/[0.06] text-brand-200 shadow-[0_0_60px_color-mix(in_srgb,var(--color-brand-500)_45%,transparent)] backdrop-blur-sm sm:size-24">
                     <Icon className="size-10 sm:size-12" strokeWidth={1.8} />
                   </span>
                 </motion.div>

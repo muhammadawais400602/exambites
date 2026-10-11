@@ -14,7 +14,7 @@ export function TwoPaths() {
   const { slow, mapped } = twoPaths;
 
   return (
-    <section id="paths" className="relative bg-white px-4 py-20 md:py-28">
+    <section id="paths" className="relative bg-surface-card px-4 py-20 md:py-28">
       <div className="mx-auto max-w-5xl">
         <div className="text-center">
           <h2 className="text-brand-gradient font-display text-[clamp(2.6rem,8vw,5rem)] font-black uppercase leading-none tracking-[-0.045em]">
@@ -62,7 +62,7 @@ export function TwoPaths() {
             whileHover={{ y: -6 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-            className="sheen relative flex flex-col overflow-hidden rounded-3xl border-2 border-brand-600 p-7 shadow-[0_30px_60px_-30px_rgba(217,119,6,0.55)] sm:p-8"
+            className="sheen relative flex flex-col overflow-hidden rounded-3xl border-2 border-brand-600 p-7 shadow-[0_30px_60px_-30px_color-mix(in_srgb,var(--color-brand-600)_55%,transparent)] sm:p-8"
           >
             <span className="absolute right-4 top-4 rounded-full bg-brand-700 px-3 py-1 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-white">
               {mapped.badge}

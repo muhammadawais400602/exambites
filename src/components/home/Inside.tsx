@@ -34,7 +34,7 @@ export function Inside() {
   const rotateX = useTransform(py, [-0.5, 0.5], [8, -8]);
   const gx = useTransform(px, [-0.5, 0.5], [0, 100]);
   const gy = useTransform(py, [-0.5, 0.5], [0, 100]);
-  const glare = useMotionTemplate`radial-gradient(circle at ${gx}% ${gy}%, rgba(254,240,138,0.16), transparent 50%)`;
+  const glare = useMotionTemplate`radial-gradient(circle at ${gx}% ${gy}%, color-mix(in srgb, var(--color-brand-200) 16%, transparent), transparent 50%)`;
 
   function onPointerMove(e: React.PointerEvent) {
     if (e.pointerType !== "mouse" || !cardRef.current) return;
@@ -52,7 +52,7 @@ export function Inside() {
 
   return (
     <section id="join" className="relative overflow-hidden bg-surface px-4 py-20 md:py-28">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 size-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-200/40 blur-3xl" />
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 size-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-200/40 blur-3xl dark:bg-brand-600/15" />
 
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
         <h2 className="text-brand-gradient font-display text-[clamp(2.6rem,8vw,5rem)] font-black uppercase leading-none tracking-[-0.045em]">
@@ -70,7 +70,7 @@ export function Inside() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-            className="relative overflow-hidden rounded-[28px] bg-night p-6 text-left shadow-[0_40px_80px_-30px_rgba(20,18,16,0.6),0_20px_50px_-30px_rgba(217,119,6,0.5)] sm:p-8"
+            className="relative overflow-hidden rounded-[28px] bg-night p-6 text-left shadow-[0_40px_80px_-30px_rgba(20,18,16,0.6),0_20px_50px_-30px_color-mix(in_srgb,var(--color-brand-600)_50%,transparent)] sm:p-8"
           >
             <motion.div aria-hidden style={{ background: glare }} className="pointer-events-none absolute inset-0" />
 
@@ -110,7 +110,7 @@ export function Inside() {
               </div>
               <MagneticButton
                 href={card.cta.href}
-                className="rounded-full bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 px-6 py-3 font-label text-xs font-bold uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_-10px_rgba(217,119,6,0.7)]"
+                className="rounded-full bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 px-6 py-3 font-label text-xs font-bold uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_-10px_color-mix(in_srgb,var(--color-brand-600)_70%,transparent)]"
               >
                 {card.cta.label}
               </MagneticButton>
