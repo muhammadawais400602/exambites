@@ -5,7 +5,7 @@ import { ArrowDown } from "lucide-react";
 import { useRef } from "react";
 import { hero } from "@/content/home";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { SkillTile } from "./SkillTile";
+import { Mascot } from "./Mascot";
 
 // Each headline word picks up the next slice of the amber ramp.
 const WORD_GRADIENTS = [
@@ -23,12 +23,6 @@ const fadeUp = (delay: number) => ({
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
 
-  // Pointer, normalised to -0.5…0.5 across the hero, smoothed.
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  const px = useSpring(rawX, { stiffness: 120, damping: 20 });
-  const py = useSpring(rawY, { stiffness: 120, damping: 20 });
-
   // Cursor glow, in pixels.
   const glowX = useSpring(useMotionValue(0), { stiffness: 90, damping: 22 });
   const glowY = useSpring(useMotionValue(0), { stiffness: 90, damping: 22 });
@@ -43,16 +37,12 @@ export function Hero() {
   function onPointerMove(e: React.PointerEvent) {
     if (e.pointerType !== "mouse" || !ref.current) return;
     const r = ref.current.getBoundingClientRect();
-    rawX.set((e.clientX - r.left) / r.width - 0.5);
-    rawY.set((e.clientY - r.top) / r.height - 0.5);
     glowX.set(e.clientX - r.left);
     glowY.set(e.clientY - r.top);
     glowOpacity.set(1);
   }
 
   function onPointerLeave() {
-    rawX.set(0);
-    rawY.set(0);
     glowOpacity.set(0);
   }
 
@@ -99,8 +89,8 @@ export function Hero() {
           ))}
         </motion.h1>
 
-        <div className="mt-10 md:mt-14">
-          <SkillTile px={px} py={py} />
+        <div className="mt-8 md:mt-10">
+          <Mascot />
         </div>
 
         <motion.p
