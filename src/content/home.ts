@@ -87,3 +87,50 @@ export const marquee = [
   "Lifetime Access",
   "Creator • Marketer • Builder • Commerce",
 ];
+
+export const inside = {
+  title: { count: 1200, suffix: "+", word: "Inside" },
+  subtitle: "A real community, learning and earning together",
+  badge: "Exambites Community",
+  card: {
+    title: "Exambites AI Academy",
+    body: "Private · members-only courses, live workshops and client vault",
+    stats: [
+      { value: "1,200+", label: "Members" },
+      { value: "19", label: "Courses" },
+      { value: "Lifetime", label: "Access" },
+    ],
+    priceLabel: "One-time entry",
+    price: "Rs. 4,800",
+    cta: { label: "Join now", href: "#enroll" },
+  },
+};
+
+export const twoPaths = {
+  title: ["Two", "Paths"],
+  subtitle: "Choose the journey that fits your ambitions",
+  slow: {
+    label: "Path 01",
+    title: "The slow way",
+    points: [
+      "Random free tutorials on YouTube",
+      "Outdated tools, endless trial and error without guidance",
+      "No clear plan to land clients or get paid",
+      "Months wasted wondering why your results don't match the hype",
+    ],
+    outcome: "Average outcome: 6–12 months of frustration",
+  },
+  mapped: {
+    label: "Path 02",
+    badge: "Recommended",
+    title: "The mapped way",
+    points: [
+      "19 step-by-step courses across 4 tracks",
+      "Only tested tools, no subscription overload",
+      "Pre-built prompt templates & workflows",
+      "Outreach, pricing and getting paid in dollars from Pakistan",
+      "Direct access to a community of 1,200+ peers",
+    ],
+    outcome: "Average outcome: first paid client within 90 days",
+  },
+};
