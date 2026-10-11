@@ -3,7 +3,8 @@ import { marquee } from "@/content/home";
 /**
  * Ticker ribbon scrolling right to left at a constant speed. Pure CSS so it
  * runs on the compositor and stays smooth while the page scrolls. Pauses on
- * hover; static for reduced-motion users.
+ * hover. Keeps running under reduced motion: it is slow, linear and has no
+ * zoom or parallax.
  */
 export function Marquee() {
   return (
@@ -20,7 +21,7 @@ export function Marquee() {
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-surface to-transparent"
       />
       {/* Two identical copies; translating by -50% makes the loop seamless. */}
-      <div className="flex w-max animate-marquee whitespace-nowrap will-change-transform group-hover:[animation-play-state:paused] motion-reduce:animate-none">
+      <div className="flex w-max animate-marquee whitespace-nowrap will-change-transform group-hover:[animation-play-state:paused]" data-motion-safe>
         {[0, 1].map((copy) => (
           <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
             {marquee.map((item) => (
