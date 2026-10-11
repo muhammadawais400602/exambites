@@ -67,3 +67,20 @@ export const studioJobs: {
     payout: 180,
   },
 ];
+
+export const marquee = [
+  "AI Content Creation",
+  "Video & Film",
+  "Graphics & Music",
+  "Social & Ads",
+  "SEO & Content",
+  "Web & App Building",
+  "Chatbots & Automation",
+  "AI Stores",
+  "Product Shots",
+  "AI Dropshipping",
+  "Client-Ready Skills",
+  "Built From Zero",
+  "Lifetime Access",
+  "Creator • Marketer • Builder • Commerce",
+];
