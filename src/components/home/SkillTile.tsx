@@ -1,16 +1,21 @@
 "use client";
 
 import { AnimatePresence, motion, type MotionValue, useReducedMotion, useTransform } from "motion/react";
-import { Atom, Calculator, Dna, FlaskConical, Sigma, Stethoscope } from "lucide-react";
+import { Bot, Camera, Clapperboard, Code, Megaphone, Music, Palette, Search, ShoppingBag, Truck, Workflow } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const SUBJECTS = [
-  { Icon: Stethoscope, label: "MDCAT" },
-  { Icon: Atom, label: "Physics" },
-  { Icon: FlaskConical, label: "Chemistry" },
-  { Icon: Dna, label: "Biology" },
-  { Icon: Sigma, label: "Maths" },
-  { Icon: Calculator, label: "NET / ECAT" },
+const SKILLS = [
+  { Icon: Clapperboard, track: "Creator", label: "Video & Film" },
+  { Icon: Palette, track: "Creator", label: "Graphics" },
+  { Icon: Music, track: "Creator", label: "Music" },
+  { Icon: Megaphone, track: "Marketer", label: "Social & Ads" },
+  { Icon: Search, track: "Marketer", label: "SEO & Content" },
+  { Icon: Code, track: "Builder", label: "Web & Apps" },
+  { Icon: Bot, track: "Builder", label: "Chatbots" },
+  { Icon: Workflow, track: "Builder", label: "Automation" },
+  { Icon: ShoppingBag, track: "Commerce", label: "Online Stores" },
+  { Icon: Camera, track: "Commerce", label: "Product Shots" },
+  { Icon: Truck, track: "Commerce", label: "AI Dropshipping" },
 ];
 
 const CYCLE_MS = 2200;
@@ -21,8 +26,8 @@ type Props = {
   py: MotionValue<number>;
 };
 
-/** Dark 3D tile that tilts toward the cursor and flips through exam subjects. */
-export function SubjectTile({ px, py }: Props) {
+/** Dark 3D tile that tilts toward the cursor and flips through the AI skills taught. */
+export function SkillTile({ px, py }: Props) {
   const [index, setIndex] = useState(0);
   const reduce = useReducedMotion();
   const rotateY = useTransform(px, [-0.5, 0.5], [-22, 22]);
@@ -36,18 +41,18 @@ export function SubjectTile({ px, py }: Props) {
 
   useEffect(() => {
     if (reduce) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % SUBJECTS.length), CYCLE_MS);
+    const id = setInterval(() => setIndex((i) => (i + 1) % SKILLS.length), CYCLE_MS);
     return () => clearInterval(id);
   }, [reduce]);
 
-  const { Icon, label } = SUBJECTS[index];
+  const { Icon, track, label } = SKILLS[index];
 
   return (
     <div className="flex flex-col items-center gap-3" style={{ perspective: 800 }}>
       <motion.button
         type="button"
-        aria-label={`Showing ${label}. Next subject`}
-        onClick={() => setIndex((i) => (i + 1) % SUBJECTS.length)}
+        aria-label={`Showing ${track}: ${label}. Next skill`}
+        onClick={() => setIndex((i) => (i + 1) % SKILLS.length)}
         initial={{ opacity: 0, scale: 0.6, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: [0, -10, 0] }}
         transition={{
@@ -91,7 +96,7 @@ export function SubjectTile({ px, py }: Props) {
           transition={{ duration: 0.25 }}
           className="font-label text-[11px] font-bold uppercase tracking-[0.2em] text-brand-700"
         >
-          {label}
+          {track} <span className="text-brand-500">·</span> {label}
         </motion.span>
       </AnimatePresence>
     </div>

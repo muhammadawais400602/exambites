@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useMotionValue, useScroll, useSpring, useTrans
 import { ArrowDown, Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { trailer } from "@/content/home";
-import { ExaminerPreview } from "./ExaminerPreview";
+import { StudioPreview } from "./StudioPreview";
 
 const fmt = (s: number) =>
   `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
@@ -132,7 +132,7 @@ export function Trailer() {
                   onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
                 />
               ) : (
-                <ExaminerPreview playing={playing} />
+                <StudioPreview playing={playing} />
               )}
 
               {/* Dim when paused */}

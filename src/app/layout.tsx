@@ -28,9 +28,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Exambites Academy · Crack Your Exam With AI",
+  title: "Exambites Academy · Earn With AI",
   description:
-    "Turn AI-powered exam prep into a top 1% rank in 90 days. MDCAT, MCAT, NET, ECAT and SAT.",
+    "AI courses for students: Creator, Marketer, Builder and Commerce tracks. Learn the tools, land clients, and earn with AI in 90 days.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
