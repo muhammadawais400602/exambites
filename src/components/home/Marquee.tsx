@@ -1,49 +1,15 @@
-"use client";
-
-import {
-  motion,
-  useAnimationFrame,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-  useVelocity,
-} from "motion/react";
-import { wrap } from "motion";
 import { marquee } from "@/content/home";
 
-/** Percent of the track width moved per second at rest. */
-const BASE_SPEED = 2.4;
-
 /**
- * Ticker ribbon. Always scrolls right to left, speeds up with scroll
- * velocity in either direction, and slows to a near stop on hover.
+ * Ticker ribbon scrolling right to left at a constant speed. Pure CSS so it
+ * runs on the compositor and stays smooth while the page scrolls. Pauses on
+ * hover; static for reduced-motion users.
  */
 export function Marquee() {
-  const reduce = useReducedMotion();
-  const offset = useMotionValue(0);
-  const hover = useSpring(1, { stiffness: 120, damping: 20 });
-
-  const { scrollY } = useScroll();
-  const velocity = useSpring(useVelocity(scrollY), { stiffness: 400, damping: 50 });
-  const boost = useTransform(velocity, [-1500, 0, 1500], [-5, 0, 5], { clamp: false });
-
-  useAnimationFrame((_, delta) => {
-    if (reduce) return;
-    const step = BASE_SPEED * (delta / 1000) * (1 + Math.abs(boost.get())) * hover.get();
-    offset.set(offset.get() - step);
-  });
-
-  // Two identical copies; wrapping at -50% makes the loop seamless.
-  const x = useTransform(offset, (v) => `${wrap(-50, 0, v)}%`);
-
   return (
     <section
       aria-label="What you learn"
-      onPointerEnter={() => hover.set(0.15)}
-      onPointerLeave={() => hover.set(1)}
-      className="relative overflow-hidden border-y border-brand-600/20 bg-brand-100/70 py-3.5"
+      className="group relative overflow-hidden border-y border-brand-600/20 bg-brand-100/70 py-3.5"
     >
       <div
         aria-hidden
@@ -53,7 +19,8 @@ export function Marquee() {
         aria-hidden
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-surface to-transparent"
       />
-      <motion.div style={{ x }} className="flex w-max whitespace-nowrap">
+      {/* Two identical copies; translating by -50% makes the loop seamless. */}
+      <div className="flex w-max animate-marquee whitespace-nowrap will-change-transform group-hover:[animation-play-state:paused] motion-reduce:animate-none">
         {[0, 1].map((copy) => (
           <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
             {marquee.map((item) => (
@@ -69,7 +36,7 @@ export function Marquee() {
             ))}
           </ul>
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }
