@@ -104,7 +104,7 @@ export function Courses() {
             // Fragment, not a wrapper: every card must share the stack as its sticky parent.
             <Fragment key={course.title}>
               <div ref={markers[i]} aria-hidden />
-              <CourseCard course={course} index={i} next={markers[i + 1]} />
+              <CourseCard course={course} index={i} next={markers[i + 1]} afterNext={markers[i + 2]} />
             </Fragment>
           ))}
         </div>
@@ -118,9 +118,11 @@ type CardProps = {
   index: number;
   /** Marker of the following card; undefined for the last card. */
   next?: RefObject<HTMLDivElement | null>;
+  /** Marker two cards ahead; once that card lands, this one is fully buried. */
+  afterNext?: RefObject<HTMLDivElement | null>;
 };
 
-function CourseCard({ course, index, next }: CardProps) {
+function CourseCard({ course, index, next, afterNext }: CardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { Icon } = course;
   const last = !next;
@@ -135,6 +137,14 @@ function CourseCard({ course, index, next }: CardProps) {
   const y = useTransform(covered, [0, 1], [0, last ? 0 : -18]);
   const dim = useTransform(covered, [0, 1], [0, last ? 0 : 0.2]);
 
+  // Fade out once two newer cards sit on top. Only the card directly beneath
+  // should peek; a pile of identical shadows and borders bands and aliases.
+  const { scrollYProgress: buried } = useScroll({
+    target: afterNext ?? ref,
+    offset: ["start end", `start ${STICKY_TOP}px`],
+  });
+  const opacity = useTransform(buried, [0, 1], [1, afterNext ? 0 : 1]);
+
   // Visual drifts inside its frame as the card rises into place.
   const { scrollYProgress: enter } = useScroll({ target: ref, offset: ["start end", "start start"] });
   const iconY = useTransform(enter, [0, 1], [50, 0]);
@@ -144,7 +154,7 @@ function CourseCard({ course, index, next }: CardProps) {
   return (
     <motion.article
       ref={ref}
-      style={{ top: STICKY_TOP, scale, y, transformOrigin: "50% 0%" }}
+      style={{ top: STICKY_TOP, scale, y, opacity, transformOrigin: "50% 0%" }}
       className={`sticky ${last ? "mb-0" : "mb-[24vh] md:mb-[30vh]"}`}
     >
       <div className="relative overflow-hidden rounded-3xl border border-ink/10 bg-white p-5 shadow-[0_30px_60px_-30px_rgba(120,53,15,0.35)] sm:p-7">
