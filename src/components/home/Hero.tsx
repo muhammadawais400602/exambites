@@ -5,7 +5,7 @@ import { ArrowDown } from "lucide-react";
 import { useRef } from "react";
 import { hero } from "@/content/home";
 import { MagneticButton } from "@/components/ui/MagneticButton";
-import { SubjectTile } from "./SubjectTile";
+import { SkillTile } from "./SkillTile";
 
 // Each headline word picks up the next slice of the amber ramp.
 const WORD_GRADIENTS = [
@@ -100,7 +100,7 @@ export function Hero() {
         </motion.h1>
 
         <div className="mt-10 md:mt-14">
-          <SubjectTile px={px} py={py} />
+          <SkillTile px={px} py={py} />
         </div>
 
         <motion.p
