@@ -69,6 +69,9 @@ export const studioJobs: {
 ];
 
 export const marquee = [
+  "Earn With AI",
+  "Earn In Dollars",
+  "In Pakistan",
   "AI Content Creation",
   "Video & Film",
   "Graphics & Music",

@@ -11,20 +11,18 @@ import {
   useVelocity,
 } from "motion/react";
 import { wrap } from "motion";
-import { useRef } from "react";
 import { marquee } from "@/content/home";
 
-/** Percent of one copy's width moved per second at rest. */
+/** Percent of the track width moved per second at rest. */
 const BASE_SPEED = 2.4;
 
 /**
- * Ticker ribbon. Drifts left at rest, speeds up with scroll velocity,
- * reverses when scrolling up, and slows to a stop on hover.
+ * Ticker ribbon. Always scrolls right to left, speeds up with scroll
+ * velocity in either direction, and slows to a near stop on hover.
  */
 export function Marquee() {
   const reduce = useReducedMotion();
   const offset = useMotionValue(0);
-  const direction = useRef(1);
   const hover = useSpring(1, { stiffness: 120, damping: 20 });
 
   const { scrollY } = useScroll();
@@ -33,10 +31,7 @@ export function Marquee() {
 
   useAnimationFrame((_, delta) => {
     if (reduce) return;
-    const b = boost.get();
-    if (b < -0.05) direction.current = -1;
-    else if (b > 0.05) direction.current = 1;
-    const step = direction.current * BASE_SPEED * (delta / 1000) * (1 + Math.abs(b)) * hover.get();
+    const step = BASE_SPEED * (delta / 1000) * (1 + Math.abs(boost.get())) * hover.get();
     offset.set(offset.get() - step);
   });
 
