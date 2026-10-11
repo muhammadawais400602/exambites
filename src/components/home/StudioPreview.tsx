@@ -46,7 +46,7 @@ export function StudioPreview({ playing }: { playing: boolean }) {
   const shownDone = playing ? done : 0;
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-[radial-gradient(120%_90%_at_20%_0%,#3a2a12_0%,#17120c_45%,#0b0907_100%)] text-left">
+    <div className="absolute inset-0 overflow-hidden bg-[radial-gradient(120%_90%_at_20%_0%,color-mix(in_srgb,var(--color-brand-900)_45%,var(--color-night))_0%,var(--color-night-card)_45%,var(--color-night)_100%)] text-left">
       <div
         aria-hidden
         className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)] [background-size:40px_40px]"
