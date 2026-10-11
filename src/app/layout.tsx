@@ -28,7 +28,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Exambites Academy · Crack With AI",
+  title: "Exambites Creative Academy · Crack With AI",
   description:
     "AI courses for students: Creator, Marketer, Builder and Commerce tracks. Learn the tools, land clients, and earn with AI in 90 days.",
 };
