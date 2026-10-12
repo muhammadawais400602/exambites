@@ -241,11 +241,11 @@ function Media({ post }: { post: Post }) {
   }
 
   const scene =
-    post.track === "Creator"
+    post.track === "Content"
       ? "from-night via-brand-800 to-brand-500"
-      : post.track === "Builder"
+      : post.track === "Web"
         ? "from-night via-brand-900 to-brand-400"
-        : post.track === "Commerce"
+        : post.track === "Selling"
           ? "from-night-card via-brand-800 to-brand-400"
           : "from-night via-brand-700 to-brand-500";
 
