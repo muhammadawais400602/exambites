@@ -9,21 +9,21 @@ import {
   useSpring,
   useTransform,
 } from "motion/react";
-import { Bot, Camera, Code, Megaphone, Music, Palette, Search, ShoppingBag, Sparkles, Truck, Workflow } from "lucide-react";
+import { Brain, Clapperboard, Film, Globe, Handshake, Megaphone, Palette, Search, Sparkles, Target } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
+// Bubble messages: one opener, then what each course teaches.
 const SKILLS = [
   { Icon: Sparkles, track: "Exambites", label: "AI Skills That Pay" },
-  { Icon: Palette, track: "Creator", label: "Graphics" },
-  { Icon: Music, track: "Creator", label: "Music" },
-  { Icon: Megaphone, track: "Marketer", label: "Social & Ads" },
-  { Icon: Search, track: "Marketer", label: "SEO & Content" },
-  { Icon: Code, track: "Builder", label: "Web & Apps" },
-  { Icon: Bot, track: "Builder", label: "Chatbots" },
-  { Icon: Workflow, track: "Builder", label: "Automation" },
-  { Icon: ShoppingBag, track: "Commerce", label: "Online Stores" },
-  { Icon: Camera, track: "Commerce", label: "Product Shots" },
-  { Icon: Truck, track: "Commerce", label: "AI Dropshipping" },
+  { Icon: Brain, track: "AI Basics", label: "Prompts & Tools" },
+  { Icon: Palette, track: "Content", label: "Canva Designs" },
+  { Icon: Clapperboard, track: "Content", label: "CapCut Reels" },
+  { Icon: Megaphone, track: "Marketing", label: "Social Media" },
+  { Icon: Search, track: "Marketing", label: "SEO" },
+  { Icon: Target, track: "Marketing", label: "Paid Ads" },
+  { Icon: Globe, track: "Web", label: "Websites" },
+  { Icon: Handshake, track: "Selling", label: "Client Pitching" },
+  { Icon: Film, track: "Bonus", label: "AI Filmmaking" },
 ];
 
 const CYCLE_MS = 2400;

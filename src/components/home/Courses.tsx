@@ -2,24 +2,21 @@
 
 import { motion, useMotionValueEvent, useScroll, useTransform } from "motion/react";
 import { useLenis } from "lenis/react";
-import { ArrowDown, Clock } from "lucide-react";
+import { ArrowDown, Clock, Gift } from "lucide-react";
 import Image from "next/image";
 import { createRef, Fragment, type RefObject, useMemo, useRef, useState } from "react";
 import { type Course, courses, coursesSection } from "@/content/courses";
-import { tracks, type Track } from "@/content/home";
-
 const STICKY_TOP = 96;
 
-// Each track gets its own glow inside the card visual.
-const TRACK_GLOW: Record<Track, string> = {
-  Creator: "color-mix(in srgb, var(--color-brand-500) 55%, transparent)",
-  Marketer: "color-mix(in srgb, var(--color-brand-700) 50%, transparent)",
-  Builder: "color-mix(in srgb, var(--color-brand-400) 50%, transparent)",
-  Commerce: "color-mix(in srgb, var(--color-brand-600) 55%, transparent)",
-};
+// Card visuals cycle through these glows so neighbouring cards differ.
+const GLOWS = [
+  "color-mix(in srgb, var(--color-brand-500) 55%, transparent)",
+  "color-mix(in srgb, var(--color-brand-700) 50%, transparent)",
+  "color-mix(in srgb, var(--color-brand-400) 50%, transparent)",
+  "color-mix(in srgb, var(--color-brand-600) 55%, transparent)",
+];
 
 const pad = (n: number) => String(n).padStart(2, "0");
-const firstIndex = (t: Track) => courses.findIndex((c) => c.track === t);
 
 /**
  * Stack of course cards. Each card pins below the header; the next one slides
@@ -45,8 +42,6 @@ export function Courses() {
     if (lenis) lenis.scrollTo(el, { offset: -STICKY_TOP });
     else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - STICKY_TOP, behavior: "smooth" });
   }
-
-  const activeTrack = courses[active].track;
 
   return (
     <section id="courses" className="relative bg-surface px-4 pt-20 pb-24 md:pt-28">
@@ -76,23 +71,22 @@ export function Courses() {
           </div>
         </div>
 
-        {/* Track shortcuts */}
+        {/* Course shortcuts */}
         <div className="mt-6 flex flex-wrap gap-2">
-          {tracks.map((t) => {
-            const on = t === activeTrack;
-            const count = courses.filter((c) => c.track === t).length;
+          {courses.map((c, i) => {
+            const on = i === active;
             return (
               <button
-                key={t}
+                key={c.title}
                 type="button"
-                onClick={() => goTo(firstIndex(t))}
+                onClick={() => goTo(i)}
                 className={`rounded-full border px-4 py-2 font-label text-xs font-bold uppercase tracking-[0.14em] transition-colors ${
                   on
                     ? "border-brand-600 bg-brand-600 text-white"
                     : "border-brand-600/25 bg-surface-card text-brand-900 dark:text-brand-200 hover:border-brand-600/60"
                 }`}
               >
-                {t} <span className={on ? "text-white/70" : "text-muted"}>· {count}</span>
+                <span className={on ? "text-white/70" : "text-muted"}>{pad(i + 1)}</span> {c.title}
               </button>
             );
           })}
@@ -161,14 +155,21 @@ function CourseCard({ course, index, next, afterNext }: CardProps) {
         <div className="grid items-center gap-6 md:grid-cols-[1.25fr_1fr] md:gap-10">
           {/* Text */}
           <div className="order-2 md:order-1">
-            <span className="font-display text-2xl font-black text-brand-600">{pad(index)}</span>
+            <div className="flex items-center gap-3">
+              <span className="font-display text-2xl font-black text-brand-600">{pad(index + 1)}</span>
+              {course.bonus && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-brand-700 to-brand-500 px-2.5 py-1 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-white">
+                  <Gift className="size-3" /> Bonus
+                </span>
+              )}
+            </div>
             <h3 className="mt-2 font-display text-xl font-black uppercase leading-tight tracking-[-0.02em] text-ink sm:text-2xl">
               {course.title}
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-ink-soft sm:text-[15px]">{course.body}</p>
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-brand-100 px-3 py-1 font-label text-[11px] font-bold uppercase tracking-[0.14em] text-brand-900">
-                {course.track}
+                {course.category}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full border border-ink/10 px-3 py-1 text-xs font-semibold text-ink-soft">
                 <Clock className="size-3" /> {course.weeks} weeks
@@ -193,7 +194,7 @@ function CourseCard({ course, index, next, afterNext }: CardProps) {
                   aria-hidden
                   className="absolute inset-0"
                   style={{
-                    background: `radial-gradient(90% 80% at 70% 30%, ${TRACK_GLOW[course.track]}, transparent 60%), radial-gradient(120% 100% at 0% 100%, color-mix(in srgb, var(--color-brand-900) 35%, var(--color-night)), var(--color-night) 70%)`,
+                    background: `radial-gradient(90% 80% at 70% 30%, ${GLOWS[index % GLOWS.length]}, transparent 60%), radial-gradient(120% 100% at 0% 100%, color-mix(in srgb, var(--color-brand-900) 35%, var(--color-night)), var(--color-night) 70%)`,
                   }}
                 />
                 <div
@@ -204,7 +205,7 @@ function CourseCard({ course, index, next, afterNext }: CardProps) {
                   aria-hidden
                   className="absolute -right-3 -top-8 select-none font-display text-[9rem] font-black leading-none text-white/[0.06]"
                 >
-                  {pad(index)}
+                  {pad(index + 1)}
                 </span>
                 <motion.div style={{ y: iconY, rotate: iconRotate }} className="absolute inset-0 grid place-items-center">
                   <span className="grid size-20 place-items-center rounded-3xl border border-brand-400/40 bg-white/[0.06] text-brand-200 shadow-[0_0_60px_color-mix(in_srgb,var(--color-brand-500)_45%,transparent)] backdrop-blur-sm sm:size-24">

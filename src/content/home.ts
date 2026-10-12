@@ -1,6 +1,7 @@
 // Homepage copy. Edit text here, not in components.
 
-export const tracks = ["Creator", "Marketer", "Builder", "Commerce"] as const;
+// Skill areas the courses cover; demo posts, stories and reviews are tagged with one.
+export const tracks = ["Content", "Marketing", "Web", "Selling"] as const;
 export type Track = (typeof tracks)[number];
 
 export const hero = {
@@ -20,7 +21,7 @@ export const hero = {
 export const trailer = {
   eyebrow: "The 3 min breakdown",
   title: { lead: "See exactly how students go", from: "from ", highlight: "zero to AI income" },
-  body: "A quick peek under the hood: the exact tools, prompt systems and client workflows taught across the Creator, Marketer, Builder and Commerce tracks.",
+  body: "A quick peek under the hood: the exact tools, prompt systems and client workflows taught in AI Basics, Content Creation, Digital Marketing, Web Development and Selling.",
   chip: "HD 4K Preview",
   caption: "AI Production Pipeline · Overview",
   duration: 180,
@@ -30,7 +31,7 @@ export const trailer = {
   videoSrc: null as string | null,
 };
 
-// Jobs the animated studio preview cycles through, one per track.
+// Jobs the animated studio preview cycles through, one per skill area.
 export const studioJobs: {
   track: Track;
   tool: string;
@@ -39,31 +40,31 @@ export const studioJobs: {
   payout: number;
 }[] = [
   {
-    track: "Creator",
-    tool: "Video · Script + Shots",
-    prompt: "Write a 30-sec reel for a local café: hook, 4 shots, captions and a lo-fi music cue.",
-    outputs: ["Hook: “Your 3pm slump ends here.”", "4-shot storyboard generated", "Captions + lo-fi track matched"],
+    track: "Content",
+    tool: "Canva + CapCut · Reel",
+    prompt: "Write a 30-sec reel for a local café: hook, 4 shots, captions and a Canva cover.",
+    outputs: ["Hook: “Your 3pm slump ends here.”", "4 shots cut in CapCut", "Captions + Canva cover ready"],
     payout: 120,
   },
   {
-    track: "Marketer",
+    track: "Marketing",
     tool: "SEO · Content Plan",
     prompt: "Build a 30-day SEO and social plan for a skincare brand targeting Lahore.",
     outputs: ["42 keywords clustered by intent", "12 blog briefs + 30 social posts", "Posting calendar exported"],
     payout: 250,
   },
   {
-    track: "Builder",
-    tool: "Automation · Chatbot",
-    prompt: "Create a WhatsApp chatbot that answers FAQs and books appointments for a clinic.",
-    outputs: ["FAQ knowledge base trained", "Booking flow connected to calendar", "Deployed to WhatsApp Business"],
+    track: "Web",
+    tool: "Website · Clinic",
+    prompt: "Build a 5-page website for a dental clinic with services, prices and an appointment form.",
+    outputs: ["Layout and copy generated", "Booking form connected", "Live on the clinic's domain"],
     payout: 400,
   },
   {
-    track: "Commerce",
-    tool: "Store · Product Shots",
-    prompt: "Turn 6 phone photos into studio product shots and write listings for a dropshipping store.",
-    outputs: ["6 studio shots, white + lifestyle", "SEO product titles and descriptions", "Store page published"],
+    track: "Selling",
+    tool: "Proposal · Pricing",
+    prompt: "Write a proposal and 3-tier quote for a bakery that wants monthly social media content.",
+    outputs: ["Proposal tailored to the brief", "Basic / Standard / Premium pricing", "Sent on Upwork, client replied"],
     payout: 180,
   },
 ];
@@ -72,20 +73,18 @@ export const marquee = [
   "Earn With AI",
   "Earn In Dollars",
   "In Pakistan",
+  "AI Basics",
   "AI Content Creation",
-  "Video & Film",
-  "Graphics & Music",
-  "Social & Ads",
-  "SEO & Content",
-  "Web & App Building",
-  "Chatbots & Automation",
-  "AI Stores",
-  "Product Shots",
-  "AI Dropshipping",
+  "Canva + CapCut",
+  "AI Digital Marketing",
+  "Social, SEO & Ads",
+  "AI Web Development",
+  "Selling & Client Communication",
+  "Fiverr & Upwork",
+  "Bonus: AI Filmmaking",
   "Client-Ready Skills",
   "Built From Zero",
   "Lifetime Access",
-  "Creator • Marketer • Builder • Commerce",
 ];
 
 export const inside = {
@@ -97,7 +96,7 @@ export const inside = {
     body: "Private · members-only courses, live workshops and client vault",
     stats: [
       { value: "1,200+", label: "Members" },
-      { value: "19", label: "Courses" },
+      { value: "5 + 1", label: "Courses" },
       { value: "Lifetime", label: "Access" },
     ],
     priceLabel: "One-time entry",
@@ -125,7 +124,7 @@ export const twoPaths = {
     badge: "Recommended",
     title: "The mapped way",
     points: [
-      "19 step-by-step courses across 4 tracks",
+      "5 step-by-step courses plus a bonus AI Filmmaking course",
       "Only tested tools, no subscription overload",
       "Pre-built prompt templates & workflows",
       "Outreach, pricing and getting paid in dollars from Pakistan",
@@ -162,7 +161,7 @@ export const faq = [
   },
   {
     q: "Are the 90-day earnings realistic?",
-    a: "They are possible, not guaranteed. Students who finish a track, build a portfolio and do the outreach steps land clients fastest. Your results depend on the time and effort you put in.",
+    a: "They are possible, not guaranteed. Students who finish the courses, build a portfolio and do the outreach steps land clients fastest. Your results depend on the time and effort you put in.",
   },
   {
     q: "Why is it only Rs. 4,800?",

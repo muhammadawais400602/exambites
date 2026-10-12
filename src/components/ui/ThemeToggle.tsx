@@ -6,15 +6,16 @@ import { useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark";
 
-// The theme lives on <html data-theme>, set before paint by the script in the
-// root layout. Read it from the DOM so every toggle stays in sync.
+// The theme lives on <html data-theme>: dark from the server, switched to the
+// saved choice before paint by the script in the root layout. Read it from the
+// DOM so every toggle stays in sync.
 function subscribe(onChange: () => void) {
   const mo = new MutationObserver(onChange);
   mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   return () => mo.disconnect();
 }
-const getTheme = (): Theme => (document.documentElement.dataset.theme === "dark" ? "dark" : "light");
-const getServerTheme = (): Theme => "light";
+const getTheme = (): Theme => (document.documentElement.dataset.theme === "light" ? "light" : "dark");
+const getServerTheme = (): Theme => "dark";
 
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const theme = useSyncExternalStore(subscribe, getTheme, getServerTheme);

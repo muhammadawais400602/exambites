@@ -1,13 +1,11 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowUp, BadgeCheck, Check } from "lucide-react";
+import { ArrowUp, BadgeCheck, Check, Gift } from "lucide-react";
 import { checkout, enrollPage, helpBox, offer, syllabus } from "@/content/enroll";
 import { courses } from "@/content/courses";
-import { tracks } from "@/content/home";
 import { SignupForm } from "./SignupForm";
 
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"];
 const pad = (n: number) => String(n).padStart(2, "0");
 
 const rise = (delay = 0) => ({
@@ -125,9 +123,8 @@ export function Seat() {
   );
 }
 
-/** All 19 courses grouped by track, numbered continuously. */
+/** The six courses as cards, numbered in teaching order. */
 export function Syllabus() {
-  let n = 0;
   return (
     <section id="syllabus" className="relative bg-surface-card px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
@@ -141,41 +138,45 @@ export function Syllabus() {
           <p className="max-w-sm text-sm text-ink-soft">{syllabus.body}</p>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {tracks.map((track, t) => {
-            const list = courses.filter((c) => c.track === track);
-            const first = n;
-            const items = list.map((c) => ({ c, i: n++ }));
-            return (
-              <motion.div
-                key={track}
-                {...rise(0.07 * t)}
-                whileHover={{ y: -6 }}
-                className="flex flex-col rounded-3xl border border-ink/10 bg-surface p-6 transition-colors hover:border-brand-600/40"
-              >
-                <div className="flex items-center justify-between border-b border-ink/10 pb-4">
-                  <span className="font-label text-[11px] font-bold uppercase tracking-[0.16em] text-brand-700">
-                    Part {ROMAN[t]} · {track}
+        <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {courses.map((c, i) => (
+            <motion.li
+              key={c.title}
+              {...rise(0.06 * (i % 3))}
+              whileHover={{ y: -6 }}
+              className={`flex flex-col rounded-3xl border p-6 transition-colors ${
+                c.bonus
+                  ? "sheen border-brand-600"
+                  : "border-ink/10 bg-surface hover:border-brand-600/40"
+              }`}
+            >
+              <div className="flex items-center justify-between border-b border-ink/10 pb-4">
+                <span className="flex items-center gap-2">
+                  <span className="font-display text-lg font-black text-brand-600">{pad(i + 1)}</span>
+                  <span className="font-label text-[11px] font-bold uppercase tracking-[0.16em] text-brand-700">{c.category}</span>
+                </span>
+                {c.bonus ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-brand-700 px-2.5 py-1 font-label text-[10px] font-bold uppercase tracking-[0.14em] text-white">
+                    <Gift className="size-3" /> Bonus
                   </span>
-                  <span className="font-mono text-xs text-muted">
-                    {pad(first)}–{pad(n - 1)}
+                ) : (
+                  <span className="font-mono text-xs text-muted">{c.weeks} weeks</span>
+                )}
+              </div>
+              <h3 className="mt-4 flex items-center gap-2 font-display text-lg font-black uppercase tracking-tight text-ink">
+                <c.Icon className="size-5 shrink-0 text-brand-600" /> {c.title}
+              </h3>
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{c.body}</p>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {c.tools.map((t) => (
+                  <span key={t} className="rounded-full border border-ink/10 bg-surface-card px-2.5 py-1 text-xs text-ink-soft">
+                    {t}
                   </span>
-                </div>
-                <ol className="mt-4 space-y-3">
-                  {items.map(({ c, i }) => (
-                    <li key={c.title} className="flex gap-3 text-sm text-ink">
-                      <span className="w-8 shrink-0 font-display text-xs font-black text-brand-600">{ROMAN[i]}.</span>
-                      <span>
-                        {c.title}
-                        <span className="block text-xs text-muted">{c.weeks} weeks</span>
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-              </motion.div>
-            );
-          })}
-        </div>
+                ))}
+              </div>
+            </motion.li>
+          ))}
+        </ol>
       </div>
     </section>
   );

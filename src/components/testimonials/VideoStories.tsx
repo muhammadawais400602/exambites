@@ -186,7 +186,7 @@ function Lightbox({ story, index, onClose }: { story: VideoStory; index: number;
               <p className="mt-3 font-display text-2xl font-black leading-tight">“{story.quote}”</p>
               <p className="mt-4 text-sm font-bold">{story.name}</p>
               <p className="text-xs text-white/60">
-                {story.track} track · {story.place}
+                {story.track} · {story.place}
               </p>
               <p className="mt-6 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60">
                 Video uploading soon.
