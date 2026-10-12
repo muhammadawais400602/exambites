@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowUp, BadgeCheck, Check, MessageCircle } from "lucide-react";
+import { ArrowUp, BadgeCheck, Check } from "lucide-react";
 import { checkout, enrollPage, helpBox, offer, syllabus } from "@/content/enroll";
 import { courses } from "@/content/courses";
 import { tracks } from "@/content/home";
@@ -181,9 +181,8 @@ export function Syllabus() {
   );
 }
 
-/** Closing box: WhatsApp help and a jump back to the form. */
+/** Closing box with a jump back to the form. */
 export function HelpBox() {
-  const wa = checkout.whatsapp ? `https://wa.me/${checkout.whatsapp}` : null;
   return (
     <section className="bg-surface-card px-4 pb-24">
       <motion.div
@@ -199,39 +198,11 @@ export function HelpBox() {
           >
             {helpBox.cta} <ArrowUp className="size-3.5" />
           </a>
-          {wa && (
-            <a
-              href={wa}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-ink/15 px-6 py-3.5 font-label text-xs font-bold uppercase tracking-[0.14em] text-ink transition-colors hover:border-[#25D366] hover:text-[#128C7E]"
-            >
-              <MessageCircle className="size-3.5" /> Chat on WhatsApp
-            </a>
-          )}
         </div>
         <p className="mt-5 inline-flex items-center gap-1.5 text-xs text-muted">
           <Check className="size-3.5 text-brand-600" /> {checkout.guarantee}
         </p>
       </motion.div>
     </section>
-  );
-}
-
-/** Floating WhatsApp button; only shown once a number is configured. */
-export function WhatsAppFab() {
-  if (!checkout.whatsapp) return null;
-  return (
-    <motion.a
-      href={`https://wa.me/${checkout.whatsapp}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      initial={{ opacity: 0, scale: 0.6, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ delay: 1.2, type: "spring", stiffness: 220, damping: 18 }}
-      className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-sm font-bold text-night shadow-lg"
-    >
-      <MessageCircle className="size-4" /> Chat with admissions
-    </motion.a>
   );
 }

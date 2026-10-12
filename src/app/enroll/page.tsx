@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HelpBox, Seat, Syllabus, WhatsAppFab } from "@/components/enroll/EnrollSections";
+import { HelpBox, Seat, Syllabus } from "@/components/enroll/EnrollSections";
 import { Faq } from "@/components/home/Faq";
 import { Footer } from "@/components/home/Footer";
 import { Header } from "@/components/home/Header";
@@ -20,7 +20,6 @@ export default function EnrollPage() {
         <HelpBox />
       </main>
       <Footer />
-      <WhatsAppFab />
     </>
   );
 }

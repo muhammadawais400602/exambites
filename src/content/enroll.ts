@@ -20,7 +20,7 @@ export const offer = {
     { Icon: Wallet, title: "Get paid in USD", body: "Step-by-step setup for Payoneer, Wise, Fiverr and Upwork withdrawals." },
     { Icon: Bot, title: "Prompt library", body: "Ready-made prompts for ChatGPT, Claude, Midjourney and more, organised by course." },
     { Icon: Wrench, title: "Free-tool first", body: "Start without paying for subscriptions; upgrade only when a client pays for it." },
-    { Icon: Users, title: "WhatsApp community", body: "Mentors and peers who review your work and answer questions every day." },
+    { Icon: Users, title: "Private community", body: "Mentors and peers who review your work and answer questions every day." },
   ] satisfies { Icon: LucideIcon; title: string; body: string }[],
   // DEMO quote: replace with a real student's words.
   quote: {
@@ -44,7 +44,7 @@ export type PaymentMethod = (typeof paymentMethods)[number];
 export const checkout = {
   amount: "Rs. 4,800",
   // TODO: add the real account title and number for each method. While a
-  // value is empty, the page says the details will be shared on WhatsApp.
+  // value is empty, step 2 says the details will be emailed.
   accounts: {
     Raast: { title: "", number: "" },
     "Meezan Bank": { title: "", number: "" },
@@ -52,9 +52,6 @@ export const checkout = {
     Easypaisa: { title: "", number: "" },
     NayaPay: { title: "", number: "" },
   } satisfies Record<PaymentMethod, { title: string; number: string }>,
-  // TODO: admissions WhatsApp number in international format without "+",
-  // e.g. "923001234567". The WhatsApp buttons stay hidden until it is set.
-  whatsapp: "",
   // TODO: must match the real refund policy (see the FAQ draft).
   guarantee: "7-day full refund if the academy isn't right for you.",
 };
@@ -67,6 +64,6 @@ export const syllabus = {
 
 export const helpBox = {
   title: "Still have questions before you join?",
-  body: "Our admissions team answers on WhatsApp: payment methods, which track to start with, or anything about the courses.",
+  body: "Not sure which track to start with, or how payment works? The FAQ above covers it, and your seat reference is emailed to you after you sign up.",
   cta: "Lock your seat · Rs. 4,800",
 };

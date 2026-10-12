@@ -1,58 +1,71 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ArrowRight, Check, Lock, MessageCircle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, LoaderCircle, Lock, Mail, ShieldCheck } from "lucide-react";
 import { useId, useState } from "react";
-import { checkout, type PaymentMethod, paymentMethods, sources } from "@/content/enroll";
+import { checkout, paymentMethods, sources } from "@/content/enroll";
+import { EMPTY_SIGNUP, type SignupErrors, type SignupFields, type SignupResponse, validateSignup } from "@/lib/enroll";
 
-type Fields = { name: string; email: string; phone: string; source: string; method: PaymentMethod | "" };
-type Errors = Partial<Record<keyof Fields, string>>;
-
-const EMPTY: Fields = { name: "", email: "", phone: "", source: "", method: "" };
-
-function validate(f: Fields): Errors {
-  const e: Errors = {};
-  if (f.name.trim().length < 2) e.name = "Enter your full name.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = "Enter a valid email address.";
-  // Pakistani mobile without the leading 0: 3XX XXXXXXX.
-  if (!/^3\d{9}$/.test(f.phone.replace(/\D/g, ""))) e.phone = "Enter a 10-digit mobile number starting with 3.";
-  if (!f.source) e.source = "Pick one option.";
-  if (!f.method) e.method = "Choose how you'll pay.";
-  return e;
-}
+type Fields = SignupFields;
+type Errors = SignupErrors;
 
 /**
- * Two-step seat form: details, then payment instructions.
- * Nothing is sent to a server yet; step 2 hands off to WhatsApp once a
- * number is configured in content/enroll.ts.
+ * Two-step seat form. Step 1 validates locally, then posts to /api/enroll,
+ * which records the sign-up in the Google Sheet and emails admissions.
+ * Step 2 shows the seat reference and payment instructions.
  */
 export function SignupForm() {
   const id = useId();
-  const [fields, setFields] = useState<Fields>(EMPTY);
+  const [fields, setFields] = useState<Fields>(EMPTY_SIGNUP);
   const [errors, setErrors] = useState<Errors>({});
   const [step, setStep] = useState<1 | 2>(1);
+  const [sending, setSending] = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [reference, setReference] = useState("");
+  // Honeypot, hidden from people; bots tend to fill every field.
+  const [company, setCompany] = useState("");
 
   const set = <K extends keyof Fields>(k: K, v: Fields[K]) => {
     setFields((f) => ({ ...f, [k]: v }));
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const found = validate(fields);
+  function showErrors(found: Errors) {
     setErrors(found);
-    if (Object.keys(found).length) {
-      document.getElementById(`${id}-${Object.keys(found)[0]}`)?.focus();
-      return;
+    const first = Object.keys(found)[0];
+    if (first) document.getElementById(`${id}-${first}`)?.focus();
+  }
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (sending) return;
+    setServerError("");
+    const found = validateSignup(fields);
+    if (Object.keys(found).length) return showErrors(found);
+
+    setSending(true);
+    try {
+      const res = await fetch("/api/enroll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...fields, company }),
+      });
+      const out = (await res.json()) as SignupResponse;
+      if (out.ok) {
+        setReference(out.reference);
+        setStep(2);
+      } else {
+        setServerError(out.error);
+        if (out.fields) showErrors(out.fields);
+      }
+    } catch {
+      setServerError("Connection problem. Check your internet and try again.");
+    } finally {
+      setSending(false);
     }
-    setStep(2);
   }
 
   const account = fields.method ? checkout.accounts[fields.method] : null;
-  const waText = encodeURIComponent(
-    `Assalam o Alaikum! I'd like to enroll in Exambites Creative Academy.\nName: ${fields.name}\nEmail: ${fields.email}\nWhatsApp: +92${fields.phone.replace(/\D/g, "")}\nPayment: ${fields.method} (${checkout.amount})`,
-  );
-  const waHref = checkout.whatsapp ? `https://wa.me/${checkout.whatsapp}?text=${waText}` : null;
 
   const input =
     "w-full rounded-xl border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-brand-600 focus:ring-4 focus:ring-brand-600/15";
@@ -125,7 +138,7 @@ export function SignupForm() {
               />
             </Field>
 
-            <Field id={`${id}-phone`} label="WhatsApp number" hint="No leading 0. For updates and your community invite." error={errors.phone} labelClass={label}>
+            <Field id={`${id}-phone`} label="Mobile number" hint="No leading 0. Used only for your enrollment." error={errors.phone} labelClass={label}>
               <div className="flex gap-2">
                 <span className="grid shrink-0 place-items-center rounded-xl border border-ink/15 bg-surface px-3 text-sm font-semibold text-ink-soft">
                   +92
@@ -191,13 +204,36 @@ export function SignupForm() {
               {errors.method && <p className="mt-1.5 text-xs font-medium text-red-500">{errors.method}</p>}
             </fieldset>
 
+            <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+              <label>
+                Company
+                <input tabIndex={-1} autoComplete="off" value={company} onChange={(e) => setCompany(e.target.value)} />
+              </label>
+            </div>
+
+            {serverError && (
+              <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400">
+                {serverError}
+              </p>
+            )}
+
             <motion.button
               type="submit"
+              disabled={sending}
+              aria-busy={sending}
               whileTap={{ scale: 0.98 }}
-              className="group flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 px-6 py-4 font-label text-sm font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-12px_color-mix(in_srgb,var(--color-brand-600)_65%,transparent)]"
+              className="group flex w-full disabled:cursor-wait disabled:opacity-80 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 px-6 py-4 font-label text-sm font-bold uppercase tracking-[0.12em] text-white shadow-[0_18px_40px_-12px_color-mix(in_srgb,var(--color-brand-600)_65%,transparent)]"
             >
-              Continue to payment · {checkout.amount}
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              {sending ? (
+                <>
+                  <LoaderCircle className="size-4 animate-spin" /> Saving your seat…
+                </>
+              ) : (
+                <>
+                  Continue to payment · {checkout.amount}
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
             </motion.button>
 
             <p className="flex items-start gap-2 text-xs text-muted">
@@ -214,6 +250,11 @@ export function SignupForm() {
             transition={{ duration: 0.25 }}
             className="mt-6 space-y-5"
           >
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-ink/10 bg-surface px-4 py-3">
+              <span className="text-xs font-semibold text-ink-soft">Your seat reference</span>
+              <span className="font-mono text-base font-semibold tracking-wider text-ink">{reference}</span>
+            </div>
+
             <div className="rounded-2xl border border-brand-600/25 bg-brand-50 p-5 dark:bg-brand-500/10">
               <p className="font-label text-[10px] font-bold uppercase tracking-[0.18em] text-brand-700">
                 Send via {fields.method}
@@ -231,15 +272,15 @@ export function SignupForm() {
                   </div>
                 </dl>
               ) : (
-                <p className="mt-2 text-sm text-ink-soft">Our admissions team will send the {fields.method} account details on WhatsApp.</p>
+                <p className="mt-2 text-sm text-ink-soft">The {fields.method} account details are on their way to {fields.email}.</p>
               )}
             </div>
 
             <ol className="space-y-3 text-sm text-ink-soft">
               {[
-                `Send ${checkout.amount} through ${fields.method}.`,
-                "Share a screenshot of the receipt with us on WhatsApp.",
-                `Get your course login at ${fields.email} and your community invite on WhatsApp.`,
+                `Send ${checkout.amount} through ${fields.method} and write ${reference} in the payment note.`,
+                "Our admissions team matches your payment to your reference.",
+                `Your student portal login arrives at ${fields.email} within 24 hours.`,
               ].map((t, i) => (
                 <li key={t} className="flex gap-3">
                   <span className="grid size-6 shrink-0 place-items-center rounded-full bg-brand-600 text-[11px] font-bold text-white">
@@ -250,28 +291,21 @@ export function SignupForm() {
               ))}
             </ol>
 
-            {waHref ? (
-              <a
-                href={waHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-4 font-label text-sm font-bold uppercase tracking-[0.12em] text-night transition-transform hover:-translate-y-px"
-              >
-                <MessageCircle className="size-4" /> Send receipt on WhatsApp
-              </a>
-            ) : (
-              <p className="flex items-center gap-2 rounded-xl border border-ink/10 bg-surface px-4 py-3 text-sm text-ink-soft">
-                <Check className="size-4 shrink-0 text-brand-600" /> Online confirmation is being set up. Contact our admissions team with your receipt to finish enrolling.
-              </p>
-            )}
+            <p className="flex items-start gap-2 rounded-xl border border-ink/10 bg-surface px-4 py-3 text-sm text-ink-soft">
+              <Mail className="mt-0.5 size-4 shrink-0 text-brand-600" />
+              {`We've emailed these steps to ${fields.email}. Check spam if you don't see it.`}
+            </p>
 
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted transition-colors hover:text-brand-700"
-            >
-              <ArrowLeft className="size-3.5" /> Edit details
-            </button>
+            <p className="flex items-center gap-1.5 text-xs text-muted">
+              <Check className="size-3.5 text-brand-600" /> Seat saved. Wrong email?{" "}
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="inline-flex items-center gap-1 font-semibold text-ink-soft underline-offset-2 hover:text-brand-700 hover:underline"
+              >
+                <ArrowLeft className="size-3" /> Sign up again
+              </button>
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
