@@ -5,7 +5,7 @@ export const communitySection = {
   eyebrow: "See what's happening",
   title: "Community",
   body: "Inside students share wins, trade high-value prompts, and review client briefs every single day.",
-  cta: { label: "Join the community", href: "#enroll" },
+  cta: { label: "Join the community", href: "/enroll" },
 };
 
 export type PostMedia =
