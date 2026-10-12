@@ -217,6 +217,5 @@ export const nav = {
     { label: "Testimonials", href: "/testimonials" },
   ],
   cta: { label: "Enroll now", href: "/enroll" },
-  // No login yet; points at the enroll page until accounts exist.
-  account: { label: "Account", href: "/enroll" },
+  account: { label: "Log in", href: "/login" },
 };
