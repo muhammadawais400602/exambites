@@ -13,7 +13,7 @@ export const hero = {
   students: "1,200+ students inside",
   price: "Rs. 4,800",
   priceNote: "(jumps to Rs. 9,999 soon)",
-  cta: { label: "Enroll now", price: "Rs. 4,800", href: "#enroll" },
+  cta: { label: "Enroll now", price: "Rs. 4,800", href: "/enroll" },
   scrollCue: { label: "Watch the trailer below", href: "#trailer" },
 };
 
@@ -102,7 +102,7 @@ export const inside = {
     ],
     priceLabel: "One-time entry",
     price: "Rs. 4,800",
-    cta: { label: "Join now", href: "#enroll" },
+    cta: { label: "Join now", href: "/enroll" },
   },
 };
 
@@ -146,7 +146,7 @@ export const enroll = {
   title: { lead: "Ready to build your", highlight: "AI business?" },
   body: "Join 1,200+ students building, scaling, and earning in dollars today.",
   // Replace with the real checkout / payment link when it exists.
-  cta: { label: "Get instant access", price: "Rs. 4,800", href: "#enroll" },
+  cta: { label: "Get instant access", price: "Rs. 4,800", href: "/enroll" },
   note: ["Lifetime access", "No monthly subscription"],
 };
 
@@ -217,7 +217,7 @@ export const nav = {
     { label: "Curriculum", href: "/#courses" },
     { label: "Testimonials", href: "/testimonials" },
   ],
-  cta: { label: "Enroll now", href: "/#enroll" },
-  // No login yet; points at enrollment until accounts exist.
-  account: { label: "Account", href: "/#enroll" },
+  cta: { label: "Enroll now", href: "/enroll" },
+  // No login yet; points at the enroll page until accounts exist.
+  account: { label: "Account", href: "/enroll" },
 };
