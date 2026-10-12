@@ -23,7 +23,13 @@ function offsetOf(i: number, index: number, n: number) {
  * Carousel of community posts. One post sits in focus in the middle; the
  * rest slide right to left on a timer. Arrows, swipe and drag also move it.
  */
-export function Community() {
+type CommunityProps = {
+  id?: string;
+  /** Heading and CTA copy; defaults to the homepage section. */
+  copy?: typeof communitySection;
+};
+
+export function Community({ id = "community", copy = communitySection }: CommunityProps = {}) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [cardW, setCardW] = useState(MAX_CARD);
@@ -55,17 +61,17 @@ export function Community() {
   const focused = ((index % n) + n) % n;
 
   return (
-    <section id="community" className="relative bg-surface px-4 py-20 md:py-28">
+    <section id={id} className="relative bg-surface px-4 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         {/* Heading */}
         <div className="mx-auto max-w-2xl text-center">
           <span className="font-label text-xs font-bold uppercase tracking-[0.22em] text-brand-700">
-            {communitySection.eyebrow}
+            {copy.eyebrow}
           </span>
           <h2 className="text-brand-gradient mt-2 font-display text-[clamp(2.6rem,8vw,5rem)] font-black uppercase leading-none tracking-[-0.045em]">
-            {communitySection.title}
+            {copy.title}
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-base text-ink-soft md:text-lg">{communitySection.body}</p>
+          <p className="mx-auto mt-4 max-w-lg text-base text-ink-soft md:text-lg">{copy.body}</p>
         </div>
 
         {/* Dark panel */}
@@ -112,10 +118,10 @@ export function Community() {
           </div>
           <div className="relative mt-5 flex justify-center">
             <a
-              href={communitySection.cta.href}
+              href={copy.cta.href}
               className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 font-label text-xs font-bold uppercase tracking-[0.16em] text-white transition-colors hover:border-brand-500 hover:bg-brand-500/10"
             >
-              {communitySection.cta.label} <ChevronRight className="size-3.5" />
+              {copy.cta.label} <ChevronRight className="size-3.5" />
             </a>
           </div>
         </div>

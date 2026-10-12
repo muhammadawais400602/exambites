@@ -4,8 +4,8 @@
 /* dark: utilities follow the toggle (data-theme on <html>), not just the OS setting. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* Brand tokens (amber edition, light). Dark mode and the violet palette
-   override these variables below, so components only ever use tokens. */
+/* Brand tokens (amber, light). Dark mode overrides these variables below, and
+   components only use tokens, so a new palette is one more override block. */
 @theme {
   --color-surface: #fbf9f5;
   --color-surface-low: #f5f3ef;
@@ -54,41 +54,6 @@
   --color-night-card: #14110e;
 }
 
-/* Violet palette (DESIGN.md "Aether"), light */
-[data-palette="violet"] {
-  --color-surface: #fafafa;
-  --color-surface-low: #f4f4f5;
-  --color-surface-card: #ffffff;
-  --color-ink: #18181b;
-  --color-ink-soft: #484456;
-  --color-muted: #797488;
-  --color-brand-900: #1d0061;
-  --color-brand-800: #3a00a8;
-  --color-brand-700: #4a00d9;
-  --color-brand-600: #6332f6;
-  --color-brand-500: #7c4dff;
-  --color-brand-400: #a855f7;
-  --color-brand-300: #cbbeff;
-  --color-brand-200: #ddb7ff;
-  --color-brand-100: #ede5ff;
-  --color-brand-50: #f6f2ff;
-  --color-night: #09090b;
-  --color-night-card: #131316;
-  --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-}
-
-/* Violet palette, dark */
-[data-theme="dark"] [data-palette="violet"] {
-  --color-surface: #09090b;
-  --color-surface-low: #111114;
-  --color-surface-card: #131316;
-  --color-ink: #f4f4f5;
-  --color-ink-soft: #c4bfd4;
-  --color-muted: #8b86a0;
-  --color-night: #050507;
-  --color-night-card: #0e0e11;
-}
-
 html {
   background: var(--color-surface);
   color: var(--color-ink);
@@ -96,6 +61,11 @@ html {
 
 body {
   overscroll-behavior: none;
+}
+
+/* Land section anchors below the fixed header when arriving from another page. */
+section[id] {
+  scroll-margin-top: 72px;
 }
 
 ::selection {

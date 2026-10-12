@@ -202,20 +202,22 @@ export const faq = [
   },
 ];
 
+// Links start with "/" so they work from every page; on the homepage Lenis
+// still scrolls smoothly because the path matches.
 export const footer = {
   links: [
-    { label: "Courses", href: "#courses" },
-    { label: "Community", href: "#community" },
-    { label: "FAQ", href: "#faq" },
+    { label: "Courses", href: "/#courses" },
+    { label: "Testimonials", href: "/testimonials" },
+    { label: "FAQ", href: "/#faq" },
   ],
 };
 
 export const nav = {
   links: [
-    { label: "Curriculum", href: "#courses" },
-    { label: "Testimonials", href: "#community" },
+    { label: "Curriculum", href: "/#courses" },
+    { label: "Testimonials", href: "/testimonials" },
   ],
-  cta: { label: "Enroll now", href: "#enroll" },
+  cta: { label: "Enroll now", href: "/#enroll" },
   // No login yet; points at enrollment until accounts exist.
-  account: { label: "Account", href: "#enroll" },
+  account: { label: "Account", href: "/#enroll" },
 };

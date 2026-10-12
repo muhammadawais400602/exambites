@@ -10,7 +10,7 @@ import { Marquee } from "./Marquee";
 import { Trailer } from "./Trailer";
 import { TwoPaths } from "./TwoPaths";
 
-/** The full homepage. Shared by every palette route. */
+/** The full homepage. */
 export function HomePage() {
   return (
     <>
