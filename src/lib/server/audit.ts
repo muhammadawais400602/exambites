@@ -12,7 +12,15 @@ export type AuditAction =
   | "teacher.restored"
   | "referral.created"
   | "referral.updated"
-  | "referral.deleted";
+  | "referral.deleted"
+  | "course.created"
+  | "course.updated"
+  | "lesson.created"
+  | "lesson.updated"
+  | "lesson.deleted"
+  | "student.lesson_passed"
+  | "student.course_completed"
+  | "student.course_started";
 
 /** Records who did what. Shown to the admin as the activity log. */
 export async function audit(

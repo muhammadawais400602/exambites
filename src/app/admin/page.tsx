@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { AddCourseForm } from "@/components/admin/courses";
 import { AddTeacherForm, EnrollmentActions, ReferralActions, ReferralForm, TeacherActions } from "@/components/admin/actions";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { formatRs } from "@/lib/pricing";
+import { lessonCounts, listCourses } from "@/lib/server/courses";
 import { adminStats, listAudit, listEnrollments, listReferralCodes, listTeachers, type EnrollmentStatus } from "@/lib/server/queries";
 import { requireRole } from "@/lib/server/session";
 
@@ -12,6 +14,7 @@ export const metadata: Metadata = { title: "Admin · Exambites", robots: { index
 const TABS = [
   { key: "overview", label: "Overview" },
   { key: "payments", label: "Payments" },
+  { key: "courses", label: "Courses" },
   { key: "students", label: "Students" },
   { key: "teachers", label: "Teachers" },
   { key: "referrals", label: "Referral codes" },
@@ -58,6 +61,7 @@ async function AdminDashboard({ searchParams }: { searchParams: PageProps<"/admi
       <div className="mt-6">
         {tab === "overview" && <Overview stats={stats} />}
         {tab === "payments" && <Enrollments status="pending" />}
+        {tab === "courses" && <Courses />}
         {tab === "students" && <Enrollments />}
         {tab === "teachers" && <Teachers />}
         {tab === "referrals" && <Referrals />}
@@ -128,12 +132,46 @@ async function Enrollments({ status }: { status?: EnrollmentStatus }) {
   );
 }
 
+async function Courses() {
+  const [courses, counts] = await Promise.all([listCourses(), lessonCounts()]);
+  return (
+    <div className="space-y-4">
+      <ul className={`${card} divide-y divide-ink/10`}>
+        {courses.map((c) => {
+          const n = counts.get(c.id);
+          return (
+            <li key={c.id}>
+              <Link href={`/admin/courses/${c.id}`} className="flex items-center justify-between gap-4 p-5 transition-colors hover:bg-ink/[0.03]">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold text-ink">{c.title}</p>
+                    {c.bonus && <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-700">Bonus</span>}
+                    {!c.published && <span className="rounded-full bg-ink/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-soft">Hidden</span>}
+                  </div>
+                  <p className="mt-0.5 text-sm text-ink-soft">
+                    {c.category && <>{c.category} · </>}
+                    {n ? `${n.published} of ${n.total} lessons visible` : "No lessons yet"}
+                  </p>
+                </div>
+                <span className="shrink-0 text-xs font-bold text-brand-700">Edit →</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+      <div className={`${card} p-5`}>
+        <AddCourseForm />
+      </div>
+    </div>
+  );
+}
+
 async function Teachers() {
   const rows = await listTeachers();
   return (
     <div className="space-y-4">
       <div className={`${card} p-5`}>
-        <p className="mb-3 text-sm text-ink-soft">New teachers get an email to set their own password.</p>
+        <p className="mb-3 text-sm text-ink-soft">New teachers get a link to set their own password. It is emailed and shown here to copy.</p>
         <AddTeacherForm />
       </div>
       {rows.length ? (

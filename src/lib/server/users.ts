@@ -1,6 +1,8 @@
 import "server-only";
 import type { Role } from "@/lib/roles";
+import { randomBytes } from "node:crypto";
 import { getAuth } from "./auth";
+import { sendEmail, siteUrl } from "./email";
 
 export class EmailTakenError extends Error {}
 
@@ -47,4 +49,34 @@ export async function signOutEverywhere(userId: string) {
 export function randomPassword() {
   const bytes = crypto.getRandomValues(new Uint8Array(24));
   return Buffer.from(bytes).toString("base64url");
+}
+
+const INVITE_DAYS = 7;
+
+/**
+ * Makes a set-password link for a staff member and tries to email it. The
+ * link is returned too, so the admin can send it another way (e.g. WhatsApp)
+ * when email isn't set up or doesn't arrive. Uses Better Auth's own
+ * reset-password token, so /reset-password accepts it as usual.
+ */
+export async function inviteStaff(user: { id: string; name: string; email: string }) {
+  const ctx = await getAuth().$context;
+  const token = randomBytes(18).toString("base64url");
+  await ctx.internalAdapter.createVerificationValue({
+    identifier: `reset-password:${token}`,
+    value: user.id,
+    expiresAt: new Date(Date.now() + INVITE_DAYS * 24 * 60 * 60 * 1000),
+  });
+  const link = `${siteUrl()}/reset-password?token=${token}`;
+  let emailed = true;
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "You're invited to teach at Exambites",
+      text: `Assalam o Alaikum ${user.name},\n\nYou've been added as a teacher at Exambites Creative Academy. Set your password here (valid for ${INVITE_DAYS} days):\n${link}\n\nThen log in at ${siteUrl()}/teacher/login\n\nExambites Creative Academy`,
+    });
+  } catch {
+    emailed = false;
+  }
+  return { link, emailed };
 }
