@@ -80,3 +80,16 @@ export async function inviteStaff(user: { id: string; name: string; email: strin
   }
   return { link, emailed };
 }
+
+/** Sets a staff member's password directly (admin-chosen) and signs them out elsewhere. */
+export async function setPassword(userId: string, password: string) {
+  const ctx = await getAuth().$context;
+  await ctx.internalAdapter.updatePassword(userId, await ctx.password.hash(password));
+  await ctx.internalAdapter.deleteUserSessions(userId);
+}
+
+export function passwordProblem(password: string) {
+  if (password.length < 8) return "Use a password of at least 8 characters.";
+  if (password.length > 128) return "That password is too long.";
+  return null;
+}
