@@ -4,7 +4,7 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { APIError } from "better-auth/api";
 import { ObjectId } from "mongodb";
 import { db, mongoClient } from "./db";
-import { sendEmail } from "./email";
+import { sendEmail, siteOrigins, siteUrl } from "./email";
 
 export type { Role } from "@/lib/roles";
 
@@ -20,7 +20,8 @@ function createAuth() {
   return betterAuth({
     database: mongodbAdapter(db(), { client: mongoClient() }),
     secret: process.env.BETTER_AUTH_SECRET,
-    baseURL: process.env.BETTER_AUTH_URL,
+    baseURL: siteUrl(),
+    trustedOrigins: siteOrigins(),
     emailAndPassword: {
       enabled: true,
       disableSignUp: true,

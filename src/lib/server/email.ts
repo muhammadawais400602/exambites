@@ -19,6 +19,26 @@ export async function sendEmail({ to, subject, text }: { to: string; subject: st
   }
 }
 
+const https = (host?: string) => (host ? `https://${host}` : "");
+
+/**
+ * The address this deployment is served from. Vercel previews use their
+ * branch URL, so logins and email links work there too.
+ */
 export function siteUrl() {
-  return (process.env.BETTER_AUTH_URL || "http://localhost:3000").replace(/\/$/, "");
+  const env = process.env;
+  const url =
+    (env.VERCEL_ENV === "preview" && https(env.VERCEL_BRANCH_URL)) ||
+    env.BETTER_AUTH_URL ||
+    https(env.VERCEL_URL) ||
+    "http://localhost:3000";
+  return url.replace(/\/$/, "");
+}
+
+/** Every address this deployment answers on; sign-in requests are accepted from these only. */
+export function siteOrigins() {
+  const env = process.env;
+  return [siteUrl(), env.BETTER_AUTH_URL, https(env.VERCEL_URL), https(env.VERCEL_BRANCH_URL)]
+    .filter((u): u is string => !!u)
+    .map((u) => u.replace(/\/$/, ""));
 }
