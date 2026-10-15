@@ -54,6 +54,9 @@ function doPost(e) {
     lock.releaseLock();
   }
 
+  // The website sends its own emails once the portal is live (sendEmails: false).
+  if (d.sendEmails === false) return reply({ ok: true });
+
   MailApp.sendEmail({
     to: NOTIFY_EMAIL,
     subject: "New seat: " + d.name + " (" + d.reference + ")",

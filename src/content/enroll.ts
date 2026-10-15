@@ -1,4 +1,5 @@
 // Enroll page copy. Items marked TODO need real details before launch.
+import { priceLabel, referralPriceLabel } from "@/lib/pricing";
 import { BadgeCheck, Bot, FileText, Infinity as InfinityIcon, type LucideIcon, Users, Wallet, Wrench, Zap } from "lucide-react";
 
 export const enrollPage = {
@@ -8,10 +9,9 @@ export const enrollPage = {
 };
 
 export const offer = {
-  label: "Launch price",
-  price: "Rs. 4,800",
-  was: "Rs. 9,999",
-  off: "52% off",
+  label: "One payment, all courses",
+  price: priceLabel,
+  referral: `${referralPriceLabel} with a referral code`,
   terms: "One-time fee · Lifetime access",
   body: "A complete, step-by-step program built for Pakistani students, creators and freelancers to learn AI skills and get paid in dollars by clients at home and abroad.",
   features: [
@@ -42,7 +42,7 @@ export const paymentMethods = ["Raast", "Meezan Bank", "JazzCash", "Easypaisa", 
 export type PaymentMethod = (typeof paymentMethods)[number];
 
 export const checkout = {
-  amount: "Rs. 4,800",
+  amount: priceLabel,
   // TODO: add the real account title and number for each method. While a
   // value is empty, step 2 says the details will be emailed.
   accounts: {
@@ -52,8 +52,7 @@ export const checkout = {
     Easypaisa: { title: "", number: "" },
     NayaPay: { title: "", number: "" },
   } satisfies Record<PaymentMethod, { title: string; number: string }>,
-  // TODO: must match the real refund policy (see the FAQ draft).
-  guarantee: "7-day full refund if the academy isn't right for you.",
+  policy: "Payments are non-refundable once your account is approved and you start watching.",
 };
 
 export const syllabus = {
@@ -65,5 +64,5 @@ export const syllabus = {
 export const helpBox = {
   title: "Still have questions before you join?",
   body: "Not sure which track to start with, or how payment works? The FAQ above covers it, and your seat reference is emailed to you after you sign up.",
-  cta: "Lock your seat · Rs. 4,800",
+  cta: `Lock your seat · ${priceLabel}`,
 };

@@ -1,6 +1,7 @@
 // Homepage copy. Edit text here, not in components.
 
 // Skill areas the courses cover; demo posts, stories and reviews are tagged with one.
+import { priceLabel, referralPriceLabel } from "@/lib/pricing";
 export const tracks = ["Content", "Marketing", "Web", "Selling"] as const;
 export type Track = (typeof tracks)[number];
 
@@ -12,9 +13,9 @@ export const hero = {
     after: ", from zero, in 90 days.",
   },
   students: "1,200+ students inside",
-  price: "Rs. 4,800",
-  priceNote: "(jumps to Rs. 9,999 soon)",
-  cta: { label: "Enroll now", price: "Rs. 4,800", href: "/enroll" },
+  price: priceLabel,
+  priceNote: `(${referralPriceLabel} with a referral code)`,
+  cta: { label: "Enroll now", price: priceLabel, href: "/enroll" },
   scrollCue: { label: "Watch the trailer below", href: "#trailer" },
 };
 
@@ -100,7 +101,7 @@ export const inside = {
       { value: "Lifetime", label: "Access" },
     ],
     priceLabel: "One-time entry",
-    price: "Rs. 4,800",
+    price: priceLabel,
     cta: { label: "Join now", href: "/enroll" },
   },
 };
@@ -145,7 +146,7 @@ export const enroll = {
   title: { lead: "Ready to build your", highlight: "AI business?" },
   body: "Join 1,200+ students building, scaling, and earning in dollars today.",
   // Replace with the real checkout / payment link when it exists.
-  cta: { label: "Get instant access", price: "Rs. 4,800", href: "/enroll" },
+  cta: { label: "Get instant access", price: priceLabel, href: "/enroll" },
   note: ["Lifetime access", "No monthly subscription"],
 };
 
@@ -164,8 +165,8 @@ export const faq = [
     a: "They are possible, not guaranteed. Students who finish the courses, build a portfolio and do the outreach steps land clients fastest. Your results depend on the time and effort you put in.",
   },
   {
-    q: "Why is it only Rs. 4,800?",
-    a: "We want AI skills to be affordable for every student in Pakistan, not just those who can pay for expensive bootcamps. The launch price rises to Rs. 9,999 later.",
+    q: `Why is it ${priceLabel}?`,
+    a: `One payment covers all six courses for life. We keep it affordable for students in Pakistan, and a referral code brings it down to ${referralPriceLabel}.`,
   },
   {
     q: "Do I need to show my face?",
@@ -186,14 +187,12 @@ export const faq = [
     a: "Right away. Once your payment is confirmed you get your login and community invite, usually within minutes.",
   },
   {
-    // TODO: replace with your actual refund policy.
     q: "Is there a refund policy?",
-    a: "Yes. If the academy isn't right for you, contact us within 7 days of joining for a full refund.",
+    a: "No. Payments are non-refundable once your account is approved and you have started watching the course videos. Ask us anything before you pay.",
   },
   {
-    // TODO: confirm when the price changes.
-    q: "Is the price really increasing?",
-    a: "Yes. Rs. 4,800 is the launch price. It moves to Rs. 9,999 once the launch period ends; members who join now keep lifetime access.",
+    q: "How do referral codes work?",
+    a: `Enter a referral code when you sign up and the price drops from ${priceLabel} to ${referralPriceLabel}. Each code has a limited number of uses and an expiry date.`,
   },
   {
     q: "Can I watch on my phone?",

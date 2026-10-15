@@ -1,5 +1,6 @@
 // Testimonials page copy. Every story below is a DEMO placeholder: replace
 // with real students' words (and their permission) before launch.
+import { priceLabel, referralPriceLabel } from "@/lib/pricing";
 import type { Track } from "./home";
 
 export const testimonialsPage = {
@@ -76,7 +77,7 @@ export const midCta = {
   eyebrow: "Your turn",
   title: "Get the same results in 90 days.",
   body: "Follow the same courses, use the same templates and join the same community these students did.",
-  primary: { label: "Enroll now · Rs. 4,800", href: "/enroll" },
+  primary: { label: `Enroll now · ${priceLabel}`, href: "/enroll" },
   secondary: { label: "See community posts", href: "#posts" },
 };
 
@@ -180,8 +181,7 @@ export const reviews: Review[] = [
 export const finalCta = {
   eyebrow: "Your story is next",
   title: "Your win could be on this wall next.",
-  body: "Join 1,200+ students at the Rs. 4,800 launch price, before it moves to Rs. 9,999.",
-  cta: { label: "Get instant access · Rs. 4,800", href: "/enroll" },
-  // TODO: the refund line must match your real policy (see the FAQ draft).
-  notes: ["Instant course access", "Private community", "7-day refund"],
+  body: `Join 1,200+ students. ${priceLabel} for all six courses, or ${referralPriceLabel} with a referral code.`,
+  cta: { label: `Get access · ${priceLabel}`, href: "/enroll" },
+  notes: ["Course access after payment approval", "Private community", "Lifetime access"],
 };
