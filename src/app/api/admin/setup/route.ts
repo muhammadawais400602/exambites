@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { audit } from "@/lib/server/audit";
 import { getAuth } from "@/lib/server/auth";
-import { db, ensureIndexes } from "@/lib/server/db";
+import { db, describeDbError, ensureIndexes } from "@/lib/server/db";
 import { readJson, reply } from "@/lib/server/admin-api";
 import { createUserWithPassword, EmailTakenError } from "@/lib/server/users";
 
@@ -11,6 +11,16 @@ import { createUserWithPassword, EmailTakenError } from "@/lib/server/users";
  * the page deployed.
  */
 export async function POST(request: Request) {
+  try {
+    return await setup(request);
+  } catch (err) {
+    console.error("[admin/setup]", err);
+    // Only someone holding the setup token gets this far, so naming the cause is safe.
+    return reply({ ok: false, error: describeDbError(err) ?? "Server error. Check the Vercel logs for /api/admin/setup." }, 500);
+  }
+}
+
+async function setup(request: Request) {
   const expected = process.env.ADMIN_SETUP_TOKEN;
   const body = await readJson<{ token: string; name: string; email: string; password: string }>(request);
   if (!expected) return reply({ ok: false, error: "Setup is not enabled on this server." }, 503);
