@@ -80,9 +80,12 @@ function createAuth() {
   });
 }
 
-let instance: ReturnType<typeof createAuth> | undefined;
+let instance: { auth: ReturnType<typeof createAuth>; client: ReturnType<typeof mongoClient> } | undefined;
 export function getAuth() {
-  return (instance ??= createAuth());
+  // Rebuilt when the database client was replaced after a lost connection.
+  const client = mongoClient();
+  if (instance?.client !== client) instance = { auth: createAuth(), client };
+  return instance.auth;
 }
 
 /**
