@@ -133,7 +133,7 @@ async function Teachers() {
   return (
     <div className="space-y-4">
       <div className={`${card} p-5`}>
-        <p className="mb-3 text-sm text-ink-soft">New teachers get an email to set their own password.</p>
+        <p className="mb-3 text-sm text-ink-soft">New teachers get a link to set their own password. It is emailed and shown here to copy.</p>
         <AddTeacherForm />
       </div>
       {rows.length ? (

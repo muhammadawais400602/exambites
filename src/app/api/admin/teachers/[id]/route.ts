@@ -1,9 +1,7 @@
 import { asAdmin, objectId, readJson, reply } from "@/lib/server/admin-api";
 import { audit } from "@/lib/server/audit";
-import { getAuth } from "@/lib/server/auth";
 import { db } from "@/lib/server/db";
-import { siteUrl } from "@/lib/server/email";
-import { signOutEverywhere } from "@/lib/server/users";
+import { inviteStaff, signOutEverywhere } from "@/lib/server/users";
 
 async function findTeacher(id: string) {
   const _id = objectId(id);
@@ -22,14 +20,14 @@ export async function DELETE(request: Request, ctx: RouteContext<"/api/admin/tea
   });
 }
 
-/** Resends the set-password email. */
+/** Makes a fresh set-password link and emails it. */
 export async function POST(request: Request, ctx: RouteContext<"/api/admin/teachers/[id]">) {
   return asAdmin(request, async () => {
     const teacher = await findTeacher((await ctx.params).id);
     const { action } = await readJson<{ action: "resend" }>(request);
     if (!teacher || action !== "resend") return reply({ ok: false, error: "Invalid request." }, 400);
     if (teacher.disabled) return reply({ ok: false, error: "Restore this teacher first." }, 409);
-    await getAuth().api.requestPasswordReset({ body: { email: teacher.email, redirectTo: `${siteUrl()}/reset-password` } });
-    return reply({ ok: true });
+    const { link, emailed } = await inviteStaff({ id: String(teacher._id), name: String(teacher.name), email: String(teacher.email) });
+    return reply({ ok: true, link, emailed });
   });
 }

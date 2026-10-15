@@ -10,7 +10,7 @@ function useAdminCall() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  async function call(key: string, url: string, method: string, body?: unknown) {
+  async function call(key: string, url: string, method: string, body?: unknown): Promise<false | Record<string, unknown>> {
     setBusy(key);
     setError("");
     try {
@@ -25,7 +25,7 @@ function useAdminCall() {
         return false;
       }
       router.refresh();
-      return true;
+      return data;
     } catch {
       setError("Connection problem. Try again.");
       return false;
@@ -87,18 +87,47 @@ export function EnrollmentActions({ id }: { id: string }) {
   );
 }
 
+type Invite = { link: string; emailed: boolean };
+const asInvite = (data: false | Record<string, unknown>): Invite | null =>
+  data && typeof data.link === "string" ? { link: data.link, emailed: !!data.emailed } : null;
+
+/** The set-password link, to copy and send by WhatsApp if the email doesn't arrive. */
+function InviteLink({ invite, name }: { invite: Invite; name: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div role="status" className="w-full rounded-2xl border border-brand-600/30 bg-brand-500/10 p-4 text-left sm:basis-full">
+      <p className="text-xs text-ink">
+        {invite.emailed ? `Invite emailed to ${name}.` : `Email couldn't be sent to ${name}.`} Send them this link to set
+        their password (valid 7 days):
+      </p>
+      <div className="mt-2 flex gap-2">
+        <input readOnly value={invite.link} onFocus={(e) => e.target.select()} className={`${field} font-mono text-xs`} />
+        <button type="button"
+          onClick={async () => {
+            await navigator.clipboard.writeText(invite.link);
+            setCopied(true);
+          }}
+          className={`${primary} shrink-0`}>
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function AddTeacherForm() {
   const { busy, error, call } = useAdminCall();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState("");
+  const [invite, setInvite] = useState<{ invite: Invite; name: string } | null>(null);
   return (
     <form
       onSubmit={async (e) => {
         e.preventDefault();
-        setSent("");
-        if (await call("add", "/api/admin/teachers", "POST", { name, email })) {
-          setSent(`Invite sent to ${email}.`);
+        setInvite(null);
+        const got = asInvite(await call("add", "/api/admin/teachers", "POST", { name, email }));
+        if (got) {
+          setInvite({ invite: got, name });
           setName("");
           setEmail("");
         }
@@ -110,29 +139,30 @@ export function AddTeacherForm() {
       <button type="submit" disabled={!!busy} className={`${primary} shrink-0 py-3`}>
         <Spin on={busy === "add"}><Plus className="size-3.5" /> Add teacher</Spin>
       </button>
-      {(error || sent) && (
-        <p role={error ? "alert" : "status"} className={`text-xs sm:basis-full ${error ? "font-medium text-red-500" : "text-ink-soft"}`}>{error || sent}</p>
-      )}
+      {error && <p role="alert" className="text-xs font-medium text-red-500 sm:basis-full">{error}</p>}
+      {invite && <InviteLink invite={invite.invite} name={invite.name} />}
     </form>
   );
 }
 
 export function TeacherActions({ id, name, email, disabled }: { id: string; name: string; email: string; disabled: boolean }) {
   const { busy, error, call } = useAdminCall();
-  const [sent, setSent] = useState(false);
+  const [invite, setInvite] = useState<Invite | null>(null);
   const url = `/api/admin/teachers/${id}`;
   return (
-    <div className="flex flex-col items-end gap-1.5">
+    <div className="flex flex-col items-end gap-1.5 sm:max-w-md">
       <div className="flex gap-2">
         {disabled ? (
-          <button type="button" disabled={!!busy} onClick={() => call("restore", "/api/admin/teachers", "POST", { name, email })} className={ghost}>
+          <button type="button" disabled={!!busy}
+            onClick={async () => setInvite(asInvite(await call("restore", "/api/admin/teachers", "POST", { name, email })))}
+            className={ghost}>
             <Spin on={busy === "restore"}>Restore</Spin>
           </button>
         ) : (
           <>
-            <button type="button" disabled={!!busy || sent}
-              onClick={async () => setSent(await call("resend", url, "POST", { action: "resend" }))} className={ghost}>
-              <Spin on={busy === "resend"}>{sent ? "Link sent" : "Resend link"}</Spin>
+            <button type="button" disabled={!!busy}
+              onClick={async () => setInvite(asInvite(await call("resend", url, "POST", { action: "resend" })))} className={ghost}>
+              <Spin on={busy === "resend"}>New invite link</Spin>
             </button>
             <button type="button" disabled={!!busy}
               onClick={() => confirm(`Remove ${name}? They are signed out at once. Their answers stay.`) && call("remove", url, "DELETE")}
@@ -143,6 +173,7 @@ export function TeacherActions({ id, name, email, disabled }: { id: string; name
         )}
       </div>
       <ErrorText text={error} />
+      {invite && <InviteLink invite={invite} name={name} />}
     </div>
   );
 }
