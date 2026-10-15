@@ -119,27 +119,34 @@ export function AddTeacherForm() {
   const { busy, error, call } = useAdminCall();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [invite, setInvite] = useState<{ invite: Invite; name: string } | null>(null);
+  const [done, setDone] = useState("");
   return (
     <form
       onSubmit={async (e) => {
         e.preventDefault();
         setInvite(null);
-        const got = asInvite(await call("add", "/api/admin/teachers", "POST", { name, email }));
-        if (got) {
-          setInvite({ invite: got, name });
-          setName("");
-          setEmail("");
-        }
+        setDone("");
+        const data = await call("add", "/api/admin/teachers", "POST", { name, email, password });
+        if (!data) return;
+        const got = asInvite(data);
+        if (got) setInvite({ invite: got, name });
+        else setDone(`${name} can log in at /teacher/login with ${email} and the password you set.`);
+        setName("");
+        setEmail("");
+        setPassword("");
       }}
       className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:[&>input]:flex-1"
     >
       <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" className={field} />
       <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className={field} />
+      <input type="text" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (optional)" className={field} />
       <button type="submit" disabled={!!busy} className={`${primary} shrink-0 py-3`}>
         <Spin on={busy === "add"}><Plus className="size-3.5" /> Add teacher</Spin>
       </button>
       {error && <p role="alert" className="text-xs font-medium text-red-500 sm:basis-full">{error}</p>}
+      {done && <p role="status" className="text-xs text-ink-soft sm:basis-full">{done}</p>}
       {invite && <InviteLink invite={invite.invite} name={invite.name} />}
     </form>
   );
@@ -151,7 +158,7 @@ export function TeacherActions({ id, name, email, disabled }: { id: string; name
   const url = `/api/admin/teachers/${id}`;
   return (
     <div className="flex flex-col items-end gap-1.5 sm:max-w-md">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
         {disabled ? (
           <button type="button" disabled={!!busy}
             onClick={async () => setInvite(asInvite(await call("restore", "/api/admin/teachers", "POST", { name, email })))}
@@ -161,8 +168,16 @@ export function TeacherActions({ id, name, email, disabled }: { id: string; name
         ) : (
           <>
             <button type="button" disabled={!!busy}
+              onClick={async () => {
+                const password = prompt(`New password for ${name} (8+ characters). They will be signed out everywhere.`);
+                if (password && (await call("password", url, "POST", { action: "password", password }))) alert(`Password updated for ${name}.`);
+              }}
+              className={ghost}>
+              <Spin on={busy === "password"}>Set password</Spin>
+            </button>
+            <button type="button" disabled={!!busy}
               onClick={async () => setInvite(asInvite(await call("resend", url, "POST", { action: "resend" })))} className={ghost}>
-              <Spin on={busy === "resend"}>New invite link</Spin>
+              <Spin on={busy === "resend"}>Invite link</Spin>
             </button>
             <button type="button" disabled={!!busy}
               onClick={() => confirm(`Remove ${name}? They are signed out at once. Their answers stay.`) && call("remove", url, "DELETE")}

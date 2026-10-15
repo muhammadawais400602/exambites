@@ -10,6 +10,7 @@ export type AuditAction =
   | "teacher.added"
   | "teacher.removed"
   | "teacher.restored"
+  | "teacher.password_set"
   | "referral.created"
   | "referral.updated"
   | "referral.deleted"
