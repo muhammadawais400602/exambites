@@ -112,3 +112,15 @@ section[id] {
     scroll-behavior: auto !important;
   }
 }
+
+/* Lesson video watermark: drifts slowly so it can't be cropped out of a recording. */
+.watermark {
+  animation: watermark-drift 40s linear infinite alternate;
+}
+@keyframes watermark-drift {
+  0% { top: 8%; left: 6%; }
+  25% { top: 70%; left: 55%; }
+  50% { top: 30%; left: 70%; }
+  75% { top: 82%; left: 12%; }
+  100% { top: 12%; left: 48%; }
+}

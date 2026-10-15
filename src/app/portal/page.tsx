@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
-import { CheckCircle2, Clock, Lock, PlayCircle, XCircle } from "lucide-react";
+import { BookOpen, CheckCircle2, Clock, Lock, PlayCircle, XCircle } from "lucide-react";
+import Link from "next/link";
 import { Suspense } from "react";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
-import { courses } from "@/content/courses";
+import { ChooseCourse } from "@/components/learn/ChooseCourse";
+import { courses as catalogue } from "@/content/courses";
 import { checkout, type PaymentMethod } from "@/content/enroll";
 import { formatRs } from "@/lib/pricing";
+import { slugify } from "@/lib/server/courses";
+import { studentPath } from "@/lib/server/learning";
 import { getEnrollment } from "@/lib/server/queries";
 import { requireRole } from "@/lib/server/session";
 
@@ -28,41 +32,7 @@ async function StudentPortal() {
   return (
     <PortalShell role="student" name={user.name}>
       {enrollment?.status === "approved" ? (
-        <>
-          <PageTitle eyebrow="My courses" title={`Welcome, ${first}`}>
-            <p className="max-w-sm text-sm text-ink-soft">Finish AI Basics first. After each course you pick the next one.</p>
-          </PageTitle>
-          <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {courses.map((c, i) => {
-              const open = i === 0;
-              return (
-                <li key={c.title} className={`${card} relative flex flex-col !p-6 ${open ? "border-brand-600/40" : "opacity-70"}`}>
-                  <div className="flex items-center justify-between">
-                    <span className="grid size-11 place-items-center rounded-2xl bg-brand-500/10 text-brand-700">
-                      <c.Icon className="size-5" />
-                    </span>
-                    <span className="font-label text-[10px] font-bold uppercase tracking-[0.16em] text-muted">
-                      {c.bonus ? "Bonus" : `Course ${String(i + 1).padStart(2, "0")}`}
-                    </span>
-                  </div>
-                  <h2 className="mt-5 font-display text-xl font-black uppercase tracking-tight text-ink">{c.title}</h2>
-                  <p className="mt-1 text-sm text-ink-soft">{c.category}</p>
-                  <div className="mt-auto pt-6">
-                    {open ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3.5 py-2 text-xs font-bold text-white">
-                        <PlayCircle className="size-4" /> Lessons coming soon
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted">
-                        <Lock className="size-3.5" /> {c.bonus ? "Unlocks after all five courses" : "Unlocks after your current course"}
-                      </span>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </>
+        <CoursePath userId={user.id} first={first} />
       ) : enrollment?.status === "rejected" ? (
         <>
           <PageTitle eyebrow="Payment" title="Payment not confirmed" />
@@ -82,6 +52,60 @@ async function StudentPortal() {
         </>
       )}
     </PortalShell>
+  );
+}
+
+const icons = new Map(catalogue.map((c) => [slugify(c.title), c.Icon]));
+
+async function CoursePath({ userId, first }: { userId: string; first: string }) {
+  const path = await studentPath(userId);
+  const list = path?.courses ?? [];
+  const choosing = !path?.currentId && list.some((c) => c.state === "choose");
+  return (
+    <>
+      <PageTitle eyebrow="My courses" title={`Welcome, ${first}`}>
+        <p className="max-w-sm text-sm text-ink-soft">
+          {choosing ? "Course finished. Pick what you want to learn next." : "One course at a time. Finish it to pick the next one."}
+        </p>
+      </PageTitle>
+      <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {list.map((c) => {
+          const Icon = icons.get(c.slug) ?? BookOpen;
+          return (
+            <li key={c.id} className={`${card} relative flex flex-col !p-6 ${c.state === "current" ? "border-brand-600/50" : c.state === "locked" ? "opacity-60" : ""}`}>
+              <div className="flex items-center justify-between">
+                <span className="grid size-11 place-items-center rounded-2xl bg-brand-500/10 text-brand-700">
+                  <Icon className="size-5" />
+                </span>
+                <span className="font-label text-[10px] font-bold uppercase tracking-[0.16em] text-muted">
+                  {c.bonus ? "Bonus" : c.state === "current" ? "In progress" : c.state === "done" ? "Completed" : c.category}
+                </span>
+              </div>
+              <h2 className="mt-5 font-display text-xl font-black uppercase tracking-tight text-ink">{c.title}</h2>
+              <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{c.description || c.category}</p>
+              <div className="mt-auto pt-6">
+                {c.state === "current" && (
+                  <Link href={`/portal/courses/${c.slug}`} className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-brand-700">
+                    <PlayCircle className="size-4" /> Continue
+                  </Link>
+                )}
+                {c.state === "done" && (
+                  <Link href={`/portal/courses/${c.slug}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:underline dark:text-emerald-400">
+                    <CheckCircle2 className="size-4" /> Completed · review
+                  </Link>
+                )}
+                {c.state === "choose" && <ChooseCourse courseId={c.id} title={c.title} />}
+                {c.state === "locked" && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted">
+                    <Lock className="size-3.5" /> {c.bonus ? "Unlocks after all other courses" : "Unlocks after your current course"}
+                  </span>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </>
   );
 }
 
