@@ -60,9 +60,8 @@ export function Seat() {
               <p className="font-label text-[11px] font-bold uppercase tracking-[0.18em] text-brand-700">{offer.label}</p>
               <div className="mt-2 flex flex-wrap items-end gap-3">
                 <span className="font-display text-5xl font-black tracking-tight text-ink">{offer.price}</span>
-                <span className="pb-1.5 text-lg text-muted line-through">{offer.was}</span>
                 <span className="mb-2 rounded-full bg-brand-600 px-2.5 py-1 font-label text-[10px] font-bold uppercase tracking-[0.14em] text-white">
-                  {offer.off}
+                  {offer.referral}
                 </span>
               </div>
               <p className="mt-1 text-sm font-semibold text-ink-soft">{offer.terms}</p>
@@ -201,7 +200,7 @@ export function HelpBox() {
           </a>
         </div>
         <p className="mt-5 inline-flex items-center gap-1.5 text-xs text-muted">
-          <Check className="size-3.5 text-brand-600" /> {checkout.guarantee}
+          <Check className="size-3.5 text-brand-600" /> {checkout.policy}
         </p>
       </motion.div>
     </section>

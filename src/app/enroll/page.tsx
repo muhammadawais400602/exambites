@@ -6,7 +6,7 @@ import { Header } from "@/components/home/Header";
 
 export const metadata: Metadata = {
   title: "Enroll · Exambites Creative Academy",
-  description: "Lock your seat at the Rs. 4,800 launch price: 5 AI courses plus a bonus, lifetime access and the Exambites community.",
+  description: "Lock your seat: 5 AI courses plus a bonus, lifetime access and the Exambites community, from Rs. 5,000 with a referral code.",
 };
 
 export default function EnrollPage() {

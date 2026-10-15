@@ -24,7 +24,7 @@ export default function LoginPage() {
             <LoginShowcase />
           </div>
           <div className="order-1 lg:order-2">
-            <LoginForm />
+            <LoginForm role="student" />
           </div>
         </div>
       </main>
