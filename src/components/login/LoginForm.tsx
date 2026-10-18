@@ -67,8 +67,10 @@ export function LoginForm({ role }: { role: Role }) {
         const text =
           signInError.status === 429
             ? "Too many attempts. Wait a minute and try again."
-            : signInError.status === 403
-              ? signInError.message ?? "This account is deactivated."
+            : signInError.status === 403 && /origin/i.test(signInError.message ?? "")
+              ? "This site address isn't set up for logins yet. Please tell the academy."
+              : signInError.status === 403
+                ? signInError.message ?? "This account is deactivated."
               : "Wrong email or password.";
         setError({ text });
         return;
