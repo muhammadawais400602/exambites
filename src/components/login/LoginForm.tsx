@@ -90,7 +90,7 @@ export function LoginForm({ role }: { role: Role }) {
       // Students and teachers share /login (either tab works); the admin has their own page.
       const accepted: Role[] = role === "admin" ? ["admin"] : ["student", "teacher"];
       if (!accepted.includes(actual)) {
-        await authClient.signOut();
+        await fetch("/api/session/logout", { method: "POST" }).catch(() => null);
         setError({
           text: actual === "admin" ? "Admins log in on the admin page." : "This account can't use the admin login.",
           href: LOGIN[actual],
