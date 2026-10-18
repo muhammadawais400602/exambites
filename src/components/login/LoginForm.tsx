@@ -12,8 +12,10 @@ import { HOME, LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
 type Mode = "login" | "reset";
 
 /**
- * Sign-in card for one role. Logging in with an account of a different role
- * signs straight back out and points to the right login page.
+ * Sign-in card. The main login (role "student", at /login) accepts every
+ * account and sends it to its own portal. The teacher and admin pages only
+ * accept their role: other accounts sign straight back out and get a link
+ * to the right login.
  */
 export function LoginForm({ role }: { role: Role }) {
   const id = useId();
@@ -72,6 +74,12 @@ export function LoginForm({ role }: { role: Role }) {
         return;
       }
       const actual = ((data?.user as { role?: Role } | undefined)?.role ?? "student") as Role;
+      // The main login (/login) lets every role in and sends each to their own portal.
+      if (role === "student") {
+        router.push(HOME[actual]);
+        router.refresh();
+        return;
+      }
       if (actual !== role) {
         await authClient.signOut();
         setError({
@@ -98,7 +106,7 @@ export function LoginForm({ role }: { role: Role }) {
     <div className="relative overflow-hidden rounded-3xl border border-ink/10 bg-surface-card p-6 shadow-[0_30px_60px_-30px_color-mix(in_srgb,var(--color-brand-900)_45%,transparent)] sm:p-8">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div key={mode} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-          <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em] text-brand-700">{ROLE_LABEL[role]}</span>
+          <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em] text-brand-700">{role === "student" ? "Students & teachers" : ROLE_LABEL[role]}</span>
           <h2 className="mt-1 font-display text-2xl font-black uppercase tracking-tight text-ink">
             {mode === "login" ? copy.heading : "Reset password"}
           </h2>

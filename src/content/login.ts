@@ -14,7 +14,7 @@ export const loginPage = {
     { Icon: Award, label: "Certificates when you finish" },
   ] satisfies { Icon: LucideIcon; label: string }[],
   roles: {
-    student: { heading: "Student login", hint: "Use the email you signed up with." },
+    student: { heading: "Log in", hint: "Students and teachers: use the email you were registered with." },
     teacher: { heading: "Teacher login", hint: "Use the email the academy invited you with." },
     admin: { heading: "Admin login", hint: "Academy administrators only." },
   } satisfies Record<Role, { heading: string; hint: string }>,
