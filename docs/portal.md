@@ -57,3 +57,9 @@ Until Bunny Stream is set up, lessons can use YouTube. Upload each video as **Un
 Needs Vercel Blob: Vercel → **Storage** → **Create** → **Blob** → choose **Public** access → connect it to the exambites project (Production and Preview). Vercel adds `BLOB_READ_WRITE_TOKEN` itself; redeploy afterwards.
 
 In a lesson, **Files → Upload files** sends files straight from the browser to storage (up to 100 MB each, 20 per lesson): PDF, Word, PowerPoint, Excel, text, CSV, ZIP and images. Files are stored under random addresses that aren't shown on any page. Students download through `/api/files/…`, which only works for lessons they've unlocked (teachers: their courses), and every student download is logged in Activity. A student who downloads a file can still share it, like any download.
+
+## Assignments
+
+In any lesson, tick **Add an assignment** and write what students should do. Optionally tick **Required** so the next lesson opens only after the student hands it in. Students submit text, a link and/or up to 5 files (50 MB each; files need Vercel Blob). They can edit until it's graded.
+
+Teachers of the course see **Assignments** on the course page (waiting ones first, and a count on their home page). They give a score out of 100 with feedback, or **Ask to resubmit** with a note, which reopens it for the student. Grades show to the student on the lesson, and in teacher and admin progress views. Every submission and grade is logged in Activity.

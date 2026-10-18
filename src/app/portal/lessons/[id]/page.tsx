@@ -5,9 +5,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { LessonVideo, LessonWatch, QuizGate } from "@/components/learn/LessonVideo";
+import { AssignmentCard } from "@/components/learn/AssignmentCard";
 import { Quiz } from "@/components/learn/Quiz";
 import { PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { videoEmbedUrl } from "@/lib/server/bunny";
+import { getSubmission } from "@/lib/server/assignments";
 import { PASS_MARK } from "@/lib/server/courses";
 import { FILE_TYPES, formatBytes } from "@/lib/files";
 import { hasWatched, lessonForStudent, needsWatching, publicQuestions } from "@/lib/server/learning";
@@ -36,7 +38,8 @@ async function Lesson({ params }: { params: Params }) {
   const src = videoEmbedUrl(lesson.videoId, origin);
   const kind = parseVideo(lesson.videoId)?.kind ?? "youtube";
   const required = needsWatching(lesson);
-  const watched = lesson.state === "done" || (required && (await hasWatched(user.id, lesson.id)));
+  const watched = lesson.quizPassed || (required && (await hasWatched(user.id, lesson.id)));
+  const submission = lesson.assignment ? await getSubmission(user.id, lesson.id) : null;
   const prev = lessons[index - 1];
   const next = lessons[index + 1];
   const nav = <LessonNav prev={prev} next={next} />;
@@ -66,8 +69,18 @@ async function Lesson({ params }: { params: Params }) {
         <div className="space-y-8">
           {lesson.summary && <p className="text-ink-soft">{lesson.summary}</p>}
           <QuizGate>
-            <Quiz lessonId={lesson.id} questions={publicQuestions(lesson)} passMark={PASS_MARK} done={lesson.state === "done"} courseSlug={course.slug} />
+            <Quiz lessonId={lesson.id} questions={publicQuestions(lesson)} passMark={PASS_MARK} done={lesson.quizPassed} courseSlug={course.slug} />
           </QuizGate>
+          {lesson.assignment && (
+            <AssignmentCard
+              lessonId={lesson.id}
+              userId={user.id}
+              instructions={lesson.assignment.instructions}
+              required={lesson.assignment.required}
+              uploadsReady={!!process.env.BLOB_READ_WRITE_TOKEN}
+              submission={submission && { id: submission.id, text: submission.text, link: submission.link, files: submission.files, status: submission.status, score: submission.score, feedback: submission.feedback, gradedByName: submission.gradedByName }}
+            />
+          )}
         </div>
         {(lesson.notes || lesson.attachments.length > 0) && (
           <aside className="h-fit space-y-6 rounded-3xl border border-ink/10 bg-surface-card p-6">

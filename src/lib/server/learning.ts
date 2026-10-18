@@ -1,6 +1,6 @@
 import "server-only";
 import { audit } from "./audit";
-import { getLesson, listCourses, listLessons, PASS_MARK, progressCol, type Course, type Lesson } from "./courses";
+import { getCourse, getLesson, listCourses, listLessons, PASS_MARK, progressCol, type Course, type Lesson } from "./courses";
 import { db } from "./db";
 import { videoEmbedUrl } from "./bunny";
 import type { AppUser } from "./session";
@@ -46,22 +46,47 @@ export async function studentPath(userId: string) {
   return { courses: path, currentId: current, completed };
 }
 
-/** Lessons of a course with the student's progress: each opens once the one before is passed. */
+/**
+ * Lessons of a course with the student's progress. A lesson is done once its
+ * quiz is passed (or it's marked watched) and, when its assignment is
+ * required, the assignment is submitted. Each opens once the one before is done.
+ */
 export async function lessonsWithProgress(userId: string, courseId: string) {
-  const [lessons, passed] = await Promise.all([
+  const [lessons, passed, submitted] = await Promise.all([
     listLessons(courseId, { publishedOnly: true }),
     progressCol()
       .find({ userId, courseId, passed: true }, { projection: { lessonId: 1 } })
       .toArray()
       .then((rows) => new Set(rows.map((r) => String(r.lessonId)))),
+    db()
+      .collection("submissions")
+      .find({ userId, courseId }, { projection: { lessonId: 1 } })
+      .toArray()
+      .then((rows) => new Set(rows.map((r) => String(r.lessonId)))),
   ]);
   let open = true;
   return lessons.map((l) => {
-    const done = passed.has(l.id);
+    const quizPassed = passed.has(l.id);
+    const assignmentDone = !l.assignment?.required || submitted.has(l.id);
+    const done = quizPassed && assignmentDone;
     const state: LessonState = done ? "done" : open ? "open" : "locked";
     if (!done) open = false;
-    return { ...l, state };
+    return { ...l, state, quizPassed, submitted: submitted.has(l.id) };
   });
+}
+
+/** Marks the course complete when every lesson is done; returns true if it just happened. */
+export async function completeCourseIfDone(user: AppUser, courseId: string) {
+  const lessons = await lessonsWithProgress(user.id, courseId);
+  if (!lessons.length || !lessons.every((l) => l.state === "done")) return false;
+  const res = await enrollments().updateOne(
+    { userId: user.id, status: "approved", currentCourseId: courseId },
+    { $set: { currentCourseId: null }, $addToSet: { completedCourseIds: courseId } },
+  );
+  if (!res.modifiedCount) return false;
+  const course = await getCourse(courseId);
+  await audit(user, "student.course_completed", `${user.name} completed ${course?.title ?? "a course"}`, { courseId });
+  return true;
 }
 
 /** Everything a student needs to open one lesson, or null when it isn't theirs to open yet. */
@@ -121,7 +146,7 @@ export function publicQuestions(lesson: Lesson) {
 }
 
 export type SubmitResult =
-  | { ok: true; score: number; passed: boolean; wrong: string[]; courseCompleted: boolean; nextLessonId: string | null }
+  | { ok: true; score: number; passed: boolean; wrong: string[]; courseCompleted: boolean; assignmentPending: boolean; nextLessonId: string | null }
   | { ok: false; error: string; status: number };
 
 /** Marks a quiz (or a lesson without one) and moves the student on when they pass. */
@@ -129,7 +154,7 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
   const found = await lessonForStudent(user.id, lessonId);
   if (!found) return { ok: false, error: "This lesson isn't open for you yet.", status: 403 };
   const { course, lesson, lessons, index } = found;
-  if (lesson.state !== "done" && needsWatching(lesson) && !(await hasWatched(user.id, lesson.id))) {
+  if (!lesson.quizPassed && needsWatching(lesson) && !(await hasWatched(user.id, lesson.id))) {
     return { ok: false, error: "Watch the video first. The quiz opens when you've seen it.", status: 409 };
   }
 
@@ -158,19 +183,13 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
     if (first.modifiedCount) {
       await audit(user, "student.lesson_passed", `${user.name} passed “${lesson.title}” (${score}%)`, { lessonId, courseId: course.id });
     }
-    const allDone = lessons.every((l) => l.id === lesson.id || l.state === "done");
-    if (allDone && course.state === "current") {
-      const done = await enrollments().updateOne(
-        { userId: user.id, status: "approved", currentCourseId: course.id },
-        { $set: { currentCourseId: null }, $addToSet: { completedCourseIds: course.id } },
-      );
-      if (done.modifiedCount) {
-        courseCompleted = true;
-        await audit(user, "student.course_completed", `${user.name} completed ${course.title}`, { courseId: course.id });
-      }
-    }
+    if (course.state === "current") courseCompleted = await completeCourseIfDone(user, course.id);
   }
-  return { ok: true, score, passed, wrong, courseCompleted, nextLessonId: passed ? (lessons[index + 1]?.id ?? null) : null };
+  const assignmentPending = passed && !!lesson.assignment?.required && !lesson.submitted;
+  return {
+    ok: true, score, passed, wrong, courseCompleted, assignmentPending,
+    nextLessonId: passed && !assignmentPending ? (lessons[index + 1]?.id ?? null) : null,
+  };
 }
 
 /** Starts the course the student picked after finishing their last one. */

@@ -22,7 +22,10 @@ export type AuditAction =
   | "student.lesson_passed"
   | "student.course_completed"
   | "student.course_started"
-  | "student.file_downloaded";
+  | "student.file_downloaded"
+  | "student.assignment_submitted"
+  | "assignment.graded"
+  | "assignment.returned";
 
 /** Records who did what. Shown to the admin as the activity log. */
 export async function audit(

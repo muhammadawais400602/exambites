@@ -32,7 +32,7 @@ async function Editor({ params }: { params: Params }) {
       <div className="mb-6 mt-3">
         <PageTitle eyebrow={`Lesson ${lesson.order}`} title={lesson.title} />
       </div>
-      <LessonEditor lesson={{ id: lesson.id, courseId: course.id, title: lesson.title, summary: lesson.summary, videoId: displayVideo(lesson.videoId), notes: lesson.notes, questions: lesson.questions, published: lesson.published }} />
+      <LessonEditor lesson={{ id: lesson.id, courseId: course.id, title: lesson.title, summary: lesson.summary, videoId: displayVideo(lesson.videoId), notes: lesson.notes, questions: lesson.questions, published: lesson.published, assignment: lesson.assignment }} />
       <div className="mt-10">
         <LessonFiles
           lessonId={lesson.id}

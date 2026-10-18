@@ -25,7 +25,9 @@ export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/less
   return asAdmin(request, async (admin) => {
     const _id = objectIdOrNull((await ctx.params).id);
     if (!_id) return reply({ ok: false, error: "Lesson not found." }, 404);
-    const body = await readJson<{ title: string; summary: string; videoId: string; notes: string; questions: unknown; published: boolean }>(request);
+    const body = await readJson<{ title: string; summary: string; videoId: string; notes: string; questions: unknown; published: boolean; assignment: { instructions?: string; required?: boolean } | null }>(request);
+    const instructions = String(body.assignment?.instructions ?? "").trim().slice(0, 5000);
+    const assignment = instructions ? { instructions, required: !!body.assignment?.required } : null;
     const title = String(body.title ?? "").trim().slice(0, 120);
     if (title.length < 2) return reply({ ok: false, error: "Enter a lesson title." }, 422);
     const rawVideo = String(body.videoId ?? "").trim();
@@ -43,6 +45,7 @@ export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/less
           videoId,
           notes: String(body.notes ?? "").slice(0, 20000),
           questions,
+          assignment,
           published: !!body.published,
           updatedAt: new Date(),
         },
