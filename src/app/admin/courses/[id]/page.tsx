@@ -37,7 +37,7 @@ async function CourseEditor({ params }: { params: PageProps<"/admin/courses/[id]
       <h2 className="mb-3 mt-10 font-display text-lg font-black uppercase tracking-tight text-ink">Lessons</h2>
       <LessonList
         courseId={course.id}
-        lessons={lessons.map((l) => ({ id: l.id, title: l.title, published: l.published, videoId: l.videoId, questions: l.questions.length }))}
+        lessons={lessons.map((l) => ({ id: l.id, title: l.title, published: l.published, videoId: l.videoId, questions: l.questions.length, files: l.attachments.length }))}
       />
     </PortalShell>
   );

@@ -51,3 +51,9 @@ Everyone (students, teachers, admin) has a profile on the **Settings** page (`/s
 ### Videos on YouTube (temporary)
 
 Until Bunny Stream is set up, lessons can use YouTube. Upload each video as **Unlisted** (not Private, which can't be embedded), keep **Allow embedding** on, and paste its link into the lesson. The player hides related videos and shows the student's email as a watermark. Unlisted videos can still be shared and downloaded by anyone who gets the link, so move paid content to Bunny when you can: paste the Bunny video ID into the same field, one lesson at a time.
+
+## Lesson files (PDF, Word, PowerPoint…)
+
+Needs Vercel Blob: Vercel → **Storage** → **Create** → **Blob** → choose **Public** access → connect it to the exambites project (Production and Preview). Vercel adds `BLOB_READ_WRITE_TOKEN` itself; redeploy afterwards.
+
+In a lesson, **Files → Upload files** sends files straight from the browser to storage (up to 100 MB each, 20 per lesson): PDF, Word, PowerPoint, Excel, text, CSV, ZIP and images. Files are stored under random addresses that aren't shown on any page. Students download through `/api/files/…`, which only works for lessons they've unlocked (teachers: their courses), and every student download is logged in Activity. A student who downloads a file can still share it, like any download.
