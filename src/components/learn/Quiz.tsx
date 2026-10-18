@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type Q = { id: string; prompt: string; options: string[] };
-type Result = { score: number; passed: boolean; wrong: string[]; courseCompleted: boolean; nextLessonId: string | null };
+type Result = { score: number; passed: boolean; wrong: string[]; courseCompleted: boolean; assignmentPending?: boolean; nextLessonId: string | null };
 
 /** The lesson quiz, or a "mark as done" button for lessons without one. */
 export function Quiz({ lessonId, questions, passMark, done, courseSlug }: { lessonId: string; questions: Q[]; passMark: number; done: boolean; courseSlug: string }) {
@@ -42,14 +42,16 @@ export function Quiz({ lessonId, questions, passMark, done, courseSlug }: { less
           {result.courseCompleted
             ? "You finished the course! Pick your next course from My courses."
             : result.passed
-              ? result.nextLessonId ? "The next lesson is unlocked." : "Nice work."
+              ? result.assignmentPending
+                ? "Now submit the assignment below to unlock the next lesson."
+                : result.nextLessonId ? "The next lesson is unlocked." : "Nice work."
               : `You need ${passMark}% to move on. ${result.wrong.length} answer${result.wrong.length === 1 ? " was" : "s were"} wrong. Rewatch the video and try again.`}
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           {result.passed && result.nextLessonId && (
             <Link href={`/portal/lessons/${result.nextLessonId}`} className="rounded-full bg-brand-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-700">Next lesson →</Link>
           )}
-          {(result.courseCompleted || (result.passed && !result.nextLessonId)) && (
+          {(result.courseCompleted || (result.passed && !result.nextLessonId && !result.assignmentPending)) && (
             <Link href={result.courseCompleted ? "/portal" : `/portal/courses/${courseSlug}`} className="rounded-full bg-brand-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-700">
               {result.courseCompleted ? "Choose next course →" : "Back to course"}
             </Link>

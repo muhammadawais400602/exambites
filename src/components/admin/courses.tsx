@@ -211,7 +211,10 @@ export function LessonList({ courseId, lessons }: { courseId: string; lessons: L
 }
 
 type Q = { id: string; prompt: string; options: string[]; answer: number };
-type LessonFields = { id: string; courseId: string; title: string; summary: string; videoId: string; notes: string; questions: Q[]; published: boolean };
+type LessonFields = {
+  id: string; courseId: string; title: string; summary: string; videoId: string; notes: string; questions: Q[]; published: boolean;
+  assignment: { instructions: string; required: boolean } | null;
+};
 
 let tempId = 0;
 const blankQuestion = (): Q => ({ id: `new-${++tempId}`, prompt: "", options: ["", "", "", ""], answer: 0 });
@@ -229,6 +232,7 @@ export function LessonEditor({ lesson }: { lesson: LessonFields }) {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (v.assignment && !v.assignment.instructions.trim()) return setState({ error: "Write the assignment instructions, or untick “Add an assignment”." });
     const blank = v.questions.findIndex((q) => !q.options[q.answer]?.trim());
     if (blank >= 0) return setState({ error: `Question ${blank + 1}: the ticked answer is empty.` });
     setState({ busy: true });
@@ -263,6 +267,33 @@ export function LessonEditor({ lesson }: { lesson: LessonFields }) {
           Notes (shown under the video)
           <textarea id={`${id}-n`} rows={8} value={v.notes} onChange={(e) => set({ notes: e.target.value })} placeholder="Key points, links, prompts to copy…" className={`${field} mt-1.5`} />
         </label>
+      </section>
+
+      <section className="space-y-3 rounded-3xl border border-ink/10 bg-surface-card p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display text-lg font-black uppercase tracking-tight text-ink">Assignment</h2>
+            <p className="text-xs text-ink-soft">Optional. Students hand in text, a link or files; the course&apos;s teachers grade it out of 100.</p>
+          </div>
+          <label className="flex cursor-pointer items-center gap-2.5 text-sm font-semibold text-ink">
+            <input type="checkbox" checked={!!v.assignment} onChange={(e) => set({ assignment: e.target.checked ? { instructions: "", required: false } : null })} className="size-4 accent-[var(--color-brand-600)]" />
+            Add an assignment
+          </label>
+        </div>
+        {v.assignment && (
+          <>
+            <label htmlFor={`${id}-a`} className={label}>
+              What should students do?
+              <textarea id={`${id}-a`} rows={5} required value={v.assignment.instructions} maxLength={5000}
+                onChange={(e) => set({ assignment: { ...v.assignment!, instructions: e.target.value } })}
+                placeholder="e.g. Design an Instagram post for a local café in Canva and share the link or upload the PNG." className={`${field} mt-1.5`} />
+            </label>
+            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-ink">
+              <input type="checkbox" checked={v.assignment.required} onChange={(e) => set({ assignment: { ...v.assignment!, required: e.target.checked } })} className="size-4 accent-[var(--color-brand-600)]" />
+              Required: the next lesson opens only after the student submits it
+            </label>
+          </>
+        )}
       </section>
 
       <section className="space-y-3">

@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { coursesForTeacher } from "@/lib/server/courses";
 import { courseRoster } from "@/lib/server/progress";
+import { waitingCount } from "@/lib/server/assignments";
 import { requireRole } from "@/lib/server/session";
 
 export const metadata: Metadata = { title: "Teacher · Exambites", robots: { index: false } };
@@ -20,7 +21,10 @@ export default function TeacherPage() {
 async function TeacherHome() {
   const user = await requireRole("teacher");
   const courses = await coursesForTeacher(user.id);
-  const rosters = await Promise.all(courses.map((c) => courseRoster(c.id)));
+  const [rosters, waiting] = await Promise.all([
+    Promise.all(courses.map((c) => courseRoster(c.id))),
+    Promise.all(courses.map((c) => waitingCount(c.id))),
+  ]);
   return (
     <PortalShell role="teacher" user={user}>
       <PageTitle eyebrow="Teacher" title={`Hi ${user.name.split(" ")[0]}`} />
@@ -35,6 +39,7 @@ async function TeacherHome() {
                   <BookOpen className="size-6 text-brand-700" />
                   <h2 className="mt-4 font-display text-xl font-black uppercase tracking-tight text-ink">{c.title}</h2>
                   <p className="mt-1 text-sm text-ink-soft">{active} studying now · {roster.length - active} completed</p>
+                  {waiting[i] > 0 && <p className="mt-2 w-fit rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white">{waiting[i]} assignment{waiting[i] === 1 ? "" : "s"} to grade</p>}
                   <span className="mt-auto pt-5 text-xs font-bold text-brand-700">See students →</span>
                 </Link>
               </li>

@@ -65,14 +65,18 @@ export type LessonProgress = {
   lastScore: number | null;
   attempts: number;
   lastAttempt: string | null;
+  /** null when the lesson has no assignment. */
+  assignment: { status: "missing" | "submitted" | "graded" | "returned"; score: number | null } | null;
 };
 
 /** One student's lesson-by-lesson record in a course. */
 export async function studentCourseProgress(userId: string, courseId: string): Promise<LessonProgress[]> {
-  const [lessons, progress] = await Promise.all([
+  const [lessons, progress, subs] = await Promise.all([
     listLessons(courseId, { publishedOnly: true }),
     progressCol().find<ProgressDoc>({ userId, courseId }).toArray(),
+    db().collection("submissions").find({ userId, courseId }, { projection: { lessonId: 1, status: 1, score: 1 } }).toArray(),
   ]);
+  const subByLesson = new Map(subs.map((x) => [String(x.lessonId), x]));
   const byLesson = new Map(progress.map((p) => [p.lessonId, p]));
   return lessons.map((l) => {
     const p = byLesson.get(l.id);
@@ -86,6 +90,9 @@ export async function studentCourseProgress(userId: string, courseId: string): P
       lastScore: p?.lastScore ?? null,
       attempts: p?.attempts ?? 0,
       lastAttempt: p?.updatedAt ? p.updatedAt.toISOString() : null,
+      assignment: l.assignment
+        ? { status: (subByLesson.get(l.id)?.status as "submitted" | "graded" | "returned" | undefined) ?? "missing", score: (subByLesson.get(l.id)?.score as number | null) ?? null }
+        : null,
     };
   });
 }
