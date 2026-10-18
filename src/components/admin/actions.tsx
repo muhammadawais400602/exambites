@@ -132,7 +132,7 @@ export function AddTeacherForm() {
         if (!data) return;
         const got = asInvite(data);
         if (got) setInvite({ invite: got, name });
-        else setDone(`${name} can log in at /teacher/login with ${email} and the password you set.`);
+        else setDone(`${name} can log in at /login (Teacher tab) with ${email} and the password you set.`);
         setName("");
         setEmail("");
         setPassword("");

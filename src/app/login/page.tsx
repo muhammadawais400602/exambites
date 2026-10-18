@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/home/Footer";
 import { Header } from "@/components/home/Header";
+import { Suspense } from "react";
 import { LoginForm } from "@/components/login/LoginForm";
+import { LoginSwitch } from "@/components/login/LoginSwitch";
 import { LoginShowcase } from "@/components/login/LoginShowcase";
 
 export const metadata: Metadata = {
   title: "Log in · Exambites Creative Academy",
-  description: "Log in to the Exambites student and admin portal.",
+  description: "Log in to the Exambites student and teacher portal.",
   robots: { index: false },
 };
 
@@ -24,7 +26,9 @@ export default function LoginPage() {
             <LoginShowcase />
           </div>
           <div className="order-1 lg:order-2">
-            <LoginForm role="student" />
+            <Suspense fallback={<LoginForm role="student" />}>
+              <LoginSwitch />
+            </Suspense>
           </div>
         </div>
       </main>

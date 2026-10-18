@@ -5,7 +5,7 @@ Three logins share one account system (Better Auth + MongoDB):
 | Who | Login | Home |
 | --- | --- | --- |
 | Students | `/login` (account made at `/enroll`) | `/portal` |
-| Teachers | `/teacher/login` (invited by the admin) | `/teacher` |
+| Teachers | `/login`, Teacher tab (added by the admin) | `/teacher` |
 | Admin | `/admin/login` | `/admin` |
 
 ## 1. Environment variables (Vercel → Settings → Environment Variables)
@@ -15,7 +15,7 @@ Three logins share one account system (Better Auth + MongoDB):
 | `MONGODB_URI` | MongoDB Atlas connection string |
 | `MONGODB_DB` | `exambites` |
 | `BETTER_AUTH_SECRET` | output of `openssl rand -base64 32` |
-| `BETTER_AUTH_URL` | the live site URL, e.g. `https://exambites.vercel.app` (previews use their own URL automatically) |
+| `BETTER_AUTH_URL` | the live site URL, e.g. `https://www.schooloftomorrow.si` (previews use their own URL automatically) |
 | `ADMIN_SETUP_TOKEN` | any long random string (only for step 2) |
 | `RESEND_API_KEY` | from resend.com (without it, emails only appear in the logs) |
 | `EMAIL_FROM` | e.g. `Exambites <hello@exambites.com>` (domain verified in Resend) |

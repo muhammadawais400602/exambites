@@ -44,7 +44,7 @@ export function ResetPasswordForm() {
         <p className="mt-2 text-sm text-ink-soft">You can log in with your new password now.</p>
         <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold">
           <Link href="/login" className="text-brand-700 hover:underline">Student login</Link>
-          <Link href="/teacher/login" className="text-brand-700 hover:underline">Teacher login</Link>
+          <Link href="/login?as=teacher" className="text-brand-700 hover:underline">Teacher login</Link>
         </div>
       </div>
     );

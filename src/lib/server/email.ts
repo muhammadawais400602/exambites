@@ -38,7 +38,13 @@ export function siteUrl() {
 /** Every address this deployment answers on; sign-in requests are accepted from these only. */
 export function siteOrigins() {
   const env = process.env;
-  return [siteUrl(), env.BETTER_AUTH_URL, https(env.VERCEL_URL), https(env.VERCEL_BRANCH_URL)]
+  const base = [siteUrl(), env.BETTER_AUTH_URL, https(env.VERCEL_URL), https(env.VERCEL_BRANCH_URL)]
     .filter((u): u is string => !!u)
     .map((u) => u.replace(/\/$/, ""));
+  // A custom domain usually answers both with and without "www.".
+  const twins = base.flatMap((u) => {
+    const m = /^(https?:\/\/)(www\.)?(.+)$/.exec(u);
+    return m && !m[3].endsWith(".vercel.app") && !m[3].startsWith("localhost") ? [`${m[1]}${m[2] ? "" : "www."}${m[3]}`] : [];
+  });
+  return [...new Set([...base, ...twins])];
 }

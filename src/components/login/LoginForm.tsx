@@ -12,8 +12,10 @@ import { HOME, LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
 type Mode = "login" | "reset";
 
 /**
- * Sign-in card for one role. Logging in with an account of a different role
- * signs straight back out and points to the right login page.
+ * Sign-in card. On /login (student or teacher tab) both students and
+ * teachers get in and land in their own portal; the admin page accepts only
+ * the admin. Other accounts sign straight back out and get a link to the
+ * right login.
  */
 export function LoginForm({ role }: { role: Role }) {
   const id = useId();
@@ -72,15 +74,17 @@ export function LoginForm({ role }: { role: Role }) {
         return;
       }
       const actual = ((data?.user as { role?: Role } | undefined)?.role ?? "student") as Role;
-      if (actual !== role) {
+      // Students and teachers share /login (either tab works); the admin has their own page.
+      const accepted: Role[] = role === "admin" ? ["admin"] : ["student", "teacher"];
+      if (!accepted.includes(actual)) {
         await authClient.signOut();
         setError({
-          text: `This is the ${ROLE_LABEL[role].toLowerCase()} login. Your account is a ${ROLE_LABEL[actual].toLowerCase()} account.`,
+          text: actual === "admin" ? "Admins log in on the admin page." : "This account can't use the admin login.",
           href: LOGIN[actual],
         });
         return;
       }
-      router.push(HOME[role]);
+      router.push(HOME[actual]);
       router.refresh();
     } catch {
       setError({ text: "Connection problem. Check your internet and try again." });
