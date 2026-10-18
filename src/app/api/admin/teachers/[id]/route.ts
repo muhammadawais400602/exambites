@@ -1,5 +1,6 @@
 import { asAdmin, objectId, readJson, reply } from "@/lib/server/admin-api";
 import { audit } from "@/lib/server/audit";
+import { courseCol, objectIdOrNull } from "@/lib/server/courses";
 import { db } from "@/lib/server/db";
 import { inviteStaff, passwordProblem, setPassword, signOutEverywhere } from "@/lib/server/users";
 
@@ -36,5 +37,23 @@ export async function POST(request: Request, ctx: RouteContext<"/api/admin/teach
     }
     const { link, emailed } = await inviteStaff({ id: String(teacher._id), name: String(teacher.name), email: String(teacher.email) });
     return reply({ ok: true, link, emailed });
+  });
+}
+
+/** Sets which courses this teacher is on ({ courseIds }). Other teachers' assignments are untouched. */
+export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/teachers/[id]">) {
+  return asAdmin(request, async (admin) => {
+    const teacher = await findTeacher((await ctx.params).id);
+    if (!teacher) return reply({ ok: false, error: "Teacher not found." }, 404);
+    const { courseIds } = await readJson<{ courseIds: string[] }>(request);
+    const ids = (Array.isArray(courseIds) ? courseIds : []).map((id) => objectIdOrNull(String(id))).filter((id) => id !== null);
+    const tid = String(teacher._id);
+    await Promise.all([
+      courseCol().updateMany({ _id: { $in: ids } }, { $addToSet: { teacherIds: tid } }),
+      courseCol().updateMany({ _id: { $nin: ids }, teacherIds: tid }, { $pull: { teacherIds: tid } }),
+    ]);
+    const names = (await courseCol().find({ _id: { $in: ids } }, { projection: { title: 1 } }).toArray()).map((c) => c.title);
+    await audit(admin, "course.updated", `Set ${teacher.name}'s courses: ${names.join(", ") || "none"}`, { userId: tid });
+    return reply({ ok: true });
   });
 }

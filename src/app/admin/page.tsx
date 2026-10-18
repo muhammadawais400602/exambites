@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { AddCourseForm } from "@/components/admin/courses";
-import { AddTeacherForm, EnrollmentActions, ReferralActions, ReferralForm, TeacherActions } from "@/components/admin/actions";
+import { AddTeacherForm, EnrollmentActions, ReferralActions, ReferralForm, TeacherActions, TeacherCourses } from "@/components/admin/actions";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { formatRs } from "@/lib/pricing";
 import { lessonCounts, listCourses } from "@/lib/server/courses";
@@ -170,7 +170,7 @@ async function Courses() {
 }
 
 async function Teachers() {
-  const rows = await listTeachers();
+  const [rows, courses] = await Promise.all([listTeachers(), listCourses()]);
   return (
     <div className="space-y-4">
       <div className={`${card} p-5`}>
@@ -180,12 +180,21 @@ async function Teachers() {
       {rows.length ? (
         <ul className={`${card} divide-y divide-ink/10`}>
           {rows.map((t) => (
-            <li key={t.id} className={`flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between ${t.disabled ? "opacity-60" : ""}`}>
-              <div className="min-w-0">
-                <p className="font-semibold text-ink">{t.name} {t.disabled && <span className="ml-1 text-xs font-medium text-muted">(removed)</span>}</p>
-                <p className="truncate text-sm text-ink-soft">{t.email}</p>
+            <li key={t.id} className={`space-y-4 p-5 ${t.disabled ? "opacity-60" : ""}`}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="font-semibold text-ink">{t.name} {t.disabled && <span className="ml-1 text-xs font-medium text-muted">(removed)</span>}</p>
+                  <p className="truncate text-sm text-ink-soft">{t.email}</p>
+                </div>
+                <TeacherActions id={t.id} name={t.name} email={t.email} disabled={t.disabled} />
               </div>
-              <TeacherActions id={t.id} name={t.name} email={t.email} disabled={t.disabled} />
+              {!t.disabled && (
+                <TeacherCourses
+                  id={t.id}
+                  courses={courses.map((c) => ({ id: c.id, title: c.title }))}
+                  assigned={courses.filter((c) => c.teacherIds?.includes(t.id)).map((c) => c.id)}
+                />
+              )}
             </li>
           ))}
         </ul>
