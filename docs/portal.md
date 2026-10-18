@@ -5,8 +5,7 @@ Three logins share one account system (Better Auth + MongoDB):
 | Who | Login | Home |
 | --- | --- | --- |
 | Students | `/login` (account made at `/enroll`) | `/portal` |
-| Anyone | `/login` also accepts teachers and the admin and sends them to their portal | |
-| Teachers | `/teacher/login` (invited by the admin) | `/teacher` |
+| Teachers | `/login`, Teacher tab (added by the admin) | `/teacher` |
 | Admin | `/admin/login` | `/admin` |
 
 ## 1. Environment variables (Vercel → Settings → Environment Variables)

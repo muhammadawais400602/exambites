@@ -1,13 +1,6 @@
-import type { Metadata } from "next";
-import { LoginForm } from "@/components/login/LoginForm";
-import { AuthFrame } from "@/components/portal/AuthFrame";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Teacher login · Exambites", robots: { index: false } };
-
+/** Teachers log in on the shared /login page; old links land on its teacher tab. */
 export default function TeacherLoginPage() {
-  return (
-    <AuthFrame>
-      <LoginForm role="teacher" />
-    </AuthFrame>
-  );
+  redirect("/login?as=teacher");
 }

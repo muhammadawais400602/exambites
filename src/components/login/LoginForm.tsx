@@ -12,10 +12,10 @@ import { HOME, LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
 type Mode = "login" | "reset";
 
 /**
- * Sign-in card. The main login (role "student", at /login) accepts every
- * account and sends it to its own portal. The teacher and admin pages only
- * accept their role: other accounts sign straight back out and get a link
- * to the right login.
+ * Sign-in card. On /login (student or teacher tab) both students and
+ * teachers get in and land in their own portal; the admin page accepts only
+ * the admin. Other accounts sign straight back out and get a link to the
+ * right login.
  */
 export function LoginForm({ role }: { role: Role }) {
   const id = useId();
@@ -74,21 +74,17 @@ export function LoginForm({ role }: { role: Role }) {
         return;
       }
       const actual = ((data?.user as { role?: Role } | undefined)?.role ?? "student") as Role;
-      // The main login (/login) lets every role in and sends each to their own portal.
-      if (role === "student") {
-        router.push(HOME[actual]);
-        router.refresh();
-        return;
-      }
-      if (actual !== role) {
+      // Students and teachers share /login (either tab works); the admin has their own page.
+      const accepted: Role[] = role === "admin" ? ["admin"] : ["student", "teacher"];
+      if (!accepted.includes(actual)) {
         await authClient.signOut();
         setError({
-          text: `This is the ${ROLE_LABEL[role].toLowerCase()} login. Your account is a ${ROLE_LABEL[actual].toLowerCase()} account.`,
+          text: actual === "admin" ? "Admins log in on the admin page." : "This account can't use the admin login.",
           href: LOGIN[actual],
         });
         return;
       }
-      router.push(HOME[role]);
+      router.push(HOME[actual]);
       router.refresh();
     } catch {
       setError({ text: "Connection problem. Check your internet and try again." });
@@ -106,7 +102,7 @@ export function LoginForm({ role }: { role: Role }) {
     <div className="relative overflow-hidden rounded-3xl border border-ink/10 bg-surface-card p-6 shadow-[0_30px_60px_-30px_color-mix(in_srgb,var(--color-brand-900)_45%,transparent)] sm:p-8">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div key={mode} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-          <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em] text-brand-700">{role === "student" ? "Students & teachers" : ROLE_LABEL[role]}</span>
+          <span className="font-label text-[10px] font-bold uppercase tracking-[0.18em] text-brand-700">{ROLE_LABEL[role]}</span>
           <h2 className="mt-1 font-display text-2xl font-black uppercase tracking-tight text-ink">
             {mode === "login" ? copy.heading : "Reset password"}
           </h2>

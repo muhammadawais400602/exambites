@@ -73,7 +73,7 @@ export async function inviteStaff(user: { id: string; name: string; email: strin
     await sendEmail({
       to: user.email,
       subject: "You're invited to teach at Exambites",
-      text: `Assalam o Alaikum ${user.name},\n\nYou've been added as a teacher at Exambites Creative Academy. Set your password here (valid for ${INVITE_DAYS} days):\n${link}\n\nThen log in at ${siteUrl()}/teacher/login\n\nExambites Creative Academy`,
+      text: `Assalam o Alaikum ${user.name},\n\nYou've been added as a teacher at Exambites Creative Academy. Set your password here (valid for ${INVITE_DAYS} days):\n${link}\n\nThen log in at ${siteUrl()}/login?as=teacher\n\nExambites Creative Academy`,
     });
   } catch {
     emailed = false;
