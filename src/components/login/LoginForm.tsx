@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowLeft, ArrowRight, Eye, EyeOff, LoaderCircle, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { loginPage } from "@/content/login";
 import { HOME, LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
@@ -28,6 +28,17 @@ export function LoginForm({ role }: { role: Role }) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<{ field?: "email" | "password"; text: string; href?: string } | null>(null);
   const [notice, setNotice] = useState("");
+
+  // Already signed in (e.g. came back from the public site): go straight to the portal.
+  // Checked once, so a sign-in on this page that gets rejected isn't redirected mid-way.
+  const { data: session, isPending } = authClient.useSession();
+  const checked = useRef(false);
+  useEffect(() => {
+    if (isPending || checked.current) return;
+    checked.current = true;
+    const signedIn = (session?.user as { role?: Role } | undefined)?.role;
+    if (signedIn) router.replace(HOME[signedIn]);
+  }, [isPending, session, router]);
 
   function switchMode(next: Mode) {
     setMode(next);

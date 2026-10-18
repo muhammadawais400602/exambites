@@ -1,6 +1,7 @@
+import { Settings } from "lucide-react";
 import Link from "next/link";
 import { brand } from "@/content/home";
-import { LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
+import { HOME, LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Avatar } from "./Avatar";
 import { SignOutButton } from "./SignOutButton";
@@ -10,20 +11,24 @@ export function PortalShell({ role, user, children }: { role: Role; user: { name
   return (
     <div className="min-h-dvh bg-surface">
       <header className="sticky top-0 z-40 border-b border-ink/10 bg-surface/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="font-display text-xl font-black tracking-tight text-ink">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link href={HOME[role]} title="Portal home" className="font-display text-xl font-black tracking-tight text-ink">
               {brand.short}
               <span className="text-brand-600">.</span>
             </Link>
-            <span className="rounded-full bg-brand-100 px-2.5 py-1 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-brand-900 dark:bg-brand-500/15 dark:text-brand-300">
+            <span className="hidden rounded-full bg-brand-100 px-2.5 py-1 min-[440px]:inline-block font-label text-[10px] font-bold uppercase tracking-[0.16em] text-brand-900 dark:bg-brand-500/15 dark:text-brand-300">
               {ROLE_LABEL[role]}
             </span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/profile" title="My profile" className="flex items-center gap-2 rounded-full py-1 pl-1 pr-1 text-sm font-semibold text-ink-soft transition-colors hover:text-ink sm:pr-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+            <Link href="/settings" title="Edit profile" className="flex items-center gap-2 rounded-full py-1 pl-1 pr-1 text-sm font-semibold text-ink-soft transition-colors hover:text-ink sm:pr-3">
               <Avatar name={user.name} image={user.image} size={30} />
               <span className="hidden max-w-40 truncate sm:block">{user.name}</span>
+            </Link>
+            <Link href="/settings" title="Settings" aria-label="Settings"
+              className="grid size-9 place-items-center rounded-full border border-ink/10 text-ink-soft transition-colors hover:border-brand-600/50 hover:text-ink">
+              <Settings className="size-4" />
             </Link>
             <ThemeToggle />
             <SignOutButton to={LOGIN[role]} />
