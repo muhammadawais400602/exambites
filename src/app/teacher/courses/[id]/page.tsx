@@ -26,7 +26,7 @@ async function Roster({ params }: { params: Params }) {
   if (!course || !course.teacherIds?.includes(user.id)) notFound();
   const rows = await courseRoster(course.id);
   return (
-    <PortalShell role="teacher" name={user.name}>
+    <PortalShell role="teacher" user={user}>
       <Link href="/teacher" className="text-xs font-semibold text-muted hover:text-brand-700">← My courses</Link>
       <div className="mb-6 mt-3">
         <PageTitle eyebrow={`${rows.length} student${rows.length === 1 ? "" : "s"}`} title={course.title} />

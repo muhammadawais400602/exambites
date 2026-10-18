@@ -31,7 +31,7 @@ async function Course({ params }: { params: Params }) {
   const next = lessons.find((l) => l.state === "open");
 
   return (
-    <PortalShell role="student" name={user.name}>
+    <PortalShell role="student" user={user}>
       <Link href="/portal" className="text-xs font-semibold text-muted hover:text-brand-700">← My courses</Link>
       <div className="mt-3">
         <PageTitle eyebrow={course.state === "done" ? "Completed" : "In progress"} title={course.title}>

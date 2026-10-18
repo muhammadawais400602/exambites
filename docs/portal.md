@@ -43,3 +43,7 @@ It only works while no admin exists. Afterwards delete `ADMIN_SETUP_TOKEN` from 
 ## How students move through courses
 
 One payment covers all courses, but one course is open at a time. AI Basics is first. When a course is finished, the student picks the next one. The bonus course opens after all the others. Videos are signed per viewer (links expire after 4 hours) and show the student's email as a moving watermark.
+
+## Profiles
+
+Everyone (students, teachers, admin) has a profile at `/profile`, opened from their name in the top bar. The **name and picture are public**: they show wherever the person appears (teacher views now, the community later). Phone, city, bio, skills and social links are **private**: only the person and the admin see them (Admin → Students → Progress). Teachers see students' names and pictures only, not their email or details. Pictures are cropped to a 256px square in the browser and stored in MongoDB (about 30 KB each). The profile page also has **Change password**.

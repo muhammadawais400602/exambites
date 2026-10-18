@@ -2,10 +2,11 @@ import Link from "next/link";
 import { brand } from "@/content/home";
 import { LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { Avatar } from "./Avatar";
 import { SignOutButton } from "./SignOutButton";
 
 /** Minimal frame shared by the student, teacher and admin portals. */
-export function PortalShell({ role, name, children }: { role: Role; name: string; children: React.ReactNode }) {
+export function PortalShell({ role, user, children }: { role: Role; user: { name: string; image?: string | null }; children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-surface">
       <header className="sticky top-0 z-40 border-b border-ink/10 bg-surface/85 backdrop-blur-xl">
@@ -20,7 +21,10 @@ export function PortalShell({ role, name, children }: { role: Role; name: string
             </span>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden max-w-48 truncate text-sm font-semibold text-ink-soft sm:block">{name}</span>
+            <Link href="/profile" title="My profile" className="flex items-center gap-2 rounded-full py-1 pl-1 pr-1 text-sm font-semibold text-ink-soft transition-colors hover:text-ink sm:pr-3">
+              <Avatar name={user.name} image={user.image} size={30} />
+              <span className="hidden max-w-40 truncate sm:block">{user.name}</span>
+            </Link>
             <ThemeToggle />
             <SignOutButton to={LOGIN[role]} />
           </div>

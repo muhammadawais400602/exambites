@@ -32,7 +32,7 @@ async function Lesson({ params }: { params: Params }) {
   const next = lessons[index + 1];
 
   return (
-    <PortalShell role="student" name={user.name}>
+    <PortalShell role="student" user={user}>
       <Link href={`/portal/courses/${course.slug}`} className="text-xs font-semibold text-muted hover:text-brand-700">← {course.title}</Link>
       <p className="mt-4 font-label text-[11px] font-bold uppercase tracking-[0.2em] text-brand-700">Lesson {index + 1} of {lessons.length}</p>
       <h1 className="mt-1 font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink md:text-4xl">{lesson.title}</h1>

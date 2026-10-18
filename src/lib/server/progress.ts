@@ -8,7 +8,7 @@ import { db } from "./db";
 export type RosterRow = {
   userId: string;
   name: string;
-  email: string;
+  image: string | null;
   status: "current" | "done";
   passed: number;
   total: number;
@@ -27,7 +27,7 @@ export async function courseRoster(courseId: string): Promise<RosterRow[]> {
   if (!enrollments.length) return [];
   const userIds = enrollments.map((e) => String(e.userId));
   const [users, lessons, progress] = await Promise.all([
-    db().collection("user").find({ _id: { $in: userIds.map(toId) } }, { projection: { name: 1, email: 1 } }).toArray(),
+    db().collection("user").find({ _id: { $in: userIds.map(toId) } }, { projection: { name: 1, image: 1 } }).toArray(),
     listLessons(courseId, { publishedOnly: true }),
     progressCol().find<ProgressDoc & { userId: string }>({ courseId, userId: { $in: userIds } }).toArray(),
   ]);
@@ -44,7 +44,7 @@ export async function courseRoster(courseId: string): Promise<RosterRow[]> {
       return {
         userId: uid,
         name: String(byUser.get(uid)?.name ?? "Deleted user"),
-        email: String(byUser.get(uid)?.email ?? ""),
+        image: (byUser.get(uid)?.image as string | null | undefined) ?? null,
         status: (e.currentCourseId === courseId ? "current" : "done") as RosterRow["status"],
         passed: rows.filter((p) => p.passed).length,
         total: lessons.length,
@@ -91,6 +91,6 @@ export async function studentCourseProgress(userId: string, courseId: string): P
 }
 
 export async function studentBasics(userId: string) {
-  const user = await db().collection("user").findOne({ _id: toId(userId) }, { projection: { name: 1, email: 1, phone: 1, role: 1 } });
-  return user && user.role === "student" ? { id: userId, name: String(user.name), email: String(user.email), phone: String(user.phone ?? "") } : null;
+  const user = await db().collection("user").findOne({ _id: toId(userId) }, { projection: { name: 1, email: 1, phone: 1, role: 1, image: 1 } });
+  return user && user.role === "student" ? { id: userId, name: String(user.name), email: String(user.email), phone: String(user.phone ?? ""), image: (user.image as string | null) ?? null } : null;
 }

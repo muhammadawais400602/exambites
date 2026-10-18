@@ -30,7 +30,7 @@ async function StudentPortal() {
   const first = user.name.split(" ")[0];
 
   return (
-    <PortalShell role="student" name={user.name}>
+    <PortalShell role="student" user={user}>
       {enrollment?.status === "approved" ? (
         <CoursePath userId={user.id} first={first} />
       ) : enrollment?.status === "rejected" ? (

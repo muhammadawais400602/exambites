@@ -22,7 +22,7 @@ async function TeacherHome() {
   const courses = await coursesForTeacher(user.id);
   const rosters = await Promise.all(courses.map((c) => courseRoster(c.id)));
   return (
-    <PortalShell role="teacher" name={user.name}>
+    <PortalShell role="teacher" user={user}>
       <PageTitle eyebrow="Teacher" title={`Hi ${user.name.split(" ")[0]}`} />
       {courses.length ? (
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

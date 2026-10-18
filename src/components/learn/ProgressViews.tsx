@@ -1,5 +1,6 @@
 import { CheckCircle2, Circle } from "lucide-react";
 import Link from "next/link";
+import { Avatar } from "@/components/portal/Avatar";
 import type { LessonProgress, RosterRow } from "@/lib/server/progress";
 
 const card = "rounded-3xl border border-ink/10 bg-surface-card";
@@ -25,12 +26,12 @@ export function RosterList({ rows, hrefFor }: { rows: RosterRow[]; hrefFor: (use
         return (
           <li key={r.userId}>
             <Link href={hrefFor(r.userId)} className="grid gap-3 p-5 transition-colors hover:bg-ink/[0.03] sm:grid-cols-[1.4fr_1fr_auto] sm:items-center">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-3">
+                <Avatar name={r.name} image={r.image} size={40} />
+                <div className="flex min-w-0 items-center gap-2">
                   <p className="truncate font-semibold text-ink">{r.name}</p>
                   {r.status === "done" && <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Completed</span>}
                 </div>
-                <p className="truncate text-xs text-ink-soft">{r.email}</p>
               </div>
               <div>
                 <div className="mb-1.5 flex justify-between text-xs text-ink-soft">

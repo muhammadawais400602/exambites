@@ -24,7 +24,7 @@ async function CourseEditor({ params }: { params: PageProps<"/admin/courses/[id]
   if (!course) notFound();
   const [lessons, teachers] = await Promise.all([listLessons(course.id), listTeachers()]);
   return (
-    <PortalShell role="admin" name={user.name}>
+    <PortalShell role="admin" user={user}>
       <Link href="/admin?tab=courses" className="text-xs font-semibold text-muted hover:text-brand-700">← All courses</Link>
       <div className="mt-3">
         <PageTitle eyebrow={course.bonus ? "Bonus course" : `Course ${String(course.order).padStart(2, "0")}`} title={course.title} />

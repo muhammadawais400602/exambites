@@ -41,7 +41,7 @@ async function AdminDashboard({ searchParams }: { searchParams: PageProps<"/admi
   const stats = await adminStats();
 
   return (
-    <PortalShell role="admin" name={user.name}>
+    <PortalShell role="admin" user={user}>
       <PageTitle eyebrow="Admin" title={TABS.find((t) => t.key === tab)!.label} />
       <nav aria-label="Admin sections" className="-mx-4 mt-6 overflow-x-auto px-4">
         <ul className="flex w-max gap-1 rounded-full border border-ink/10 bg-surface-card p-1">
