@@ -256,8 +256,8 @@ export function LessonEditor({ lesson }: { lesson: LessonFields }) {
           <input id={`${id}-s`} value={v.summary} onChange={(e) => set({ summary: e.target.value })} maxLength={300} className={`${field} mt-1.5`} />
         </label>
         <label htmlFor={`${id}-v`} className={label}>
-          Bunny video ID
-          <input id={`${id}-v`} value={v.videoId} onChange={(e) => set({ videoId: e.target.value.trim() })} placeholder="e.g. 8f3c1a2b-…  (Bunny → Stream → video → Video GUID)" className={`${field} mt-1.5 font-mono`} />
+          Video: YouTube link (or Bunny video ID later)
+          <input id={`${id}-v`} value={v.videoId} onChange={(e) => set({ videoId: e.target.value.trim() })} placeholder="https://youtu.be/…  (set the video to Unlisted in YouTube)" className={`${field} mt-1.5 font-mono`} />
         </label>
         <label htmlFor={`${id}-n`} className={label}>
           Notes (shown under the video)

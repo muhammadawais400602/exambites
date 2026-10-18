@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { asAdmin, readJson, reply } from "@/lib/server/admin-api";
 import { audit } from "@/lib/server/audit";
 import { lessonCol, objectIdOrNull, type Question } from "@/lib/server/courses";
+import { parseVideo, storeVideo } from "@/lib/video";
 
 function cleanQuestions(raw: unknown): Question[] | string {
   if (!Array.isArray(raw)) return [];
@@ -19,7 +20,7 @@ function cleanQuestions(raw: unknown): Question[] | string {
   return out;
 }
 
-/** Saves a lesson: text, Bunny video id, notes, quiz and whether students can see it. */
+/** Saves a lesson: text, video (YouTube link or Bunny id), notes, quiz and whether students can see it. */
 export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/lessons/[id]">) {
   return asAdmin(request, async (admin) => {
     const _id = objectIdOrNull((await ctx.params).id);
@@ -27,8 +28,10 @@ export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/less
     const body = await readJson<{ title: string; summary: string; videoId: string; notes: string; questions: unknown; published: boolean }>(request);
     const title = String(body.title ?? "").trim().slice(0, 120);
     if (title.length < 2) return reply({ ok: false, error: "Enter a lesson title." }, 422);
-    const videoId = String(body.videoId ?? "").trim();
-    if (videoId && !/^[A-Za-z0-9-]{8,64}$/.test(videoId)) return reply({ ok: false, error: "The video ID looks wrong. Copy it from Bunny (Video GUID)." }, 422);
+    const rawVideo = String(body.videoId ?? "").trim();
+    const video = parseVideo(rawVideo);
+    if (rawVideo && !video) return reply({ ok: false, error: "Paste a YouTube link (e.g. https://youtu.be/…) or a Bunny video ID." }, 422);
+    const videoId = video ? storeVideo(video) : "";
     const questions = cleanQuestions(body.questions);
     if (typeof questions === "string") return reply({ ok: false, error: questions }, 422);
     const lesson = await lessonCol().findOneAndUpdate(

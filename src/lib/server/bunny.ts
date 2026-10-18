@@ -1,20 +1,33 @@
 import "server-only";
 import { createHash } from "node:crypto";
+import { parseVideo } from "@/lib/video";
 
 /**
- * Bunny Stream player URL for a lesson video. With BUNNY_TOKEN_KEY set (Bunny →
- * Stream → library → Security → "Embed view token authentication"), the URL is
- * signed and stops working after a few hours, so a copied link goes stale.
+ * Player URL for a lesson video.
+ *
+ * YouTube: privacy-enhanced embed without related videos. Unlisted YouTube
+ * videos can be shared and downloaded by anyone who has the link, so this is
+ * a stop-gap until videos move to Bunny.
+ *
+ * Bunny Stream: with BUNNY_TOKEN_KEY set (Bunny → Stream → library → Security
+ * → "Embed view token authentication"), the URL is signed and stops working
+ * after a few hours, so a copied link goes stale.
  */
-export function videoEmbedUrl(videoId: string) {
+export function videoEmbedUrl(stored: string) {
+  const video = parseVideo(stored);
+  if (!video) return null;
+  if (video.kind === "youtube") {
+    const params = new URLSearchParams({ rel: "0", modestbranding: "1", playsinline: "1", iv_load_policy: "3" });
+    return `https://www.youtube-nocookie.com/embed/${video.id}?${params}`;
+  }
   const library = process.env.BUNNY_LIBRARY_ID;
-  if (!library || !videoId) return null;
+  if (!library) return null;
   const params = new URLSearchParams({ autoplay: "false", preload: "true", responsive: "true" });
   const key = process.env.BUNNY_TOKEN_KEY;
   if (key) {
     const expires = Math.floor(Date.now() / 1000) + 4 * 60 * 60;
-    params.set("token", createHash("sha256").update(key + videoId + expires).digest("hex"));
+    params.set("token", createHash("sha256").update(key + video.id + expires).digest("hex"));
     params.set("expires", String(expires));
   }
-  return `https://iframe.mediadelivery.net/embed/${encodeURIComponent(library)}/${encodeURIComponent(videoId)}?${params}`;
+  return `https://iframe.mediadelivery.net/embed/${encodeURIComponent(library)}/${encodeURIComponent(video.id)}?${params}`;
 }

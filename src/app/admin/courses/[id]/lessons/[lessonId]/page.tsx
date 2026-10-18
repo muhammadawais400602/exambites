@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { LessonEditor } from "@/components/admin/courses";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { getCourse, getLesson } from "@/lib/server/courses";
+import { displayVideo } from "@/lib/video";
 import { requireRole } from "@/lib/server/session";
 
 export const metadata: Metadata = { title: "Edit lesson · Exambites", robots: { index: false } };
@@ -30,7 +31,7 @@ async function Editor({ params }: { params: Params }) {
       <div className="mb-6 mt-3">
         <PageTitle eyebrow={`Lesson ${lesson.order}`} title={lesson.title} />
       </div>
-      <LessonEditor lesson={{ id: lesson.id, courseId: course.id, title: lesson.title, summary: lesson.summary, videoId: lesson.videoId, notes: lesson.notes, questions: lesson.questions, published: lesson.published }} />
+      <LessonEditor lesson={{ id: lesson.id, courseId: course.id, title: lesson.title, summary: lesson.summary, videoId: displayVideo(lesson.videoId), notes: lesson.notes, questions: lesson.questions, published: lesson.published }} />
     </PortalShell>
   );
 }

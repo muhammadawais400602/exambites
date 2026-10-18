@@ -38,7 +38,7 @@ It only works while no admin exists. Afterwards delete `ADMIN_SETUP_TOKEN` from 
 - **Activity**: every admin action and sign-up is logged.
 - **Courses**: the six courses are created automatically. Open one to edit its text, add lessons, reorder them and publish. A course or lesson is only visible to students once **Visible to students** is ticked.
 - **Teachers on a course**: tick teachers on the course page. They see that course's students (on it now or finished) with lesson-by-lesson progress and quiz scores; the admin sees every student via **Students → Progress**.
-- **Lessons**: title, Bunny video ID (Bunny → Stream → video → Video GUID), notes and a multiple-choice quiz. Students need 80% to unlock the next lesson; a lesson without questions is marked done after watching.
+- **Lessons**: title, video (a YouTube link for now: upload as **Unlisted**, with embedding allowed; or a Bunny video ID later), notes and a multiple-choice quiz. Students need 80% to unlock the next lesson; a lesson without questions is marked done after watching.
 
 ## How students move through courses
 
@@ -47,3 +47,7 @@ One payment covers all courses, but one course is open at a time. AI Basics is f
 ## Profiles
 
 Everyone (students, teachers, admin) has a profile on the **Settings** page (`/settings`), opened from the ⚙️ icon or their name in the top bar. The **name and picture are public**: they show wherever the person appears (teacher views now, the community later). Phone, city, bio, skills and social links are **private**: only the person and the admin see them (Admin → Students → Progress). Teachers see students' names and pictures only, not their email or details. Pictures are cropped to a 256px square in the browser and stored in MongoDB (about 30 KB each). The settings page also has **Change password**.
+
+### Videos on YouTube (temporary)
+
+Until Bunny Stream is set up, lessons can use YouTube. Upload each video as **Unlisted** (not Private, which can't be embedded), keep **Allow embedding** on, and paste its link into the lesson. The player hides related videos and shows the student's email as a watermark. Unlisted videos can still be shared and downloaded by anyone who gets the link, so move paid content to Bunny when you can: paste the Bunny video ID into the same field, one lesson at a time.
