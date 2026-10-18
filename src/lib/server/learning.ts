@@ -2,6 +2,7 @@ import "server-only";
 import { audit } from "./audit";
 import { getLesson, listCourses, listLessons, PASS_MARK, progressCol, type Course, type Lesson } from "./courses";
 import { db } from "./db";
+import { videoEmbedUrl } from "./bunny";
 import type { AppUser } from "./session";
 
 /**
@@ -76,6 +77,44 @@ export async function lessonForStudent(userId: string, lessonId: string) {
   return { course, lesson: lessons[index], lessons, index };
 }
 
+/** A lesson needs watching first when it has a video students can actually play. */
+export const needsWatching = (lesson: Lesson) => !!videoEmbedUrl(lesson.videoId);
+
+export async function hasWatched(userId: string, lessonId: string) {
+  const p = await progressCol().findOne({ userId, lessonId }, { projection: { watchedAt: 1, passed: 1 } });
+  return !!(p?.watchedAt || p?.passed);
+}
+
+/**
+ * Records video watching. "start" notes when playback began and how long the
+ * video is; "complete" (sent once the browser has seen most of it played)
+ * only counts if at least half the video's length has passed since then,
+ * so skipping to the end or calling this directly doesn't unlock the quiz.
+ */
+export async function recordWatch(user: AppUser, lessonId: string, event: "start" | "complete", duration: number) {
+  const found = await lessonForStudent(user.id, lessonId);
+  if (!found || !needsWatching(found.lesson)) return { ok: false as const, error: "Not available.", status: 404 };
+  const now = new Date();
+  if (event === "start") {
+    const seconds = Math.min(Math.max(Math.round(duration) || 0, 1), 6 * 60 * 60);
+    await progressCol().updateOne(
+      { userId: user.id, lessonId },
+      { $min: { watchStartedAt: now }, $set: { watchDuration: seconds, courseId: found.course.id, updatedAt: now }, $setOnInsert: { createdAt: now, attempts: 0 } },
+      { upsert: true },
+    );
+    return { ok: true as const };
+  }
+  const p = await progressCol().findOne({ userId: user.id, lessonId });
+  if (p?.watchedAt) return { ok: true as const };
+  const started = p?.watchStartedAt as Date | undefined;
+  const length = Number(p?.watchDuration ?? 0);
+  if (!started || !length) return { ok: false as const, error: "Play the video first.", status: 409 };
+  const elapsed = (now.getTime() - started.getTime()) / 1000;
+  if (elapsed < length * 0.5) return { ok: false as const, error: "Keep watching: the quiz opens after the video.", status: 409 };
+  await progressCol().updateOne({ userId: user.id, lessonId }, { $set: { watchedAt: now, updatedAt: now } });
+  return { ok: true as const };
+}
+
 /** The quiz as students see it: no correct answers. */
 export function publicQuestions(lesson: Lesson) {
   return lesson.questions.map(({ id, prompt, options }) => ({ id, prompt, options }));
@@ -90,6 +129,9 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
   const found = await lessonForStudent(user.id, lessonId);
   if (!found) return { ok: false, error: "This lesson isn't open for you yet.", status: 403 };
   const { course, lesson, lessons, index } = found;
+  if (lesson.state !== "done" && needsWatching(lesson) && !(await hasWatched(user.id, lesson.id))) {
+    return { ok: false, error: "Watch the video first. The quiz opens when you've seen it.", status: 409 };
+  }
 
   const wrong = lesson.questions.filter((q) => answers[q.id] !== q.answer).map((q) => q.id);
   const total = lesson.questions.length;

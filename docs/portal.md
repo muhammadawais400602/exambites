@@ -38,7 +38,7 @@ It only works while no admin exists. Afterwards delete `ADMIN_SETUP_TOKEN` from 
 - **Activity**: every admin action and sign-up is logged.
 - **Courses**: the six courses are created automatically. Open one to edit its text, add lessons, reorder them and publish. A course or lesson is only visible to students once **Visible to students** is ticked.
 - **Teachers on a course**: tap course chips under each teacher in the Teachers tab, or tick teachers on the course page. They see that course's students (on it now or finished) with lesson-by-lesson progress and quiz scores; the admin sees every student via **Students → Progress**.
-- **Lessons**: title, video (a YouTube link for now: upload as **Unlisted**, with embedding allowed; or a Bunny video ID later), notes and a multiple-choice quiz. Students need 80% to unlock the next lesson; a lesson without questions is marked done after watching.
+- **Lessons**: title, video (a YouTube link for now: upload as **Unlisted**, with embedding allowed; or a Bunny video ID later), notes and a multiple-choice quiz. Students must watch the video before the quiz opens (the player counts only seconds actually played, at least 90%, and the server also checks that enough real time has passed), then need 80% to unlock the next lesson; a lesson without questions is marked done after watching. Lessons have Previous / Next buttons; Next unlocks once the lesson is passed.
 
 ## How students move through courses
 

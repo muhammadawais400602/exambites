@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
-import { Download, FileText, Film } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, FileText, Film, Lock } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { LessonVideo, LessonWatch, QuizGate } from "@/components/learn/LessonVideo";
 import { Quiz } from "@/components/learn/Quiz";
 import { PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { videoEmbedUrl } from "@/lib/server/bunny";
 import { PASS_MARK } from "@/lib/server/courses";
 import { FILE_TYPES, formatBytes } from "@/lib/files";
-import { lessonForStudent, publicQuestions } from "@/lib/server/learning";
+import { hasWatched, lessonForStudent, needsWatching, publicQuestions } from "@/lib/server/learning";
+import { parseVideo } from "@/lib/video";
 import { requireRole } from "@/lib/server/session";
 
 export const metadata: Metadata = { title: "Lesson · Exambites", robots: { index: false } };
@@ -28,39 +31,43 @@ async function Lesson({ params }: { params: Params }) {
   const found = await lessonForStudent(user.id, (await params).id);
   if (!found) notFound();
   const { course, lesson, lessons, index } = found;
-  const src = videoEmbedUrl(lesson.videoId);
+  const h = await headers();
+  const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`;
+  const src = videoEmbedUrl(lesson.videoId, origin);
+  const kind = parseVideo(lesson.videoId)?.kind ?? "youtube";
+  const required = needsWatching(lesson);
+  const watched = lesson.state === "done" || (required && (await hasWatched(user.id, lesson.id)));
   const prev = lessons[index - 1];
   const next = lessons[index + 1];
+  const nav = <LessonNav prev={prev} next={next} />;
 
   return (
     <PortalShell role="student" user={user}>
       <Link href={`/portal/courses/${course.slug}`} className="text-xs font-semibold text-muted hover:text-brand-700">← {course.title}</Link>
       <p className="mt-4 font-label text-[11px] font-bold uppercase tracking-[0.2em] text-brand-700">Lesson {index + 1} of {lessons.length}</p>
-      <h1 className="mt-1 font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink md:text-4xl">{lesson.title}</h1>
-
-      <div className="relative mt-6 aspect-video overflow-hidden rounded-3xl border border-ink/10 bg-black">
-        {src ? (
-          <>
-            <iframe src={src} title={lesson.title} loading="lazy" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowFullScreen className="absolute inset-0 size-full border-0" />
-            {/* Who is watching, so screen recordings can be traced back to an account. */}
-            <div aria-hidden className="pointer-events-none absolute inset-0 select-none overflow-hidden">
-              <span className="watermark absolute font-mono text-xs text-white/25">{user.email}</span>
-            </div>
-          </>
-        ) : (
-          <div className="absolute inset-0 grid place-items-center text-center text-white/60">
-            <div>
-              <Film className="mx-auto size-8" />
-              <p className="mt-3 text-sm">The video for this lesson is coming soon.</p>
-            </div>
-          </div>
-        )}
+      <div className="mt-1 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <h1 className="font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink md:text-4xl">{lesson.title}</h1>
+        <div className="shrink-0">{nav}</div>
       </div>
+
+      <LessonWatch lessonId={lesson.id} required={required} initiallyWatched={watched}>
+      {src ? (
+        <LessonVideo src={src} kind={kind} title={lesson.title} watermark={user.email} />
+      ) : (
+        <div className="relative mt-6 grid aspect-video place-items-center overflow-hidden rounded-3xl border border-ink/10 bg-black text-center text-white/60">
+          <div>
+            <Film className="mx-auto size-8" />
+            <p className="mt-3 text-sm">The video for this lesson is coming soon.</p>
+          </div>
+        </div>
+      )}
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-8">
           {lesson.summary && <p className="text-ink-soft">{lesson.summary}</p>}
-          <Quiz lessonId={lesson.id} questions={publicQuestions(lesson)} passMark={PASS_MARK} done={lesson.state === "done"} courseSlug={course.slug} />
+          <QuizGate>
+            <Quiz lessonId={lesson.id} questions={publicQuestions(lesson)} passMark={PASS_MARK} done={lesson.state === "done"} courseSlug={course.slug} />
+          </QuizGate>
         </div>
         {(lesson.notes || lesson.attachments.length > 0) && (
           <aside className="h-fit space-y-6 rounded-3xl border border-ink/10 bg-surface-card p-6">
@@ -94,10 +101,35 @@ async function Lesson({ params }: { params: Params }) {
         )}
       </div>
 
-      <nav aria-label="Lessons" className="mt-10 flex justify-between gap-3 border-t border-ink/10 pt-6 text-sm font-semibold">
-        {prev ? <Link href={`/portal/lessons/${prev.id}`} className="text-ink-soft hover:text-brand-700">← {prev.title}</Link> : <span />}
-        {next && next.state !== "locked" && <Link href={`/portal/lessons/${next.id}`} className="text-right text-ink-soft hover:text-brand-700">{next.title} →</Link>}
-      </nav>
+      </LessonWatch>
+      <div className="mt-10 border-t border-ink/10 pt-6">{nav}</div>
     </PortalShell>
+  );
+}
+
+type NavLesson = { id: string; title: string; state: "done" | "open" | "locked" } | undefined;
+
+/** Previous / next lesson. The next one stays locked until this lesson is passed. */
+function LessonNav({ prev, next }: { prev: NavLesson; next: NavLesson }) {
+  const btn = "inline-flex items-center gap-1.5 rounded-full border px-4 py-2.5 text-xs font-bold transition-colors";
+  return (
+    <nav aria-label="Lessons" className="flex flex-wrap items-center justify-between gap-2 md:justify-end">
+      {prev ? (
+        <Link href={`/portal/lessons/${prev.id}`} title={prev.title} className={`${btn} border-ink/15 text-ink-soft hover:border-brand-600/50 hover:text-ink`}>
+          <ArrowLeft className="size-3.5" /> Previous
+        </Link>
+      ) : (
+        <span className={`${btn} cursor-not-allowed border-ink/10 text-muted opacity-50`}><ArrowLeft className="size-3.5" /> Previous</span>
+      )}
+      {next && next.state !== "locked" ? (
+        <Link href={`/portal/lessons/${next.id}`} title={next.title} className={`${btn} border-brand-600 bg-brand-600 text-white hover:bg-brand-700`}>
+          Next <ArrowRight className="size-3.5" />
+        </Link>
+      ) : (
+        <span title={next ? "Pass this lesson to unlock the next one" : "This is the last lesson"} className={`${btn} cursor-not-allowed border-ink/10 text-muted`}>
+          {next ? <><Lock className="size-3.5" /> Next</> : "Last lesson"}
+        </span>
+      )}
+    </nav>
   );
 }
