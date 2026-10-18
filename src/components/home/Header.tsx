@@ -7,6 +7,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { brand, nav } from "@/content/home";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { Avatar } from "@/components/portal/Avatar";
+import { authClient } from "@/lib/auth-client";
+import { HOME, type Role } from "@/lib/roles";
 
 const hashOf = (href: string) => href.split("#")[1];
 
@@ -15,6 +18,9 @@ const hashOf = (href: string) => href.split("#")[1];
  * on screen; page links (/testimonials) light up on their own page.
  */
 export function Header() {
+  // Signed-in members get a link back to their portal instead of "Log in".
+  const { data: session } = authClient.useSession();
+  const member = session?.user as { name: string; image?: string | null; role?: string } | undefined;
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [section, setSection] = useState<string | null>(null);
@@ -102,13 +108,19 @@ export function Header() {
           >
             {nav.cta.label}
           </a>
-          <a
-            href={nav.account.href}
-            aria-label={nav.account.label}
-            className="grid size-9 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white"
-          >
-            <User className="size-4" />
-          </a>
+          {member ? (
+            <Link href={HOME[(member.role as Role) || "student"]} aria-label="My portal" title="My portal" className="rounded-full ring-2 ring-brand-600/40 transition-shadow hover:ring-brand-600">
+              <Avatar name={member.name} image={member.image} size={36} />
+            </Link>
+          ) : (
+            <a
+              href={nav.account.href}
+              aria-label={nav.account.label}
+              className="grid size-9 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-white"
+            >
+              <User className="size-4" />
+            </a>
+          )}
         </div>
       </div>
       <AnimatePresence>

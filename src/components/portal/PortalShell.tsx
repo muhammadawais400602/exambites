@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { brand } from "@/content/home";
-import { LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
+import { HOME, LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Avatar } from "./Avatar";
 import { SignOutButton } from "./SignOutButton";
@@ -12,7 +12,7 @@ export function PortalShell({ role, user, children }: { role: Role; user: { name
       <header className="sticky top-0 z-40 border-b border-ink/10 bg-surface/85 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
           <div className="flex items-center gap-3">
-            <Link href="/" className="font-display text-xl font-black tracking-tight text-ink">
+            <Link href={HOME[role]} title="Portal home" className="font-display text-xl font-black tracking-tight text-ink">
               {brand.short}
               <span className="text-brand-600">.</span>
             </Link>
