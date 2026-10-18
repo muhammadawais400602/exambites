@@ -126,6 +126,9 @@ async function Enrollments({ status }: { status?: EnrollmentStatus }) {
             </p>
           </div>
           {r.status === "pending" && <EnrollmentActions id={r.id} />}
+          {r.status === "approved" && (
+            <Link href={`/admin/students/${r.userId}`} className="shrink-0 text-xs font-bold text-brand-700 hover:underline">Progress →</Link>
+          )}
         </li>
       ))}
     </ul>
