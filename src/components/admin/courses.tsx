@@ -65,9 +65,9 @@ export function AddCourseForm() {
   );
 }
 
-type CourseFields = { id: string; title: string; category: string; description: string; published: boolean; bonus: boolean };
+type CourseFields = { id: string; title: string; category: string; description: string; published: boolean; bonus: boolean; teacherIds: string[] };
 
-export function CourseForm({ course }: { course: CourseFields }) {
+export function CourseForm({ course, teachers }: { course: CourseFields; teachers: { id: string; name: string }[] }) {
   const router = useRouter();
   const id = useId();
   const [v, setV] = useState(course);
@@ -101,6 +101,25 @@ export function CourseForm({ course }: { course: CourseFields }) {
         Description (students see this)
         <textarea id={`${id}-d`} rows={3} value={v.description} onChange={(e) => set({ description: e.target.value })} className={`${field} mt-1.5`} />
       </label>
+      <fieldset>
+        <legend className={label}>Teachers on this course (they see its students&apos; progress)</legend>
+        {teachers.length ? (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {teachers.map((t) => {
+              const on = v.teacherIds.includes(t.id);
+              return (
+                <label key={t.id} className={`flex cursor-pointer items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors ${on ? "border-brand-600 bg-brand-500/10 text-ink" : "border-ink/15 text-ink-soft hover:border-ink/30"}`}>
+                  <input type="checkbox" checked={on} className="size-3.5 accent-[var(--color-brand-600)]"
+                    onChange={(e) => set({ teacherIds: e.target.checked ? [...v.teacherIds, t.id] : v.teacherIds.filter((x) => x !== t.id) })} />
+                  {t.name}
+                </label>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="mt-2 text-xs text-muted">No teachers yet. Add them in the Teachers tab.</p>
+        )}
+      </fieldset>
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
         <Toggle checked={v.published} onChange={(published) => set({ published })}>Visible to students</Toggle>
         <Toggle checked={v.bonus} onChange={(bonus) => set({ bonus })}>Bonus course (opens after all other courses)</Toggle>

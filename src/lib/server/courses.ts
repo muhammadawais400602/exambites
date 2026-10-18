@@ -17,6 +17,8 @@ export type CourseDoc = {
   order: number;
   bonus: boolean;
   published: boolean;
+  /** Teachers assigned to this course: they see its students' progress. */
+  teacherIds?: string[];
   createdAt: Date;
 };
 
@@ -47,7 +49,7 @@ export const slugify = (s: string) =>
 
 const toCourse = (d: CourseDoc): Course => ({
   id: String(d._id), slug: d.slug, title: d.title, category: d.category, description: d.description ?? "",
-  order: d.order, bonus: !!d.bonus, published: !!d.published,
+  order: d.order, bonus: !!d.bonus, published: !!d.published, teacherIds: d.teacherIds ?? [],
 });
 const toLesson = (d: LessonDoc): Lesson => ({
   id: String(d._id), courseId: d.courseId, order: d.order, title: d.title, summary: d.summary ?? "",
@@ -116,6 +118,12 @@ export async function listLessons(courseId: string, { publishedOnly = false } = 
     .sort({ order: 1 })
     .toArray();
   return docs.map(toLesson);
+}
+
+export async function coursesForTeacher(teacherId: string) {
+  await ensureCourses();
+  const docs = await courseCol().find({ teacherIds: teacherId }).sort({ order: 1 }).toArray();
+  return docs.map(toCourse);
 }
 
 export async function getLesson(id: string) {

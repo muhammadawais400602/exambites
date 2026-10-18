@@ -37,8 +37,13 @@ It only works while no admin exists. Afterwards delete `ADMIN_SETUP_TOKEN` from 
 - **Referral codes**: pick the code, how many sign-ups it allows and an optional last day. A code drops the price from Rs. 7,000 to Rs. 5,000.
 - **Activity**: every admin action and sign-up is logged.
 - **Courses**: the six courses are created automatically. Open one to edit its text, add lessons, reorder them and publish. A course or lesson is only visible to students once **Visible to students** is ticked.
+- **Teachers on a course**: tick teachers on the course page. They see that course's students (on it now or finished) with lesson-by-lesson progress and quiz scores; the admin sees every student via **Students → Progress**.
 - **Lessons**: title, Bunny video ID (Bunny → Stream → video → Video GUID), notes and a multiple-choice quiz. Students need 80% to unlock the next lesson; a lesson without questions is marked done after watching.
 
 ## How students move through courses
 
 One payment covers all courses, but one course is open at a time. AI Basics is first. When a course is finished, the student picks the next one. The bonus course opens after all the others. Videos are signed per viewer (links expire after 4 hours) and show the student's email as a moving watermark.
+
+## Profiles
+
+Everyone (students, teachers, admin) has a profile at `/profile`, opened from their name in the top bar. The **name and picture are public**: they show wherever the person appears (teacher views now, the community later). Phone, city, bio, skills and social links are **private**: only the person and the admin see them (Admin → Students → Progress). Teachers see students' names and pictures only, not their email or details. Pictures are cropped to a 256px square in the browser and stored in MongoDB (about 30 KB each). The profile page also has **Change password**.

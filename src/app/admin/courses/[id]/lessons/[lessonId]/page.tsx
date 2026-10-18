@@ -25,7 +25,7 @@ async function Editor({ params }: { params: Params }) {
   const [course, lesson] = await Promise.all([getCourse(id), getLesson(lessonId)]);
   if (!course || !lesson || lesson.courseId !== course.id) notFound();
   return (
-    <PortalShell role="admin" name={user.name}>
+    <PortalShell role="admin" user={user}>
       <Link href={`/admin/courses/${course.id}`} className="text-xs font-semibold text-muted hover:text-brand-700">← {course.title}</Link>
       <div className="mb-6 mt-3">
         <PageTitle eyebrow={`Lesson ${lesson.order}`} title={lesson.title} />

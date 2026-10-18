@@ -10,6 +10,8 @@ export type AppUser = {
   email: string;
   role: Role;
   phone?: string | null;
+  /** Profile picture URL (/api/avatars/…), or empty. Public, like the name. */
+  image?: string | null;
   disabled?: boolean | null;
 };
 
@@ -38,11 +40,18 @@ export async function requireRole(role: Role): Promise<AppUser> {
   return user;
 }
 
+/** For pages any signed-in role can open (e.g. the profile page). */
+export async function requireUser(): Promise<AppUser> {
+  const user = await currentUser();
+  if (!user || user.disabled) redirect("/login");
+  return user;
+}
+
 /** For route handlers: the user if they have the role, otherwise a JSON error response. */
-export async function requireApiRole(request: Request, role: Role): Promise<AppUser | Response> {
+export async function requireApiRole(request: Request, role: Role | "any"): Promise<AppUser | Response> {
   const session = await getAuth().api.getSession({ headers: request.headers });
   const user = asAppUser(session?.user);
   if (!user) return Response.json({ ok: false, error: "Please log in." }, { status: 401 });
-  if (user.role !== role || user.disabled) return Response.json({ ok: false, error: "Not allowed." }, { status: 403 });
+  if ((role !== "any" && user.role !== role) || user.disabled) return Response.json({ ok: false, error: "Not allowed." }, { status: 403 });
   return user;
 }

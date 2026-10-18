@@ -23,13 +23,16 @@ const https = (host?: string) => (host ? `https://${host}` : "");
 
 /**
  * The address this deployment is served from. Vercel previews use their
- * branch URL, so logins and email links work there too.
+ * branch URL, so logins and email links work there too. In production,
+ * Vercel's own production domain (the custom domain once one is added) is
+ * the fallback when BETTER_AUTH_URL isn't set.
  */
 export function siteUrl() {
   const env = process.env;
   const url =
     (env.VERCEL_ENV === "preview" && https(env.VERCEL_BRANCH_URL)) ||
     env.BETTER_AUTH_URL ||
+    https(env.VERCEL_PROJECT_PRODUCTION_URL) ||
     https(env.VERCEL_URL) ||
     "http://localhost:3000";
   return url.replace(/\/$/, "");
@@ -38,7 +41,9 @@ export function siteUrl() {
 /** Every address this deployment answers on; sign-in requests are accepted from these only. */
 export function siteOrigins() {
   const env = process.env;
-  const base = [siteUrl(), env.BETTER_AUTH_URL, https(env.VERCEL_URL), https(env.VERCEL_BRANCH_URL)]
+  // VERCEL_PROJECT_PRODUCTION_URL follows the project's production domain, so a
+  // domain change keeps logins working even before BETTER_AUTH_URL is updated.
+  const base = [siteUrl(), env.BETTER_AUTH_URL, https(env.VERCEL_PROJECT_PRODUCTION_URL), https(env.VERCEL_URL), https(env.VERCEL_BRANCH_URL)]
     .filter((u): u is string => !!u)
     .map((u) => u.replace(/\/$/, ""));
   // A custom domain usually answers both with and without "www.".
