@@ -132,7 +132,7 @@ export function CourseForm({ course, teachers }: { course: CourseFields; teacher
   );
 }
 
-type LessonRow = { id: string; title: string; published: boolean; videoId: string; questions: number };
+type LessonRow = { id: string; title: string; published: boolean; videoId: string; questions: number; files: number };
 
 export function LessonList({ courseId, lessons }: { courseId: string; lessons: LessonRow[] }) {
   const router = useRouter();
@@ -170,7 +170,7 @@ export function LessonList({ courseId, lessons }: { courseId: string; lessons: L
                   {l.title}
                 </Link>
                 <p className="mt-0.5 text-xs text-muted">
-                  {l.published ? "Visible" : "Hidden"} · {l.videoId ? "Video added" : "No video yet"} · {l.questions} question{l.questions === 1 ? "" : "s"}
+                  {l.published ? "Visible" : "Hidden"} · {l.videoId ? "Video added" : "No video yet"} · {l.questions} question{l.questions === 1 ? "" : "s"}{l.files ? ` · ${l.files} file${l.files === 1 ? "" : "s"}` : ""}
                 </p>
               </div>
               <div className="flex shrink-0 gap-1">

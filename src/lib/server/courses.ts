@@ -22,6 +22,8 @@ export type CourseDoc = {
   createdAt: Date;
 };
 
+export type Attachment = { id: string; name: string; url: string; size: number; type: string; uploadedAt: Date };
+
 export type LessonDoc = {
   _id: ObjectId;
   courseId: string;
@@ -32,13 +34,15 @@ export type LessonDoc = {
   videoId: string;
   notes: string;
   questions: Question[];
+  /** Files for students to download (PDF, Word, PowerPoint…), stored in Vercel Blob. */
+  attachments?: Attachment[];
   published: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
 
 export type Course = Omit<CourseDoc, "_id" | "createdAt"> & { id: string };
-export type Lesson = Omit<LessonDoc, "_id" | "createdAt" | "updatedAt"> & { id: string };
+export type Lesson = Omit<LessonDoc, "_id" | "createdAt" | "updatedAt" | "attachments"> & { id: string; attachments: Attachment[] };
 
 const courseCol = () => db().collection<CourseDoc>("courses");
 const lessonCol = () => db().collection<LessonDoc>("lessons");
@@ -53,7 +57,7 @@ const toCourse = (d: CourseDoc): Course => ({
 });
 const toLesson = (d: LessonDoc): Lesson => ({
   id: String(d._id), courseId: d.courseId, order: d.order, title: d.title, summary: d.summary ?? "",
-  videoId: d.videoId ?? "", notes: d.notes ?? "", questions: d.questions ?? [], published: !!d.published,
+  videoId: d.videoId ?? "", notes: d.notes ?? "", questions: d.questions ?? [], attachments: d.attachments ?? [], published: !!d.published,
 });
 
 let seeded: Promise<void> | null = null;

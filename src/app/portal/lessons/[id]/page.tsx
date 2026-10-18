@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Film } from "lucide-react";
+import { Download, FileText, Film } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -7,6 +7,7 @@ import { Quiz } from "@/components/learn/Quiz";
 import { PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { videoEmbedUrl } from "@/lib/server/bunny";
 import { PASS_MARK } from "@/lib/server/courses";
+import { FILE_TYPES, formatBytes } from "@/lib/files";
 import { lessonForStudent, publicQuestions } from "@/lib/server/learning";
 import { requireRole } from "@/lib/server/session";
 
@@ -61,10 +62,34 @@ async function Lesson({ params }: { params: Params }) {
           {lesson.summary && <p className="text-ink-soft">{lesson.summary}</p>}
           <Quiz lessonId={lesson.id} questions={publicQuestions(lesson)} passMark={PASS_MARK} done={lesson.state === "done"} courseSlug={course.slug} />
         </div>
-        {lesson.notes && (
-          <aside className="h-fit rounded-3xl border border-ink/10 bg-surface-card p-6">
-            <h2 className="font-label text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Notes</h2>
-            <div className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-ink">{lesson.notes}</div>
+        {(lesson.notes || lesson.attachments.length > 0) && (
+          <aside className="h-fit space-y-6 rounded-3xl border border-ink/10 bg-surface-card p-6">
+            {lesson.notes && (
+              <div>
+                <h2 className="font-label text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Notes</h2>
+                <div className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-ink">{lesson.notes}</div>
+              </div>
+            )}
+            {lesson.attachments.length > 0 && (
+              <div>
+                <h2 className="font-label text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Files</h2>
+                <ul className="mt-3 space-y-2">
+                  {lesson.attachments.map((f) => (
+                    <li key={f.id}>
+                      <a href={`/api/files/${lesson.id}/${f.id}`} target="_blank" rel="noreferrer"
+                        className="flex items-center gap-3 rounded-2xl border border-ink/10 p-3 transition-colors hover:border-brand-600/40">
+                        <FileText className="size-5 shrink-0 text-brand-700" />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-semibold text-ink">{f.name}</span>
+                          <span className="text-xs text-muted">{FILE_TYPES[f.type] ?? "File"} · {formatBytes(f.size)}</span>
+                        </span>
+                        <Download className="size-4 shrink-0 text-ink-soft" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </aside>
         )}
       </div>
