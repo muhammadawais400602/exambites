@@ -254,3 +254,31 @@ export function ReferralActions({ code, active }: { code: string; active: boolea
     </div>
   );
 }
+
+/** Course chips on a teacher's row: tick the courses they teach. Saves on each click. */
+export function TeacherCourses({ id, courses, assigned }: { id: string; courses: { id: string; title: string }[]; assigned: string[] }) {
+  const { busy, error, call } = useAdminCall();
+  const [on, setOn] = useState(assigned);
+  async function toggle(courseId: string) {
+    const next = on.includes(courseId) ? on.filter((c) => c !== courseId) : [...on, courseId];
+    setOn(next);
+    if (!(await call("courses", `/api/admin/teachers/${id}`, "PATCH", { courseIds: next }))) setOn(on);
+  }
+  return (
+    <div>
+      <p className="mb-1.5 text-[11px] font-semibold text-muted">Teaches</p>
+      <div className="flex flex-wrap gap-1.5">
+        {courses.map((c) => {
+          const active = on.includes(c.id);
+          return (
+            <button key={c.id} type="button" aria-pressed={active} disabled={!!busy} onClick={() => toggle(c.id)}
+              className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors disabled:opacity-60 ${active ? "border-brand-600 bg-brand-600 text-white" : "border-ink/15 text-ink-soft hover:border-brand-600/50 hover:text-ink"}`}>
+              {c.title}
+            </button>
+          );
+        })}
+      </div>
+      <ErrorText text={error} />
+    </div>
+  );
+}
