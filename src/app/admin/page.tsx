@@ -9,7 +9,7 @@ import { lessonCounts, listCourses } from "@/lib/server/courses";
 import { adminStats, listAudit, listEnrollments, listReferralCodes, listTeachers, type EnrollmentStatus } from "@/lib/server/queries";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Admin · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Admin · School of Tomorrow", robots: { index: false } };
 
 const TABS = [
   { key: "overview", label: "Overview" },

@@ -1,5 +1,5 @@
 /**
- * Exambites sign-ups: Google Apps Script web app.
+ * School of Tomorrow sign-ups: Google Apps Script web app.
  *
  * Paste this into Extensions → Apps Script of the sign-ups Google Sheet,
  * fill in the three settings below, then deploy it as a web app
@@ -15,7 +15,7 @@ const SECRET = "PASTE-THE-SAME-SECRET-AS-VERCEL";
 // Where new sign-up alerts go.
 const NOTIFY_EMAIL = "admissions@example.com";
 // Name shown as the sender of the student's confirmation email.
-const FROM_NAME = "Exambites Creative Academy";
+const FROM_NAME = "School of Tomorrow";
 // ────────────────────────────────────────────────────────────────────────
 
 const SHEET_NAME = "Signups";
@@ -82,11 +82,11 @@ function doPost(e) {
     to: d.email,
     name: FROM_NAME,
     replyTo: NOTIFY_EMAIL,
-    subject: "Your Exambites seat reference: " + d.reference,
+    subject: "Your School of Tomorrow seat reference: " + d.reference,
     body: [
       "Assalam o Alaikum " + d.name + ",",
       "",
-      "Your seat at Exambites Creative Academy is reserved.",
+      "Your seat at School of Tomorrow is reserved.",
       "",
       "Seat reference: " + d.reference,
       "Amount: " + d.amount,

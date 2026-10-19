@@ -7,7 +7,7 @@ import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/Porta
 import { courseSteps, lessonsWithProgress, studentPath } from "@/lib/server/learning";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Course · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Course · School of Tomorrow", robots: { index: false } };
 
 type Params = PageProps<"/portal/courses/[slug]">["params"];
 

@@ -9,7 +9,7 @@ const listItem = {
   show: { opacity: 1, x: 0 },
 };
 
-/** Side-by-side comparison: the slow way versus the Exambites way. */
+/** Side-by-side comparison: the slow way versus the School of Tomorrow way. */
 export function TwoPaths() {
   const { slow, mapped } = twoPaths;
 

@@ -9,12 +9,13 @@ import { SignOutButton } from "./SignOutButton";
 
 /** Minimal frame shared by the student, teacher and admin portals. */
 export function PortalShell({ role, user, children }: { role: Role; user: { name: string; image?: string | null }; children: React.ReactNode }) {
+  const tabs = role === "admin" ? null : role;
   return (
     <div className="min-h-dvh bg-surface">
       <header className="sticky top-0 z-40 border-b border-ink/10 bg-surface/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4">
+        <div className={`mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto] items-center gap-2 px-4 ${tabs ? "xl:grid-cols-[1fr_auto_1fr]" : ""}`}>
           <div className="flex min-w-0 items-center gap-3">
-            <Link href={HOME[role]} title="Portal home" className="font-display text-xl font-black tracking-tight text-ink">
+            <Link href={HOME[role]} title="Portal home" className="truncate font-display text-base font-black tracking-tight text-ink min-[400px]:text-lg sm:text-xl">
               {brand.short}
               <span className="text-brand-600">.</span>
             </Link>
@@ -22,10 +23,11 @@ export function PortalShell({ role, user, children }: { role: Role; user: { name
               {ROLE_LABEL[role]}
             </span>
           </div>
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
-            <Link href="/settings" title="Edit profile" className="flex items-center gap-2 rounded-full py-1 pl-1 pr-1 text-sm font-semibold text-ink-soft transition-colors hover:text-ink sm:pr-3">
+          {tabs && <div className="hidden h-full xl:block"><PortalNav role={tabs} inline /></div>}
+          <div className="flex shrink-0 items-center justify-self-end gap-1.5 sm:gap-3">
+            <Link href="/settings" title={`${user.name} · Edit profile`} className="flex items-center gap-2 rounded-full py-1 pl-1 pr-1 text-sm font-semibold text-ink-soft transition-colors hover:text-ink sm:pr-3 xl:pr-1">
               <Avatar name={user.name} image={user.image} size={30} />
-              <span className="hidden max-w-40 truncate sm:block">{user.name}</span>
+              <span className={`hidden max-w-40 truncate sm:block ${tabs ? "xl:hidden" : ""}`}>{user.name}</span>
             </Link>
             <Link href="/settings" title="Settings" aria-label="Settings"
               className="grid size-9 place-items-center rounded-full border border-ink/10 text-ink-soft transition-colors hover:border-brand-600/50 hover:text-ink">
@@ -35,9 +37,9 @@ export function PortalShell({ role, user, children }: { role: Role; user: { name
             <SignOutButton to={LOGIN[role]} />
           </div>
         </div>
-        {role !== "admin" && <PortalNav role={role} />}
+        {tabs && <div className="xl:hidden"><PortalNav role={tabs} /></div>}
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 py-6 md:py-8">{children}</main>
     </div>
   );
 }

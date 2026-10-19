@@ -7,7 +7,7 @@ import { HOME } from "@/lib/roles";
 import { getProfile } from "@/lib/server/profile";
 import { requireUser } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Settings · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Settings · School of Tomorrow", robots: { index: false } };
 
 export default function SettingsPage() {
   return (

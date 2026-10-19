@@ -91,9 +91,9 @@ export const marquee = [
 export const inside = {
   title: { count: 1200, suffix: "+", word: "Inside" },
   subtitle: "A real community, learning and earning together",
-  badge: "Exambites Community",
+  badge: "School of Tomorrow Community",
   card: {
-    title: "Exambites Creative Academy",
+    title: "School of Tomorrow",
     body: "Private · members-only courses, live workshops and client vault",
     stats: [
       { value: "1,200+", label: "Members" },
@@ -136,8 +136,8 @@ export const twoPaths = {
 };
 
 export const brand = {
-  name: "Exambites Creative Academy",
-  short: "Exambites",
+  name: "School of Tomorrow",
+  short: "School of Tomorrow",
   // Copyright year. Static on purpose: the page is prerendered, so reading the clock here fails the build.
   year: 2026,
 };

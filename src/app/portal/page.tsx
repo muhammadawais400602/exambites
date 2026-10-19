@@ -13,7 +13,7 @@ import { CourseIcon } from "@/components/learn/CourseCover";
 import { getEnrollment } from "@/lib/server/queries";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Dashboard · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Dashboard · School of Tomorrow", robots: { index: false } };
 
 const card = "rounded-3xl border border-ink/10 bg-surface-card p-6 sm:p-8";
 
@@ -72,10 +72,10 @@ async function CoursePath({ userId, first }: { userId: string; first: string }) 
       {celebrate && <PendingCelebration completion={celebrate} />}
       <div>
         <h1 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink md:text-4xl">Welcome, {first}</h1>
-        <p className="mt-1 text-sm text-ink-soft">{[profile.city, "Exambites Creative Academy"].filter(Boolean).join(" · ")}</p>
+        <p className="mt-1 text-sm text-ink-soft">{[profile.city, "School of Tomorrow"].filter(Boolean).join(" · ")}</p>
       </div>
 
-      <section className="mt-8 grid overflow-hidden rounded-3xl border border-ink/10 bg-surface-card lg:grid-cols-[1fr_1.15fr]">
+      <section className="mt-5 grid overflow-hidden rounded-3xl border border-ink/10 bg-surface-card lg:grid-cols-[1fr_1.15fr]">
         <div className="flex flex-col p-6 sm:p-8">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">

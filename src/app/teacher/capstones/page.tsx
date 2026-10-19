@@ -8,7 +8,7 @@ import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/Porta
 import { listCapstones } from "@/lib/server/capstone";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Capstones · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Capstones · School of Tomorrow", robots: { index: false } };
 
 const BADGE = {
   submitted: ["To review", "bg-brand-500/15 text-brand-700"],

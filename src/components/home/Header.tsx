@@ -56,7 +56,7 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href="/" className="font-display text-xl font-black tracking-tight text-ink">
+        <Link href="/" className="font-display text-xl font-black leading-[1.05] tracking-tight text-ink sm:whitespace-nowrap">
           {brand.short}
           <span className="text-brand-600">.</span>
         </Link>

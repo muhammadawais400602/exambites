@@ -6,7 +6,7 @@ import { pathProgress, studentPath } from "@/lib/server/learning";
 import { requireRole } from "@/lib/server/session";
 import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Courses · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Courses · School of Tomorrow", robots: { index: false } };
 
 export default function CoursesPage() {
   return (

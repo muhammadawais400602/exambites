@@ -5,8 +5,8 @@ import { Footer } from "@/components/home/Footer";
 import { Header } from "@/components/home/Header";
 
 export const metadata: Metadata = {
-  title: "Enroll · Exambites Creative Academy",
-  description: "Lock your seat: 5 AI courses plus a bonus, lifetime access and the Exambites community, from Rs. 5,000 with a referral code.",
+  title: "Enroll · School of Tomorrow",
+  description: "Lock your seat: 5 AI courses plus a bonus, lifetime access and the School of Tomorrow community, from Rs. 5,000 with a referral code.",
 };
 
 export default function EnrollPage() {

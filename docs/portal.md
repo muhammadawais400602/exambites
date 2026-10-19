@@ -18,7 +18,7 @@ Three logins share one account system (Better Auth + MongoDB):
 | `BETTER_AUTH_URL` | the live site URL, e.g. `https://www.schooloftomorrow.si` (previews use their own URL automatically) |
 | `ADMIN_SETUP_TOKEN` | any long random string (only for step 2) |
 | `RESEND_API_KEY` | from resend.com (without it, emails only appear in the logs) |
-| `EMAIL_FROM` | e.g. `Exambites <hello@exambites.com>` (domain verified in Resend) |
+| `EMAIL_FROM` | e.g. `School of Tomorrow <hello@schooloftomorrow.si>` (domain verified in Resend) |
 | `ADMIN_NOTIFY_EMAIL` | inbox that gets new sign-up alerts |
 | `BUNNY_LIBRARY_ID` | Bunny → Stream → your library → API → Library ID |
 | `BUNNY_TOKEN_KEY` | Bunny → Stream → library → Security → turn on **Embed view token authentication**, copy the key (secret) |

@@ -7,7 +7,7 @@ import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/Porta
 import { capstoneProgress, getCapstone } from "@/lib/server/capstone";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Capstone · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Capstone · School of Tomorrow", robots: { index: false } };
 
 export default function Page() {
   return (

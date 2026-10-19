@@ -8,7 +8,7 @@ import { getCourse, listLessons } from "@/lib/server/courses";
 import { listTeachers } from "@/lib/server/queries";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Edit course · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Edit course · School of Tomorrow", robots: { index: false } };
 
 export default function CoursePage({ params }: PageProps<"/admin/courses/[id]">) {
   return (

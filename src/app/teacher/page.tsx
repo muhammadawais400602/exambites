@@ -8,7 +8,7 @@ import { courseRoster } from "@/lib/server/progress";
 import { waitingCount } from "@/lib/server/assignments";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Teacher · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Teacher · School of Tomorrow", robots: { index: false } };
 
 export default function TeacherPage() {
   return (

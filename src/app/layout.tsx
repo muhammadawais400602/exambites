@@ -28,7 +28,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Exambites Creative Academy · Crack With AI",
+  title: "School of Tomorrow · Crack With AI",
   description:
     "AI courses for students: AI Basics, Content Creation with Canva and CapCut, Digital Marketing, Web Development, Selling, plus a bonus AI Filmmaking course. Learn the tools, land clients and earn with AI in 90 days.",
 };

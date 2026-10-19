@@ -12,7 +12,7 @@ import { studentPath } from "@/lib/server/learning";
 import { studentBasics, studentCourseProgress } from "@/lib/server/progress";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Student · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Student · School of Tomorrow", robots: { index: false } };
 
 type Params = PageProps<"/admin/students/[userId]">["params"];
 

@@ -217,7 +217,7 @@ function Watermark() {
       aria-hidden
       className="pointer-events-none absolute inset-0 grid place-items-center font-label text-lg font-bold uppercase tracking-[0.3em] text-white/15 [transform:rotate(-18deg)]"
     >
-      exambites.com
+      schooloftomorrow.si
     </span>
   );
 }

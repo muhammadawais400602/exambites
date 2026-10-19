@@ -7,8 +7,8 @@ import { LoginSwitch } from "@/components/login/LoginSwitch";
 import { LoginShowcase } from "@/components/login/LoginShowcase";
 
 export const metadata: Metadata = {
-  title: "Log in · Exambites Creative Academy",
-  description: "Log in to the Exambites student and teacher portal.",
+  title: "Log in · School of Tomorrow",
+  description: "Log in to the School of Tomorrow student and teacher portal.",
   robots: { index: false },
 };
 

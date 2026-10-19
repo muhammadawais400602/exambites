@@ -12,7 +12,7 @@ import { CAPSTONE_KINDS, getCapstoneById } from "@/lib/server/capstone";
 import { studentBasics } from "@/lib/server/progress";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Review capstone · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Review capstone · School of Tomorrow", robots: { index: false } };
 
 type Params = PageProps<"/teacher/capstones/[id]">["params"];
 

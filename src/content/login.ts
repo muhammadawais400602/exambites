@@ -4,7 +4,7 @@ import { priceLabel } from "@/lib/pricing";
 import type { Role } from "@/lib/roles";
 
 export const loginPage = {
-  eyebrow: "Exambites portal",
+  eyebrow: "School of Tomorrow portal",
   title: { lead: "Welcome", highlight: "back." },
   body: "Pick up where you left off: lessons, projects, the community and your certificates, all in one place.",
   perks: [

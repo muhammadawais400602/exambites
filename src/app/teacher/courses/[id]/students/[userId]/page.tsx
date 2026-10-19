@@ -11,7 +11,7 @@ import { requireRole } from "@/lib/server/session";
 import { studentRecord } from "@/lib/server/students";
 import { StudentActions } from "@/components/staff/StudentTable";
 
-export const metadata: Metadata = { title: "Student progress · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Student progress · School of Tomorrow", robots: { index: false } };
 
 type Params = PageProps<"/teacher/courses/[id]/students/[userId]">["params"];
 

@@ -18,7 +18,7 @@ import { requireRole } from "@/lib/server/session";
 import { PendingCelebration } from "@/components/learn/CourseCompleteDialog";
 import { parseVideo } from "@/lib/video";
 
-export const metadata: Metadata = { title: "Lesson · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Lesson · School of Tomorrow", robots: { index: false } };
 
 type Props = { params: PageProps<"/portal/lessons/[id]">["params"]; searchParams: PageProps<"/portal/lessons/[id]">["searchParams"] };
 

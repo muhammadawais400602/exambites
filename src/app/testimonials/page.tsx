@@ -9,8 +9,8 @@ import { VideoStories } from "@/components/testimonials/VideoStories";
 import { postsSection } from "@/content/testimonials";
 
 export const metadata: Metadata = {
-  title: "Testimonials · Exambites Creative Academy",
-  description: "Video stories, community posts and written reviews from Exambites students earning with AI skills.",
+  title: "Testimonials · School of Tomorrow",
+  description: "Video stories, community posts and written reviews from School of Tomorrow students earning with AI skills.",
 };
 
 export default function TestimonialsPage() {
