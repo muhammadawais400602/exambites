@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Eye, EyeOff, Globe, LoaderCircle, Lock, Trash2 } from "lucide-react";
+import { Camera, Eye, EyeOff, Globe, GraduationCap, LoaderCircle, Lock, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
@@ -9,6 +9,10 @@ import { Avatar } from "@/components/portal/Avatar";
 type Fields = {
   name: string;
   phone: string;
+  regNo: string;
+  campus: string;
+  className: string;
+  section: string;
   city: string;
   bio: string;
   skills: string;
@@ -128,6 +132,19 @@ export function ProfileForm({ initial, image, email, showPhone }: { initial: Fie
           Email (used to log in)
           <input value={email} readOnly disabled className={`${field} mt-1.5 opacity-60`} />
         </label>
+        {showPhone && (
+          <fieldset className="grid gap-4 rounded-2xl border border-ink/10 p-4">
+            <legend className="flex items-center gap-1.5 px-1 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-brand-700">
+              <GraduationCap className="size-3.5" /> School details
+            </legend>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {input("regNo", "Registration number", { maxLength: 40, placeholder: "e.g. 2024-0153" })}
+              {input("campus", "Campus", { maxLength: 80, placeholder: "e.g. Main Campus" })}
+              {input("className", "Class", { maxLength: 40, placeholder: "e.g. Grade 9" })}
+              {input("section", "Section", { maxLength: 20, placeholder: "e.g. B" })}
+            </div>
+          </fieldset>
+        )}
         <div className="grid gap-4 sm:grid-cols-2">
           {showPhone && input("phone", "Mobile number", { inputMode: "tel", placeholder: "3001234567" })}
           {input("city", "City", { maxLength: 60, placeholder: "e.g. Lahore" })}

@@ -31,6 +31,10 @@ async function Student({ params }: { params: Params }) {
   if (!student) notFound();
   const [path, profile] = await Promise.all([studentPath(userId), getProfile(userId)]);
   const details = [
+    ["Registration number", profile.regNo],
+    ["Campus", profile.campus],
+    ["Class", profile.className],
+    ["Section", profile.section],
     ["City", profile.city],
     ["About", profile.bio],
     ["Skills", profile.skills],

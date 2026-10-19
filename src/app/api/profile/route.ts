@@ -12,6 +12,8 @@ export async function PATCH(request: Request) {
   if (name.length < 2 || name.length > 60) return Response.json({ ok: false, error: "Enter your name (2–60 characters)." }, { status: 422 });
   const profile = cleanProfile(body);
   if (typeof profile === "string") return Response.json({ ok: false, error: profile }, { status: 422 });
+  // School details belong to students only.
+  if (user.role !== "student") Object.assign(profile, { regNo: "", campus: "", className: "", section: "" });
 
   const set: Record<string, unknown> = { name, updatedAt: new Date() };
   if (user.role === "student" && body.phone !== undefined) {

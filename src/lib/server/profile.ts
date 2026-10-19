@@ -9,6 +9,11 @@ import { db } from "./db";
  * see it.
  */
 export type PrivateProfile = {
+  /** School details (students only). */
+  regNo: string;
+  campus: string;
+  className: string;
+  section: string;
   city: string;
   bio: string;
   skills: string;
@@ -19,6 +24,10 @@ export type PrivateProfile = {
 };
 
 export const PROFILE_LIMITS: Record<keyof PrivateProfile, number> = {
+  regNo: 40,
+  campus: 80,
+  className: 40,
+  section: 20,
   city: 60,
   bio: 600,
   skills: 200,
@@ -28,7 +37,12 @@ export const PROFILE_LIMITS: Record<keyof PrivateProfile, number> = {
   website: 200,
 };
 
-const EMPTY: PrivateProfile = { city: "", bio: "", skills: "", linkedin: "", instagram: "", facebook: "", website: "" };
+const EMPTY: PrivateProfile = { regNo: "", campus: "", className: "", section: "", city: "", bio: "", skills: "", linkedin: "", instagram: "", facebook: "", website: "" };
+
+const LABELS: Record<keyof PrivateProfile, string> = {
+  regNo: "Registration number", campus: "Campus", className: "Class", section: "Section", city: "City", bio: "About you",
+  skills: "Skills", linkedin: "LinkedIn", instagram: "Instagram", facebook: "Facebook", website: "Website",
+};
 
 const profiles = () => db().collection("profiles");
 const avatars = () => db().collection("avatars");
@@ -45,7 +59,7 @@ export function cleanProfile(input: Record<string, unknown>): PrivateProfile | s
   const out = { ...EMPTY };
   for (const k of Object.keys(EMPTY) as (keyof PrivateProfile)[]) {
     const v = String(input[k] ?? "").trim();
-    if (v.length > PROFILE_LIMITS[k]) return `${k[0].toUpperCase() + k.slice(1)} is too long.`;
+    if (v.length > PROFILE_LIMITS[k]) return `${LABELS[k]} is too long.`;
     out[k] = v;
   }
   for (const k of ["linkedin", "instagram", "facebook", "website"] as const) {
