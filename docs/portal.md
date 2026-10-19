@@ -38,7 +38,7 @@ It only works while no admin exists. Afterwards delete `ADMIN_SETUP_TOKEN` from 
 - **Activity**: every admin action and sign-up is logged.
 - **Courses**: the six courses are created automatically. Open one to edit its text, add lessons, reorder them and publish. A course or lesson is only visible to students once **Visible to students** is ticked.
 - **Teachers on a course**: tap course chips under each teacher in the Teachers tab, or tick teachers on the course page. They see that course's students (on it now or finished) with lesson-by-lesson progress and quiz scores; the admin sees every student via **Students → Progress**.
-- **Lessons**: title, video (a YouTube link for now: upload as **Unlisted**, with embedding allowed; or a Bunny video ID later), notes and a multiple-choice quiz. Each lesson has steps (Video, Quiz, Assignment) listed in **Course content** beside the lesson. Videos can be skipped; the quiz must be passed (80%, one question at a time) and the assignment submitted before moving on. A lesson without questions has a **Mark as complete** button.
+- **Lessons**: title, video (a YouTube link for now: upload as **Unlisted**, with embedding allowed; or a Bunny video ID later), notes and a multiple-choice quiz. Each lesson has steps (Video, Quiz, Assignment) listed in **Course content** beside the lesson. Videos can be skipped; the quiz must be passed (80%, one question at a time) and the assignment submitted before moving on. After a failed attempt students see every question with the right answer in green and their wrong pick struck through in red, then **Retry quiz**. A lesson without questions has a **Mark as complete** button.
 
 ## How students move through courses
 
