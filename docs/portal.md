@@ -61,6 +61,12 @@ Teachers get a **Students** tab listing every student on, or finished with, one 
 - The admin has the same buttons on **Admin → Students → (student)**. Students can't change their own school details.
 - Every change is recorded in the activity log.
 
+## Capstone
+
+Students have a **Capstone** tab. It unlocks once every core course is finished (bonus courses aren't needed); the dashboard shows a "Capstone unlocked" banner. The student picks **Project** (something they made) or **Proof of earning** (their first income), adds a title, a description, a link and/or up to 5 screenshots (PNG, JPG, WebP or PDF, 10 MB each; screenshots need Vercel Blob), and submits. They can edit while it's waiting.
+
+Every teacher has a **Capstones** tab listing all students' capstones (waiting first), since the capstone covers the whole program. They open one and **Approve** it (the student sees "Capstone approved — you've completed the whole program") or **Reject** it with feedback (the student updates it and submits again). Decisions are logged in Activity.
+
 ## Lesson files (PDF, Word, PowerPoint…)
 
 Needs Vercel Blob: Vercel → **Storage** → **Create** → **Blob** → choose **Public** access → connect it to the exambites project (Production and Preview). Vercel adds `BLOB_READ_WRITE_TOKEN` itself; redeploy afterwards.

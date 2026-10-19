@@ -1,18 +1,20 @@
 "use client";
 
-import { BookOpen, LayoutDashboard, UserRound, Users } from "lucide-react";
+import { BookOpen, LayoutDashboard, Trophy, UserRound, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const STUDENT_TABS = [
   { href: "/portal", label: "Dashboard", Icon: LayoutDashboard, match: (p: string) => p === "/portal" },
   { href: "/portal/courses", label: "Courses", Icon: BookOpen, match: (p: string) => p.startsWith("/portal/courses") || p.startsWith("/portal/lessons") },
+  { href: "/portal/capstone", label: "Capstone", Icon: Trophy, match: (p: string) => p.startsWith("/portal/capstone") },
   { href: "/settings", label: "Profile", Icon: UserRound, match: (p: string) => p.startsWith("/settings") },
 ];
 
 const TEACHER_TABS = [
   { href: "/teacher", label: "My courses", Icon: BookOpen, match: (p: string) => p === "/teacher" || p.startsWith("/teacher/courses") },
   { href: "/teacher/students", label: "Students", Icon: Users, match: (p: string) => p.startsWith("/teacher/students") },
+  { href: "/teacher/capstones", label: "Capstones", Icon: Trophy, match: (p: string) => p.startsWith("/teacher/capstones") },
   { href: "/settings", label: "Profile", Icon: UserRound, match: (p: string) => p.startsWith("/settings") },
 ];
 

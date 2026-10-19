@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Award, CheckCircle2, Clock, Lock, PlayCircle, XCircle } from "lucide-react";
+import { Award, CheckCircle2, Clock, Lock, PlayCircle, Trophy, XCircle } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
@@ -131,6 +131,17 @@ async function CoursePath({ userId, first }: { userId: string; first: string }) 
           </div>
         </div>
       </section>
+
+      {core.length > 0 && doneCount === core.length && (
+        <Link href="/portal/capstone" className="mt-6 flex items-center gap-4 rounded-3xl border border-brand-600/40 bg-gradient-to-r from-brand-500/15 to-transparent p-5 transition-colors hover:border-brand-600">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-brand-600 text-white"><Trophy className="size-6" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-black uppercase tracking-tight text-ink">Capstone unlocked</span>
+            <span className="block text-sm text-ink-soft">Hand in your first project or proof of earning to complete the program.</span>
+          </span>
+          <span className="shrink-0 text-sm font-bold text-brand-700">Open →</span>
+        </Link>
+      )}
 
       <div className="mb-5 mt-12 flex items-end justify-between">
         <h2 className="font-display text-2xl font-black uppercase tracking-tight text-ink">My courses</h2>
