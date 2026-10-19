@@ -10,7 +10,7 @@ import { getCourse } from "@/lib/server/courses";
 import { courseRoster } from "@/lib/server/progress";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Course students · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Course students · School of Tomorrow", robots: { index: false } };
 
 type Params = PageProps<"/teacher/courses/[id]">["params"];
 

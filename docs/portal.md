@@ -18,7 +18,7 @@ Three logins share one account system (Better Auth + MongoDB):
 | `BETTER_AUTH_URL` | the live site URL, e.g. `https://www.schooloftomorrow.si` (previews use their own URL automatically) |
 | `ADMIN_SETUP_TOKEN` | any long random string (only for step 2) |
 | `RESEND_API_KEY` | from resend.com (without it, emails only appear in the logs) |
-| `EMAIL_FROM` | e.g. `Exambites <hello@exambites.com>` (domain verified in Resend) |
+| `EMAIL_FROM` | e.g. `School of Tomorrow <hello@schooloftomorrow.si>` (domain verified in Resend) |
 | `ADMIN_NOTIFY_EMAIL` | inbox that gets new sign-up alerts |
 | `BUNNY_LIBRARY_ID` | Bunny → Stream → your library → API → Library ID |
 | `BUNNY_TOKEN_KEY` | Bunny → Stream → library → Security → turn on **Embed view token authentication**, copy the key (secret) |
@@ -60,6 +60,12 @@ Teachers get a **Students** tab listing every student on, or finished with, one 
 - **⋯** on a row: **View progress**, **Edit profile** (name, Reg No, campus, class, section), **Reset password** (teacher sets a new one and gives it to the student; other devices are signed out) and **Disable / Enable account** (a disabled student is signed out and can't log in; progress is kept).
 - The admin has the same buttons on **Admin → Students → (student)**. Students can't change their own school details.
 - Every change is recorded in the activity log.
+
+## Capstone
+
+Students have a **Capstone** tab. It unlocks once every core course is finished (bonus courses aren't needed); the dashboard shows a "Capstone unlocked" banner. The student picks **Project** (something they made) or **Proof of earning** (their first income), adds a title, a description, a link and/or up to 5 screenshots (PNG, JPG, WebP or PDF, 10 MB each; screenshots need Vercel Blob), and submits. They can edit while it's waiting.
+
+Every teacher has a **Capstones** tab listing all students' capstones (waiting first), since the capstone covers the whole program. They open one and **Approve** it (the student sees "Capstone approved — you've completed the whole program") or **Reject** it with feedback (the student updates it and submits again). Decisions are logged in Activity.
 
 ## Lesson files (PDF, Word, PowerPoint…)
 

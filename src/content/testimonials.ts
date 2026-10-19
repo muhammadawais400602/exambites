@@ -6,7 +6,7 @@ import type { Track } from "./home";
 export const testimonialsPage = {
   eyebrow: "Proof of results · Student wall",
   title: { lead: "Real students.", highlight: "Real dollar income." },
-  body: "Video stories, community posts and written reviews from Exambites students across Pakistan, learning AI skills and getting paid by clients at home and abroad.",
+  body: "Video stories, community posts and written reviews from School of Tomorrow students across Pakistan, learning AI skills and getting paid by clients at home and abroad.",
   stats: [
     { value: "1,200+", label: "Students", note: "Learning inside the academy" },
     { value: "4", label: "Video stories", note: "Recorded with students" },
@@ -174,7 +174,7 @@ export const reviews: Review[] = [
     place: "Karachi, Sindh",
     track: "Selling",
     badge: "$300 → $1,200",
-    text: "Fiverr pe pehle mahine $300 kamaye, doosre mahine $1,200. Proposal templates ne kamaal kar diya. Shukriya Exambites!",
+    text: "Fiverr pe pehle mahine $300 kamaye, doosre mahine $1,200. Proposal templates ne kamaal kar diya. Shukriya School of Tomorrow!",
   },
 ];
 

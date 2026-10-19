@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Award, CheckCircle2, Clock, Lock, PlayCircle, XCircle } from "lucide-react";
+import { Award, CheckCircle2, Clock, Lock, PlayCircle, Trophy, XCircle } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
@@ -13,7 +13,7 @@ import { CourseIcon } from "@/components/learn/CourseCover";
 import { getEnrollment } from "@/lib/server/queries";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Dashboard · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Dashboard · School of Tomorrow", robots: { index: false } };
 
 const card = "rounded-3xl border border-ink/10 bg-surface-card p-6 sm:p-8";
 
@@ -72,10 +72,10 @@ async function CoursePath({ userId, first }: { userId: string; first: string }) 
       {celebrate && <PendingCelebration completion={celebrate} />}
       <div>
         <h1 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink md:text-4xl">Welcome, {first}</h1>
-        <p className="mt-1 text-sm text-ink-soft">{[profile.city, "Exambites Creative Academy"].filter(Boolean).join(" · ")}</p>
+        <p className="mt-1 text-sm text-ink-soft">{[profile.city, "School of Tomorrow"].filter(Boolean).join(" · ")}</p>
       </div>
 
-      <section className="mt-8 grid overflow-hidden rounded-3xl border border-ink/10 bg-surface-card lg:grid-cols-[1fr_1.15fr]">
+      <section className="mt-5 grid overflow-hidden rounded-3xl border border-ink/10 bg-surface-card lg:grid-cols-[1fr_1.15fr]">
         <div className="flex flex-col p-6 sm:p-8">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
@@ -131,6 +131,17 @@ async function CoursePath({ userId, first }: { userId: string; first: string }) 
           </div>
         </div>
       </section>
+
+      {core.length > 0 && doneCount === core.length && (
+        <Link href="/portal/capstone" className="mt-6 flex items-center gap-4 rounded-3xl border border-brand-600/40 bg-gradient-to-r from-brand-500/15 to-transparent p-5 transition-colors hover:border-brand-600">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-brand-600 text-white"><Trophy className="size-6" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-black uppercase tracking-tight text-ink">Capstone unlocked</span>
+            <span className="block text-sm text-ink-soft">Hand in your first project or proof of earning to complete the program.</span>
+          </span>
+          <span className="shrink-0 text-sm font-bold text-brand-700">Open →</span>
+        </Link>
+      )}
 
       <div className="mb-5 mt-12 flex items-end justify-between">
         <h2 className="font-display text-2xl font-black uppercase tracking-tight text-ink">My courses</h2>

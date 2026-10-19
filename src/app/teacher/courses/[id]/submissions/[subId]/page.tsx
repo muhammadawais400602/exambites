@@ -13,7 +13,7 @@ import { studentBasics } from "@/lib/server/progress";
 import { requireRole } from "@/lib/server/session";
 import { formatBytes } from "@/lib/files";
 
-export const metadata: Metadata = { title: "Review assignment · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Review assignment · School of Tomorrow", robots: { index: false } };
 
 type Params = PageProps<"/teacher/courses/[id]/submissions/[subId]">["params"];
 

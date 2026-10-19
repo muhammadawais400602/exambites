@@ -9,7 +9,7 @@ import { getCourse, getLesson } from "@/lib/server/courses";
 import { displayVideo } from "@/lib/video";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "Edit lesson · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Edit lesson · School of Tomorrow", robots: { index: false } };
 
 type Params = PageProps<"/admin/courses/[id]/lessons/[lessonId]">["params"];
 

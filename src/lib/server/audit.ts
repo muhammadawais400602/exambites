@@ -31,7 +31,10 @@ export type AuditAction =
   | "assignment.graded"
   | "assignment.returned"
   | "assignment.approved"
-  | "assignment.rejected";
+  | "assignment.rejected"
+  | "capstone.submitted"
+  | "capstone.approved"
+  | "capstone.rejected";
 
 /** Records who did what. Shown to the admin as the activity log. */
 export async function audit(

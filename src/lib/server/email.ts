@@ -7,7 +7,7 @@ import { Resend } from "resend";
  */
 export async function sendEmail({ to, subject, text }: { to: string; subject: string; text: string }) {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM || "Exambites <onboarding@resend.dev>";
+  const from = process.env.EMAIL_FROM || "School of Tomorrow <onboarding@resend.dev>";
   if (!key) {
     console.info(`[email:dev] to=${to} subject="${subject}"\n${text}`);
     return;

@@ -14,7 +14,7 @@ import { useEffect, useId, useRef, useState } from "react";
 
 // Bubble messages: one opener, then what each course teaches.
 const SKILLS = [
-  { Icon: Sparkles, track: "Exambites", label: "AI Skills That Pay" },
+  { Icon: Sparkles, track: "Welcome", label: "AI Skills That Pay" },
   { Icon: Brain, track: "AI Basics", label: "Prompts & Tools" },
   { Icon: Palette, track: "Content", label: "Canva Designs" },
   { Icon: Clapperboard, track: "Content", label: "CapCut Reels" },
@@ -147,7 +147,7 @@ export function Mascot() {
 
       <motion.button
         type="button"
-        aria-label="Exambites robot mascot. Click to see the next skill"
+        aria-label="School of Tomorrow robot mascot. Click to see the next skill"
         onClick={() => {
           setHops((h) => h + 1);
           setSkill((i) => (i + 1) % SKILLS.length);

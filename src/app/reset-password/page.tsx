@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { AuthFrame } from "@/components/portal/AuthFrame";
 import { ResetPasswordForm } from "@/components/portal/ResetPasswordForm";
 
-export const metadata: Metadata = { title: "Set password · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Set password · School of Tomorrow", robots: { index: false } };
 
 export default function ResetPasswordPage() {
   return (

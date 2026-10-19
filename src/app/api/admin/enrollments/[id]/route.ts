@@ -31,11 +31,11 @@ export async function POST(request: Request, ctx: RouteContext<"/api/admin/enrol
     if (student?.email) {
       await sendEmail({
         to: student.email,
-        subject: action === "approve" ? "Your Exambites account is active" : "About your Exambites payment",
+        subject: action === "approve" ? "Your School of Tomorrow account is active" : "About your School of Tomorrow payment",
         text:
           action === "approve"
-            ? `Assalam o Alaikum ${who},\n\nWe received your payment (${enrollment.reference}). Your account is active and AI Basics is unlocked.\n\nLog in: ${siteUrl()}/login\n\nExambites Creative Academy`
-            : `Assalam o Alaikum ${who},\n\nWe couldn't match a payment to your reference ${enrollment.reference}.${note ? `\n\nNote from the academy: ${note}` : ""}\n\nReply to this email if you've already paid.\n\nExambites Creative Academy`,
+            ? `Assalam o Alaikum ${who},\n\nWe received your payment (${enrollment.reference}). Your account is active and AI Basics is unlocked.\n\nLog in: ${siteUrl()}/login\n\nSchool of Tomorrow`
+            : `Assalam o Alaikum ${who},\n\nWe couldn't match a payment to your reference ${enrollment.reference}.${note ? `\n\nNote from the academy: ${note}` : ""}\n\nReply to this email if you've already paid.\n\nSchool of Tomorrow`,
       }).catch((err) => console.error("[enroll] decision email failed", err));
     }
     return reply({ ok: true, status });

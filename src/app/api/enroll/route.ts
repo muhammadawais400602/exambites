@@ -119,11 +119,11 @@ function paymentLines(method: SignupFields["method"]) {
 async function notifyStudent(f: SignupFields, reference: string, amount: number) {
   await sendEmail({
     to: f.email,
-    subject: `Your Exambites seat reference: ${reference}`,
+    subject: `Your School of Tomorrow seat reference: ${reference}`,
     text: [
       `Assalam o Alaikum ${f.name},`,
       "",
-      "Your Exambites account is created and waiting for payment.",
+      "Your School of Tomorrow account is created and waiting for payment.",
       "",
       `Seat reference: ${reference}`,
       `Amount: ${formatRs(amount)}`,
@@ -134,7 +134,7 @@ async function notifyStudent(f: SignupFields, reference: string, amount: number)
       "2. We match your payment to your reference and unlock your account.",
       `3. Log in any time at ${siteUrl()}/login to see your status.`,
       "",
-      "Exambites Creative Academy",
+      "School of Tomorrow",
     ].join("\n"),
   });
 }

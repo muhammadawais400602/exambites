@@ -8,8 +8,8 @@ const field =
   "w-full rounded-xl border border-ink/15 bg-surface px-3.5 py-2.5 text-sm text-ink outline-none placeholder:text-muted focus:border-brand-600 focus:ring-4 focus:ring-brand-600/15";
 
 /** Teacher review: approve the work (next lesson opens) or reject it with feedback (student redoes it). */
-export function GradeForm({ id, status, feedback, backHref }: {
-  id: string; status: "submitted" | "approved" | "rejected"; feedback: string; backHref: string;
+export function GradeForm({ id, status, feedback, backHref, endpoint = "/api/submissions", approveHint = "Approving opens the student's next lesson." }: {
+  id: string; status: "submitted" | "approved" | "rejected"; feedback: string; backHref: string; endpoint?: string; approveHint?: string;
 }) {
   const router = useRouter();
   const [f, setF] = useState(feedback);
@@ -18,7 +18,7 @@ export function GradeForm({ id, status, feedback, backHref }: {
   async function send(action: "approve" | "reject") {
     if (action === "reject" && !f.trim()) return setState({ error: "Tell the student what to change." });
     setState({ busy: action });
-    const res = await fetch(`/api/submissions/${id}`, {
+    const res = await fetch(`${endpoint}/${id}`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, feedback: f }),
     }).catch(() => null);
     const data = (await res?.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
@@ -52,7 +52,7 @@ export function GradeForm({ id, status, feedback, backHref }: {
           {state.busy === "reject" ? <LoaderCircle className="size-3.5 animate-spin" /> : <><XCircle className="size-3.5" /> Reject</>}
         </button>
       </div>
-      <p className="text-[11px] text-muted">Approving opens the student&apos;s next lesson. Rejecting sends your feedback and asks them to redo it.</p>
+      <p className="text-[11px] text-muted">{approveHint} Rejecting sends your feedback and asks them to redo it.</p>
     </form>
   );
 }

@@ -5,7 +5,7 @@ import { StudentTable } from "@/components/staff/StudentTable";
 import { requireRole } from "@/lib/server/session";
 import { teacherStudents } from "@/lib/server/students";
 
-export const metadata: Metadata = { title: "Students · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Students · School of Tomorrow", robots: { index: false } };
 
 export default function Page() {
   return (

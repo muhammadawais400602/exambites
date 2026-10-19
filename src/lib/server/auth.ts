@@ -32,8 +32,8 @@ function createAuth() {
       sendResetPassword: async ({ user, url }) => {
         await sendEmail({
           to: user.email,
-          subject: "Set your Exambites password",
-          text: `Assalam o Alaikum ${user.name},\n\nUse this link to set your password (valid for 24 hours):\n${url}\n\nIf you didn't ask for this, ignore this email.\n\nExambites Creative Academy`,
+          subject: "Set your School of Tomorrow password",
+          text: `Assalam o Alaikum ${user.name},\n\nUse this link to set your password (valid for 24 hours):\n${url}\n\nIf you didn't ask for this, ignore this email.\n\nSchool of Tomorrow`,
         });
       },
     },
