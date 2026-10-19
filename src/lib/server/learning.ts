@@ -102,21 +102,39 @@ export function courseSteps(lessons: Awaited<ReturnType<typeof lessonsWithProgre
 }
 
 /** Marks the course complete when every lesson is done and opens the next one; returns true if it just happened. */
-export async function completeCourseIfDone(user: AppUser, courseId: string) {
+/** What the "course complete" popup shows: the finished course and the one that opened. */
+export type CourseCompletion = {
+  course: { title: string; slug: string };
+  next: { title: string; slug: string; image: string | null; number: number; bonus: boolean } | null;
+};
+
+/**
+ * Moves the student on once every lesson of their current course is done.
+ * Returns what was finished and what opened, or null if nothing changed.
+ */
+export async function completeCourseIfDone(user: AppUser, courseId: string): Promise<CourseCompletion | null> {
   const lessons = await lessonsWithProgress(user.id, courseId);
-  if (!lessons.length || !lessons.every((l) => l.state === "done")) return false;
+  if (!lessons.length || !lessons.every((l) => l.state === "done")) return null;
   const enrollment = await enrollments().findOne({ userId: user.id, status: "approved", currentCourseId: courseId });
-  if (!enrollment) return false;
+  if (!enrollment) return null;
   const completed = [...new Set([...(enrollment.completedCourseIds ?? []), courseId])];
-  const next = nextCourse(await listCourses({ publishedOnly: true }), completed);
+  const courses = await listCourses({ publishedOnly: true });
+  const next = nextCourse(courses, completed);
   const res = await enrollments().updateOne(
     { _id: enrollment._id, currentCourseId: courseId },
     { $set: { currentCourseId: next?.id ?? null, completedCourseIds: completed } },
   );
-  if (!res.modifiedCount) return false;
-  const course = await getCourse(courseId);
+  if (!res.modifiedCount) return null;
+  const course = courses.find((c) => c.id === courseId) ?? (await getCourse(courseId));
   await audit(user, "student.course_completed", `${user.name} completed ${course?.title ?? "a course"}${next ? `; ${next.title} is open` : ""}`, { courseId, nextCourseId: next?.id ?? null });
-  return true;
+  const core = courses.filter((c) => !c.bonus);
+  return {
+    course: { title: course?.title ?? "your course", slug: course?.slug ?? "" },
+    next: next && {
+      title: next.title, slug: next.slug, image: next.image ?? null, bonus: next.bonus,
+      number: next.bonus ? 0 : core.findIndex((c) => c.id === next.id) + 1,
+    },
+  };
 }
 
 /** Everything a student needs to open one lesson, or null when it isn't theirs to open yet. */
@@ -180,7 +198,7 @@ export type SubmitResult =
       ok: true; score: number; passed: boolean; wrong: string[]; total: number;
       /** Correct option per question, so a failed attempt can be reviewed. */
       correct: Record<string, number>;
-      courseCompleted: boolean; assignmentPending: boolean; nextLessonId: string | null;
+      courseCompleted: boolean; completion: CourseCompletion | null; assignmentPending: boolean; nextLessonId: string | null;
     }
   | { ok: false; error: string; status: number };
 
@@ -206,7 +224,7 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
     { upsert: true },
   );
 
-  let courseCompleted = false;
+  let completion: CourseCompletion | null = null;
   if (passed) {
     const first = await progressCol().updateOne(
       { userId: user.id, lessonId, passed: { $ne: true } },
@@ -215,11 +233,11 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
     if (first.modifiedCount) {
       await audit(user, "student.lesson_passed", `${user.name} passed “${lesson.title}” (${score}%)`, { lessonId, courseId: course.id });
     }
-    if (course.state === "current") courseCompleted = await completeCourseIfDone(user, course.id);
+    if (course.state === "current") completion = await completeCourseIfDone(user, course.id);
   }
   const assignmentPending = passed && !!lesson.assignment && !lesson.submitted;
   return {
-    ok: true, score, passed, wrong, total, courseCompleted, assignmentPending,
+    ok: true, score, passed, wrong, total, courseCompleted: !!completion, completion, assignmentPending,
     correct: Object.fromEntries(lesson.questions.map((q) => [q.id, q.answer])),
     nextLessonId: passed && !assignmentPending ? (lessons[index + 1]?.id ?? null) : null,
   };

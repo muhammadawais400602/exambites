@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { ACCEPT, fileType, formatBytes, safeName } from "@/lib/files";
+import type { CourseCompletion } from "@/lib/server/learning";
+import { CourseCompleteDialog } from "./CourseCompleteDialog";
 
 type File_ = { id: string; name: string; url: string; size: number; type: string };
 type Sub = { id: string; text: string; link: string; files: File_[]; status: "submitted" | "graded" | "returned"; score: number | null; feedback: string; gradedByName: string | null } | null;
@@ -26,7 +28,7 @@ export function AssignmentCard({ lessonId, userId, instructions, required, submi
   const [link, setLink] = useState(submission?.link ?? "");
   const [files, setFiles] = useState<File_[]>(submission?.files ?? []);
   const [progress, setProgress] = useState<string | null>(null);
-  const [state, setState] = useState<{ busy?: boolean; error?: string; done?: { next: string | null; completed: boolean } }>({});
+  const [state, setState] = useState<{ busy?: boolean; error?: string; done?: { next: string | null; completed: boolean; completion: CourseCompletion | null } }>({});
 
   async function addFiles(list: FileList) {
     setState({});
@@ -55,10 +57,10 @@ export function AssignmentCard({ lessonId, userId, instructions, required, submi
     const res = await fetch(`/api/portal/lessons/${lessonId}/assignment`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, link, files }),
     }).catch(() => null);
-    const data = (await res?.json().catch(() => null)) as { ok?: boolean; error?: string; nextLessonId?: string | null; courseCompleted?: boolean } | null;
+    const data = (await res?.json().catch(() => null)) as { ok?: boolean; error?: string; nextLessonId?: string | null; courseCompleted?: boolean; completion?: CourseCompletion | null } | null;
     if (!data?.ok) return setState({ error: data?.error ?? "Connection problem. Try again." });
     setEditing(false);
-    setState({ done: { next: data.nextLessonId ?? null, completed: !!data.courseCompleted } });
+    setState({ done: { next: data.nextLessonId ?? null, completed: !!data.courseCompleted, completion: data.completion ?? null } });
     router.refresh();
   }
 
@@ -104,6 +106,7 @@ export function AssignmentCard({ lessonId, userId, instructions, required, submi
         </div>
       )}
 
+      {state.done?.completion && <CourseCompleteDialog completion={state.done.completion} />}
       {state.done && (
         <p className="mt-4 text-sm text-emerald-600 dark:text-emerald-400" role="status">
           Submitted! {state.done.completed ? <Link href="/portal" className="font-bold underline">Your next course is open →</Link> : state.done.next ? <Link href={`/portal/lessons/${state.done.next}`} className="font-bold underline">Next lesson →</Link> : null}
