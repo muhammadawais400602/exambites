@@ -67,7 +67,7 @@ export type LessonProgress = {
   attempts: number;
   lastAttempt: string | null;
   /** null when the lesson has no assignment. */
-  assignment: { status: "missing" | "submitted" | "approved" | "rejected" } | null;
+  assignment: { status: "missing" | "submitted" | "approved" | "rejected"; submissionId: string | null } | null;
 };
 
 function assignmentState(raw: unknown): "missing" | "submitted" | "approved" | "rejected" {
@@ -96,7 +96,7 @@ export async function studentCourseProgress(userId: string, courseId: string): P
       attempts: p?.attempts ?? 0,
       lastAttempt: p?.updatedAt ? p.updatedAt.toISOString() : null,
       assignment: l.assignment
-        ? { status: assignmentState(subByLesson.get(l.id)?.status) }
+        ? { status: assignmentState(subByLesson.get(l.id)?.status), submissionId: subByLesson.has(l.id) ? String(subByLesson.get(l.id)!._id) : null }
         : null,
     };
   });

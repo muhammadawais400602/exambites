@@ -47,7 +47,7 @@ async function Student({ params }: { params: Params }) {
           <StudentActions student={record} />
         </div>
       )}
-      <LessonProgressList lessons={lessons} />
+      <LessonProgressList lessons={lessons} reviewHref={(sid) => `/teacher/courses/${course.id}/submissions/${sid}`} />
     </PortalShell>
   );
 }
