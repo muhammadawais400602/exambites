@@ -4,9 +4,11 @@ import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, CircleHelp, LoaderCir
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { CourseCompletion } from "@/lib/server/learning";
+import { CourseCompleteDialog } from "./CourseCompleteDialog";
 
 type Q = { id: string; prompt: string; options: string[] };
-type Result = { score: number; passed: boolean; wrong: string[]; total: number; correct: Record<string, number>; courseCompleted: boolean; assignmentPending?: boolean; nextLessonId: string | null };
+type Result = { score: number; passed: boolean; wrong: string[]; total: number; correct: Record<string, number>; courseCompleted: boolean; completion?: CourseCompletion | null; assignmentPending?: boolean; nextLessonId: string | null };
 
 /**
  * The lesson quiz, one question at a time. Passing (80%) is required to move
@@ -36,9 +38,14 @@ export function Quiz({ lessonId, questions, passMark, passed, bestScore, continu
 
   const card = "rounded-3xl border border-ink/10 bg-surface-card p-6 sm:p-8";
 
+  const celebrate = result?.completion ? <CourseCompleteDialog completion={result.completion} /> : null;
+
   if (!questions.length) {
     return passed ? (
-      <Done title="Lesson complete" body="You've finished this lesson." href={continueHref} />
+      <>
+        {celebrate}
+        <Done title="Lesson complete" body="You've finished this lesson." href={continueHref} />
+      </>
     ) : (
       <div className={card}>
         <p className="text-sm text-ink-soft">This lesson has no quiz. Mark it complete when you&apos;re ready to move on.</p>
@@ -57,8 +64,11 @@ export function Quiz({ lessonId, questions, passMark, passed, bestScore, continu
   if (result) {
     if (result.passed) {
       return (
-        <Done title={`${result.score}% · Passed`} href={continueHref}
-          body={result.courseCompleted ? "You finished the course! Your next course is now open." : result.assignmentPending ? "Next, hand in the assignment for this lesson." : "The next lesson is unlocked."} />
+        <>
+          {celebrate}
+          <Done title={`${result.score}% · Passed`} href={continueHref}
+            body={result.courseCompleted ? "You finished the course! Your next course is now open." : result.assignmentPending ? "Next, hand in the assignment for this lesson." : "The next lesson is unlocked."} />
+        </>
       );
     }
     const retry = () => { setResult(null); setAnswers({}); setI(0); };

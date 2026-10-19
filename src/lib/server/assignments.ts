@@ -102,8 +102,8 @@ export async function saveSubmission(user: AppUser, lessonId: string, input: { t
     { upsert: true },
   );
   await audit(user, "student.assignment_submitted", `${user.name} ${existing ? "updated" : "submitted"} the assignment for “${found.lesson.title}”`, { lessonId, courseId: found.course.id });
-  const courseCompleted = !existing && found.course.state === "current" ? await completeCourseIfDone(user, found.course.id) : false;
-  return { ok: true as const, courseCompleted, nextLessonId: found.lessons[found.index + 1]?.id ?? null };
+  const completion = !existing && found.course.state === "current" ? await completeCourseIfDone(user, found.course.id) : null;
+  return { ok: true as const, courseCompleted: !!completion, completion, nextLessonId: found.lessons[found.index + 1]?.id ?? null };
 }
 
 /** Can this user grade (and see) work for this course? Assigned teachers and the admin. */
