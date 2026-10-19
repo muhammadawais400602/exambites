@@ -12,7 +12,7 @@ export function CourseBanner({ title, slug, image }: { title: string; slug: stri
           <div aria-hidden className="absolute inset-0 bg-[radial-gradient(60%_120%_at_90%_0%,color-mix(in_srgb,var(--color-brand-500)_55%,transparent),transparent_65%),radial-gradient(50%_120%_at_0%_100%,color-mix(in_srgb,var(--color-brand-800)_70%,transparent),transparent_70%)]" />
           <div aria-hidden className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(white_1px,transparent_1px),linear-gradient(90deg,white_1px,transparent_1px)] [background-size:28px_28px]" />
           <CourseIcon slug={slug} aria-hidden className="absolute -right-6 top-1/2 size-48 -translate-y-1/2 text-white/10" strokeWidth={1.2} />
-          <p className="absolute bottom-4 left-6 font-display text-3xl font-black uppercase tracking-tight text-white sm:bottom-5 sm:text-5xl">{title}</p>
+          <p className="absolute inset-0 flex items-center justify-center px-6 text-center font-display text-3xl font-black uppercase leading-none tracking-tight text-white sm:text-5xl">{title}</p>
         </>
       )}
     </div>
