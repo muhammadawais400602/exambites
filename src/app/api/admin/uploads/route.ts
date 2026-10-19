@@ -1,5 +1,5 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
-import { getLesson } from "@/lib/server/courses";
+import { getCourse, getLesson } from "@/lib/server/courses";
 import { requireApiRole } from "@/lib/server/session";
 import { FILE_TYPES, MAX_FILE_BYTES } from "@/lib/files";
 
@@ -19,8 +19,14 @@ export async function POST(request: Request) {
     const result = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (pathname, lessonId) => {
-        const lesson = lessonId ? await getLesson(lessonId) : null;
+      onBeforeGenerateToken: async (pathname, payload) => {
+        // Course cover pictures: "cover:<courseId>".
+        if (payload?.startsWith("cover:")) {
+          const course = await getCourse(payload.slice(6));
+          if (!course || !pathname.startsWith(`covers/${course.id}/`)) throw new Error("Unknown course.");
+          return { allowedContentTypes: ["image/png", "image/jpeg", "image/webp"], maximumSizeInBytes: 5 * 1024 * 1024, addRandomSuffix: true };
+        }
+        const lesson = payload ? await getLesson(payload) : null;
         if (!lesson || !pathname.startsWith(`lessons/${lesson.id}/`)) throw new Error("Unknown lesson.");
         return { allowedContentTypes: Object.keys(FILE_TYPES), maximumSizeInBytes: MAX_FILE_BYTES, addRandomSuffix: true };
       },

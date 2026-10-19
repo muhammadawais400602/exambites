@@ -63,3 +63,7 @@ In a lesson, **Files → Upload files** sends files straight from the browser to
 In any lesson, tick **Add an assignment** and write what students should do. Optionally tick **Required** so the next lesson opens only after the student hands it in. Students submit text, a link and/or up to 5 files (50 MB each; files need Vercel Blob). They can edit until it's graded.
 
 Teachers of the course see **Assignments** on the course page (waiting ones first, and a count on their home page). They give a score out of 100 with feedback, or **Ask to resubmit** with a note, which reopens it for the student. Grades show to the student on the lesson, and in teacher and admin progress views. Every submission and grade is logged in Activity.
+
+## Student dashboard
+
+Students land on **Dashboard** (`/portal`): a welcome, the program card (courses completed, a button to continue the current course, and the path of all courses), then **My courses** as cover cards. **Courses** (`/portal/courses`) shows the same cards; **Profile** opens Settings. Locked courses are dimmed with a padlock and "Complete Course N to unlock". Upload a cover picture per course in **Admin → Courses → (course)**, 16:9 works best; without one, a designed cover with the course icon is shown.

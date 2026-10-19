@@ -2,6 +2,7 @@ import "server-only";
 import { ObjectId } from "mongodb";
 import { courses as catalogue } from "@/content/courses";
 import { db } from "./db";
+import { slugify } from "@/lib/slug";
 
 /** Share of quiz questions a student must get right to pass a lesson. */
 export const PASS_MARK = 80;
@@ -19,6 +20,8 @@ export type CourseDoc = {
   published: boolean;
   /** Teachers assigned to this course: they see its students' progress. */
   teacherIds?: string[];
+  /** Cover picture (Vercel Blob URL) shown on the student's course card. */
+  image?: string | null;
   createdAt: Date;
 };
 
@@ -60,12 +63,11 @@ const courseCol = () => db().collection<CourseDoc>("courses");
 const lessonCol = () => db().collection<LessonDoc>("lessons");
 const progressCol = () => db().collection("progress");
 
-export const slugify = (s: string) =>
-  s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+export { slugify } from "@/lib/slug";
 
 const toCourse = (d: CourseDoc): Course => ({
   id: String(d._id), slug: d.slug, title: d.title, category: d.category, description: d.description ?? "",
-  order: d.order, bonus: !!d.bonus, published: !!d.published, teacherIds: d.teacherIds ?? [],
+  order: d.order, bonus: !!d.bonus, published: !!d.published, teacherIds: d.teacherIds ?? [], image: d.image ?? null,
 });
 const toLesson = (d: LessonDoc): Lesson => ({
   id: String(d._id), courseId: d.courseId, order: d.order, title: d.title, summary: d.summary ?? "",

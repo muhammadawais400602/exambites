@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowDown, ArrowUp, LoaderCircle, Plus, Trash2 } from "lucide-react";
+import { upload } from "@vercel/blob/client";
+import { ArrowDown, ArrowUp, ImageIcon, LoaderCircle, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { field } from "./actions";
 
 const btn =
@@ -402,5 +403,57 @@ export function LessonEditor({ lesson }: { lesson: LessonFields }) {
         </div>
       </div>
     </form>
+  );
+}
+
+/** Course cover picture: shown on students' course cards. Saved as soon as it uploads. */
+export function CourseCoverUpload({ courseId, image, storageReady }: { courseId: string; image: string | null; storageReady: boolean }) {
+  const router = useRouter();
+  const input = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  async function pick(file: File) {
+    setError("");
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) return setError("Use a PNG, JPG or WebP picture.");
+    if (file.size > 5 * 1024 * 1024) return setError("Use a picture under 5 MB.");
+    setBusy(true);
+    try {
+      const blob = await upload(`covers/${courseId}/${file.name.replace(/[^\w.-]+/g, "-").slice(-60)}`, file, {
+        access: "public", contentType: file.type, handleUploadUrl: "/api/admin/uploads", clientPayload: `cover:${courseId}`,
+      });
+      const r = await send(`/api/admin/courses/${courseId}`, "PATCH", { image: blob.url });
+      if (!r.ok) throw new Error(r.error);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      <div className="relative aspect-[16/9] w-48 shrink-0 overflow-hidden rounded-2xl border border-ink/10 bg-ink/5">
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={image} alt="Course cover" className="size-full object-cover" />
+        ) : (
+          <span className="grid size-full place-items-center text-muted"><ImageIcon className="size-6" /></span>
+        )}
+      </div>
+      <div className="space-y-2">
+        <p className="text-xs text-ink-soft">Cover picture for students&apos; course cards. 16:9 works best (e.g. 1600×900), up to 5 MB.</p>
+        <div className="flex gap-2">
+          <button type="button" disabled={!storageReady || busy} onClick={() => input.current?.click()} className={ghost}>
+            {busy ? <LoaderCircle className="size-3.5 animate-spin" /> : <ImageIcon className="size-3.5" />} {image ? "Change picture" : "Upload picture"}
+          </button>
+          {image && (
+            <button type="button" disabled={busy} onClick={async () => { await send(`/api/admin/courses/${courseId}`, "PATCH", { image: null }); router.refresh(); }} className={danger}>Remove</button>
+          )}
+        </div>
+        {!storageReady && <p className="text-xs text-muted">Connect Vercel Blob storage to upload pictures.</p>}
+        {error && <p role="alert" className="text-xs font-medium text-red-500">{error}</p>}
+        <input ref={input} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) pick(f); }} />
+      </div>
+    </div>
   );
 }

@@ -196,3 +196,10 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
     nextLessonId: passed && !assignmentPending ? (lessons[index + 1]?.id ?? null) : null,
   };
 }
+
+/** Lessons done / total per course the student has reached (for course cards). */
+export async function pathProgress(userId: string, courses: PathCourse[]) {
+  const reached = courses.filter((c) => c.state !== "locked");
+  const rows = await Promise.all(reached.map((c) => lessonsWithProgress(userId, c.id)));
+  return new Map(reached.map((c, i) => [c.id, { done: rows[i].filter((l) => l.state === "done").length, total: rows[i].length }]));
+}

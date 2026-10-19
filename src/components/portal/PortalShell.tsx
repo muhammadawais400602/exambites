@@ -4,6 +4,7 @@ import { brand } from "@/content/home";
 import { HOME, LOGIN, ROLE_LABEL, type Role } from "@/lib/roles";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Avatar } from "./Avatar";
+import { PortalNav } from "./PortalNav";
 import { SignOutButton } from "./SignOutButton";
 
 /** Minimal frame shared by the student, teacher and admin portals. */
@@ -34,6 +35,7 @@ export function PortalShell({ role, user, children }: { role: Role; user: { name
             <SignOutButton to={LOGIN[role]} />
           </div>
         </div>
+        {role === "student" && <PortalNav />}
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">{children}</main>
     </div>
