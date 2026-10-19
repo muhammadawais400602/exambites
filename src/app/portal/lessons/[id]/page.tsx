@@ -74,17 +74,13 @@ async function Lesson({ params, searchParams }: Props) {
   return (
     <PortalShell role="student" user={user}>
       {celebrate && <PendingCelebration completion={celebrate} />}
-      <div className="flex items-center gap-4">
-        <Link href="/portal/courses" className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-ink"><ArrowLeft className="size-4" /> Back</Link>
-        <div className="min-w-0">
-          <h1 className="truncate font-display text-xl font-black uppercase tracking-tight text-ink sm:text-2xl">{course.title}</h1>
-          <p className="text-xs text-ink-soft">{done}/{steps.length} completed · {pct}%</p>
-        </div>
-      </div>
-      <div className="mt-5"><CourseBanner title={course.title} slug={course.slug} image={course.image} /></div>
+      <h1 className="sr-only">{course.title}</h1>
+      <Link href="/portal/courses" className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-ink"><ArrowLeft className="size-4" /> Back</Link>
+      <div className="mt-4"><CourseBanner title={course.title} slug={course.slug} image={course.image} /></div>
       <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-ink/10" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Course progress">
         <div className="h-full rounded-full bg-gradient-to-r from-brand-700 to-brand-500" style={{ width: `${pct}%` }} />
       </div>
+      <p className="mt-2 text-right text-xs text-ink-soft">{done}/{steps.length} completed · {pct}%</p>
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[300px_1fr]">
         <details open className="group order-2 rounded-3xl border border-ink/10 bg-surface-card lg:order-1 lg:sticky lg:top-32 xl:top-24 [&_summary::-webkit-details-marker]:hidden">
