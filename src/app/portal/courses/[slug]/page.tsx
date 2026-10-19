@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { CheckCircle2, Lock, PlayCircle } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
-import { lessonsWithProgress, studentPath } from "@/lib/server/learning";
+import { courseSteps, lessonsWithProgress, studentPath } from "@/lib/server/learning";
 import { requireRole } from "@/lib/server/session";
 
 export const metadata: Metadata = { title: "Course · Exambites", robots: { index: false } };
@@ -26,6 +26,14 @@ async function Course({ params }: { params: Params }) {
   const course = path?.courses.find((c) => c.slug === slug);
   if (!course || (course.state !== "current" && course.state !== "done")) notFound();
   const lessons = await lessonsWithProgress(user.id, course.id);
+  // Go straight to where the student is: the first unfinished step, or the start when all are done.
+  const steps = courseSteps(lessons);
+  const target = steps.find((s) => s.state === "open" && s.kind !== "video") ?? steps.find((s) => s.state === "open") ?? steps[0];
+  if (target) {
+    const first = steps.find((s) => s.lessonId === target.lessonId)!;
+    const go = target.kind === "quiz" && first.state === "open" ? first : target;
+    redirect(`/portal/lessons/${go.lessonId}?step=${go.kind}`);
+  }
   const done = lessons.filter((l) => l.state === "done").length;
   const pct = lessons.length ? Math.round((done / lessons.length) * 100) : 0;
   const next = lessons.find((l) => l.state === "open");

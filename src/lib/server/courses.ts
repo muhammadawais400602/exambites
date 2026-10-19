@@ -29,8 +29,8 @@ export type Attachment = { id: string; name: string; url: string; size: number; 
 
 export type LessonAssignment = {
   instructions: string;
-  /** When true, the next lesson opens only after the student submits. */
-  required: boolean;
+  /** Kept for older records; every assignment must be submitted before the next lesson opens. */
+  required?: boolean;
 };
 
 export type LessonDoc = {
