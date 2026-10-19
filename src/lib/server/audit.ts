@@ -29,7 +29,9 @@ export type AuditAction =
   | "student.disabled"
   | "student.restored"
   | "assignment.graded"
-  | "assignment.returned";
+  | "assignment.returned"
+  | "assignment.approved"
+  | "assignment.rejected";
 
 /** Records who did what. Shown to the admin as the activity log. */
 export async function audit(

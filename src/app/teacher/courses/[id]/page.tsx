@@ -35,7 +35,7 @@ async function Roster({ params }: { params: Params }) {
         <PageTitle eyebrow={`${rows.length} student${rows.length === 1 ? "" : "s"}`} title={course.title} />
       </div>
       <h2 className="mb-3 font-display text-lg font-black uppercase tracking-tight text-ink">
-        Assignments {waiting > 0 && <span className="ml-1 rounded-full bg-brand-600 px-2 py-0.5 align-middle text-xs text-white">{waiting} to grade</span>}
+        Assignments {waiting > 0 && <span className="ml-1 rounded-full bg-brand-600 px-2 py-0.5 align-middle text-xs text-white">{waiting} to review</span>}
       </h2>
       <SubmissionList rows={submissions} hrefFor={(id) => `/teacher/courses/${course.id}/submissions/${id}`} />
       <h2 className="mb-3 mt-10 font-display text-lg font-black uppercase tracking-tight text-ink">Students</h2>

@@ -49,33 +49,51 @@ export function RosterList({ rows, hrefFor }: { rows: RosterRow[]; hrefFor: (use
   );
 }
 
-/** One student's lessons in a course: passed or not, scores and attempts. */
-export function LessonProgressList({ lessons }: { lessons: LessonProgress[] }) {
+const ASSIGNMENT = {
+  approved: ["Approved", "text-emerald-600 dark:text-emerald-400"],
+  submitted: ["To review", "text-brand-700"],
+  rejected: ["Rejected", "text-red-500"],
+  missing: ["Not handed in", "text-muted"],
+} as const;
+
+/**
+ * One student's lessons in a course: quiz scores, attempts and the
+ * assignment. With `reviewHref`, a handed-in assignment links to its review
+ * page (approve / reject).
+ */
+export function LessonProgressList({ lessons, reviewHref }: { lessons: LessonProgress[]; reviewHref?: (submissionId: string) => string }) {
   if (!lessons.length) return <p className={`${card} p-8 text-center text-sm text-ink-soft`}>This course has no lessons yet.</p>;
   return (
     <ol className={`${card} divide-y divide-ink/10`}>
-      {lessons.map((l, i) => (
-        <li key={l.id} className="flex items-center gap-4 p-4 sm:p-5">
-          {l.passed ? <CheckCircle2 className="size-5 shrink-0 text-emerald-500" /> : <Circle className="size-5 shrink-0 text-ink/25" />}
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold text-ink"><span className="mr-2 font-label text-xs text-muted">{i + 1}</span>{l.title}</p>
-            <p className="mt-0.5 text-xs text-ink-soft">
-              {l.attempts === 0
-                ? "Not attempted"
-                : l.questions
-                  ? `Best ${l.bestScore}% · last ${l.lastScore}% · ${l.attempts} attempt${l.attempts === 1 ? "" : "s"}`
-                  : "Marked as watched"}
-              {l.assignment && (
-                <span className={l.assignment.status === "graded" ? "text-emerald-600 dark:text-emerald-400" : l.assignment.status === "submitted" ? "text-brand-700" : ""}>
-                  {" · Assignment: "}
-                  {l.assignment.status === "graded" ? `${l.assignment.score}/100` : l.assignment.status === "submitted" ? "to grade" : l.assignment.status === "returned" ? "redo asked" : "not handed in"}
-                </span>
-              )}
-            </p>
-          </div>
-          <span className="shrink-0 text-xs text-muted">{l.lastAttempt ? when(l.lastAttempt) : ""}</span>
-        </li>
-      ))}
+      {lessons.map((l, i) => {
+        const done = l.passed && (!l.assignment || l.assignment.status === "approved");
+        const a = l.assignment;
+        const [label, tone] = a ? ASSIGNMENT[a.status] : ["", ""];
+        return (
+          <li key={l.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 p-4 sm:p-5">
+            {done ? <CheckCircle2 className="size-5 shrink-0 text-emerald-500" /> : <Circle className="size-5 shrink-0 text-ink/25" />}
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-semibold text-ink"><span className="mr-2 font-label text-xs text-muted">{i + 1}</span>{l.title}</p>
+              <p className="mt-0.5 text-xs text-ink-soft">
+                {l.attempts === 0
+                  ? "Not attempted"
+                  : l.questions
+                    ? `Best ${l.bestScore}% · last ${l.lastScore}% · ${l.attempts} attempt${l.attempts === 1 ? "" : "s"}`
+                    : "Marked as complete"}
+                {a && <span className={tone}> · Assignment: {label.toLowerCase()}</span>}
+              </p>
+            </div>
+            {a?.submissionId && reviewHref ? (
+              <Link href={reviewHref(a.submissionId)}
+                className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold ${a.status === "submitted" ? "bg-brand-600 text-white hover:bg-brand-700" : "border border-ink/15 text-ink-soft hover:text-ink"}`}>
+                {a.status === "submitted" ? "Review assignment" : "View assignment"}
+              </Link>
+            ) : (
+              <span className="shrink-0 text-xs text-muted">{l.lastAttempt ? when(l.lastAttempt) : ""}</span>
+            )}
+          </li>
+        );
+      })}
     </ol>
   );
 }

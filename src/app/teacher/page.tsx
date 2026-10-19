@@ -39,7 +39,7 @@ async function TeacherHome() {
                   <BookOpen className="size-6 text-brand-700" />
                   <h2 className="mt-4 font-display text-xl font-black uppercase tracking-tight text-ink">{c.title}</h2>
                   <p className="mt-1 text-sm text-ink-soft">{active} studying now · {roster.length - active} completed</p>
-                  {waiting[i] > 0 && <p className="mt-2 w-fit rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white">{waiting[i]} assignment{waiting[i] === 1 ? "" : "s"} to grade</p>}
+                  {waiting[i] > 0 && <p className="mt-2 w-fit rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white">{waiting[i]} assignment{waiting[i] === 1 ? "" : "s"} to review</p>}
                   <span className="mt-auto pt-5 text-xs font-bold text-brand-700">See students →</span>
                 </Link>
               </li>

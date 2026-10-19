@@ -5,7 +5,8 @@ import { Suspense } from "react";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { checkout, type PaymentMethod } from "@/content/enroll";
 import { formatRs } from "@/lib/pricing";
-import { pathProgress, studentPath } from "@/lib/server/learning";
+import { pathProgress, pendingCelebration, studentPath } from "@/lib/server/learning";
+import { PendingCelebration } from "@/components/learn/CourseCompleteDialog";
 import { getProfile } from "@/lib/server/profile";
 import { CourseGrid } from "@/components/learn/CourseGrid";
 import { CourseIcon } from "@/components/learn/CourseCover";
@@ -56,7 +57,7 @@ async function StudentPortal() {
 }
 
 async function CoursePath({ userId, first }: { userId: string; first: string }) {
-  const [path, profile] = await Promise.all([studentPath(userId), getProfile(userId)]);
+  const [path, profile, celebrate] = await Promise.all([studentPath(userId), getProfile(userId), pendingCelebration(userId)]);
   const list = path?.courses ?? [];
   const progress = await pathProgress(userId, list);
   const core = list.filter((c) => !c.bonus);
@@ -68,6 +69,7 @@ async function CoursePath({ userId, first }: { userId: string; first: string }) 
 
   return (
     <>
+      {celebrate && <PendingCelebration completion={celebrate} />}
       <div>
         <h1 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink md:text-4xl">Welcome, {first}</h1>
         <p className="mt-1 text-sm text-ink-soft">{[profile.city, "Exambites Creative Academy"].filter(Boolean).join(" · ")}</p>

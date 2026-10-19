@@ -5,8 +5,8 @@ import { when } from "./ProgressViews";
 
 const BADGE = {
   submitted: "bg-brand-500/15 text-brand-700",
-  returned: "bg-ink/10 text-ink-soft",
-  graded: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  rejected: "bg-red-500/15 text-red-500",
+  approved: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
 } as const;
 
 /** Assignment submissions for a course, waiting ones first. */
@@ -23,7 +23,7 @@ export function SubmissionList({ rows, hrefFor }: { rows: ReviewRow[]; hrefFor: 
               <p className="truncate text-xs text-ink-soft">Lesson {r.lessonOrder}: {r.lessonTitle} · {when(r.submittedAt)}</p>
             </div>
             <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${BADGE[r.status]}`}>
-              {r.status === "graded" ? `${r.score}/100` : r.status === "returned" ? "Redo asked" : "To grade"}
+              {r.status === "approved" ? "Approved" : r.status === "rejected" ? "Rejected" : "To review"}
             </span>
           </Link>
         </li>
