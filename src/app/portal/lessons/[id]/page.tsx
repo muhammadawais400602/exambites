@@ -13,8 +13,9 @@ import { FILE_TYPES, formatBytes } from "@/lib/files";
 import { getSubmission } from "@/lib/server/assignments";
 import { videoEmbedUrl } from "@/lib/server/bunny";
 import { PASS_MARK } from "@/lib/server/courses";
-import { courseSteps, lessonForStudent, publicQuestions, type LessonStep, type StepKind } from "@/lib/server/learning";
+import { courseSteps, lessonForStudent, pendingCelebration, publicQuestions, type LessonStep, type StepKind } from "@/lib/server/learning";
 import { requireRole } from "@/lib/server/session";
+import { PendingCelebration } from "@/components/learn/CourseCompleteDialog";
 import { parseVideo } from "@/lib/video";
 
 export const metadata: Metadata = { title: "Lesson · Exambites", robots: { index: false } };
@@ -47,11 +48,14 @@ async function Lesson({ params, searchParams }: Props) {
   const done = steps.filter((s) => s.state === "done").length;
   const pct = steps.length ? Math.round((done / steps.length) * 100) : 0;
 
-  // Moving on needs the quiz passed (or the lesson marked complete) and the assignment handed in.
+  // Moving on needs the quiz passed (or the lesson marked complete) and the assignment approved.
   const hasQuiz = lesson.questions.length > 0;
   const blocked =
     here.kind === "quiz" && !lesson.quizPassed ? "Pass the quiz to continue"
-      : here.kind === "assignment" && !lesson.submitted ? "Submit the assignment to continue"
+      : here.kind === "assignment" && !lesson.approved
+        ? lesson.assignmentStatus === "submitted" ? "Waiting for your teacher's approval"
+          : lesson.assignmentStatus === "rejected" ? "Redo the assignment to continue"
+            : "Submit the assignment to continue"
         : here.kind === "video" && !hasQuiz && !lesson.quizPassed ? "Mark the lesson complete to continue"
           : null;
   const canNext = !!next && !blocked && next.state !== "locked";
@@ -61,11 +65,15 @@ async function Lesson({ params, searchParams }: Props) {
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`;
   const src = videoEmbedUrl(lesson.videoId, origin);
-  const submission = here.kind === "assignment" ? await getSubmission(user.id, lesson.id) : null;
+  const [submission, celebrate] = await Promise.all([
+    here.kind === "assignment" ? getSubmission(user.id, lesson.id) : null,
+    pendingCelebration(user.id),
+  ]);
   const btn = "inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-bold transition-colors";
 
   return (
     <PortalShell role="student" user={user}>
+      {celebrate && <PendingCelebration completion={celebrate} />}
       <div className="flex items-center gap-4">
         <Link href="/portal/courses" className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft hover:text-ink"><ArrowLeft className="size-4" /> Back</Link>
         <div className="min-w-0">
@@ -159,7 +167,7 @@ async function Lesson({ params, searchParams }: Props) {
               instructions={lesson.assignment.instructions}
               required
               uploadsReady={!!process.env.BLOB_READ_WRITE_TOKEN}
-              submission={submission && { id: submission.id, text: submission.text, link: submission.link, files: submission.files, status: submission.status, score: submission.score, feedback: submission.feedback, gradedByName: submission.gradedByName }}
+              submission={submission && { id: submission.id, text: submission.text, link: submission.link, files: submission.files, status: submission.status, feedback: submission.feedback, gradedByName: submission.gradedByName }}
             />
           )}
 

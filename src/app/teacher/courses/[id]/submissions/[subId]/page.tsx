@@ -13,7 +13,7 @@ import { studentBasics } from "@/lib/server/progress";
 import { requireRole } from "@/lib/server/session";
 import { formatBytes } from "@/lib/files";
 
-export const metadata: Metadata = { title: "Grade assignment · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Review assignment · Exambites", robots: { index: false } };
 
 type Params = PageProps<"/teacher/courses/[id]/submissions/[subId]">["params"];
 
@@ -59,7 +59,7 @@ async function Review({ params }: { params: Params }) {
             ))}
           </section>
         </div>
-        <GradeForm id={sub.id} score={sub.score} feedback={sub.feedback} backHref={back} />
+        <GradeForm id={sub.id} status={sub.status} feedback={sub.status === "submitted" ? "" : sub.feedback} backHref={back} />
       </div>
     </PortalShell>
   );

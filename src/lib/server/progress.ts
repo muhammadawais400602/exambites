@@ -2,6 +2,7 @@ import "server-only";
 import { toId } from "./auth";
 import { listLessons, progressCol } from "./courses";
 import { db } from "./db";
+import { APPROVED } from "./learning";
 
 /** What teachers and the admin see about students' progress. */
 
@@ -66,15 +67,19 @@ export type LessonProgress = {
   attempts: number;
   lastAttempt: string | null;
   /** null when the lesson has no assignment. */
-  assignment: { status: "missing" | "submitted" | "graded" | "returned"; score: number | null } | null;
+  assignment: { status: "missing" | "submitted" | "approved" | "rejected" } | null;
 };
+
+function assignmentState(raw: unknown): "missing" | "submitted" | "approved" | "rejected" {
+  return !raw ? "missing" : APPROVED.includes(String(raw)) ? "approved" : raw === "rejected" || raw === "returned" ? "rejected" : "submitted";
+}
 
 /** One student's lesson-by-lesson record in a course. */
 export async function studentCourseProgress(userId: string, courseId: string): Promise<LessonProgress[]> {
   const [lessons, progress, subs] = await Promise.all([
     listLessons(courseId, { publishedOnly: true }),
     progressCol().find<ProgressDoc>({ userId, courseId }).toArray(),
-    db().collection("submissions").find({ userId, courseId }, { projection: { lessonId: 1, status: 1, score: 1 } }).toArray(),
+    db().collection("submissions").find({ userId, courseId }, { projection: { lessonId: 1, status: 1 } }).toArray(),
   ]);
   const subByLesson = new Map(subs.map((x) => [String(x.lessonId), x]));
   const byLesson = new Map(progress.map((p) => [p.lessonId, p]));
@@ -91,7 +96,7 @@ export async function studentCourseProgress(userId: string, courseId: string): P
       attempts: p?.attempts ?? 0,
       lastAttempt: p?.updatedAt ? p.updatedAt.toISOString() : null,
       assignment: l.assignment
-        ? { status: (subByLesson.get(l.id)?.status as "submitted" | "graded" | "returned" | undefined) ?? "missing", score: (subByLesson.get(l.id)?.score as number | null) ?? null }
+        ? { status: assignmentState(subByLesson.get(l.id)?.status) }
         : null,
     };
   });

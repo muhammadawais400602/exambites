@@ -88,3 +88,11 @@ export function CourseCompleteDialog({ completion }: { completion: CourseComplet
     </dialog>
   );
 }
+
+/** A course finished while the student was away (teacher approved the last assignment): show the popup once. */
+export function PendingCelebration({ completion }: { completion: CourseCompletion }) {
+  useEffect(() => {
+    fetch("/api/portal/celebration", { method: "POST" }).catch(() => null);
+  }, []);
+  return <CourseCompleteDialog completion={completion} />;
+}

@@ -54,30 +54,37 @@ export async function studentPath(userId: string) {
  * opens once the one before is done.
  */
 export async function lessonsWithProgress(userId: string, courseId: string) {
-  const [lessons, progress, submitted] = await Promise.all([
+  const [lessons, progress, work] = await Promise.all([
     listLessons(courseId, { publishedOnly: true }),
     progressCol().find({ userId, courseId }, { projection: { lessonId: 1, passed: 1, watchedAt: 1, bestScore: 1 } }).toArray(),
     db()
       .collection("submissions")
-      .find({ userId, courseId }, { projection: { lessonId: 1 } })
+      .find({ userId, courseId }, { projection: { lessonId: 1, status: 1 } })
       .toArray()
-      .then((rows) => new Set(rows.map((r) => String(r.lessonId)))),
+      .then((rows) => new Map(rows.map((r) => [String(r.lessonId), String(r.status)]))),
   ]);
   const byLesson = new Map(progress.map((p) => [String(p.lessonId), p]));
   let open = true;
   return lessons.map((l) => {
     const p = byLesson.get(l.id);
     const quizPassed = !!p?.passed;
-    const assignmentDone = !l.assignment || submitted.has(l.id);
-    const done = quizPassed && assignmentDone;
+    const raw = work.get(l.id);
+    const assignmentStatus: AssignmentStatus = !raw ? "none" : APPROVED.includes(raw) ? "approved" : raw === "rejected" || raw === "returned" ? "rejected" : "submitted";
+    const done = quizPassed && (!l.assignment || assignmentStatus === "approved");
     const state: LessonState = done ? "done" : open ? "open" : "locked";
     if (!done) open = false;
     return {
-      ...l, state, quizPassed, submitted: submitted.has(l.id),
+      ...l, state, quizPassed, assignmentStatus, approved: assignmentStatus === "approved",
       watched: !!p?.watchedAt, bestScore: typeof p?.bestScore === "number" ? (p.bestScore as number) : null,
     };
   });
 }
+
+/** Submission statuses that count as approved (older records used "graded"). */
+export const APPROVED = ["approved", "graded"];
+
+/** "none" = not handed in yet. */
+export type AssignmentStatus = "none" | "submitted" | "approved" | "rejected";
 
 export type StepKind = "video" | "quiz" | "assignment";
 export type StepState = "done" | "open" | "locked";
@@ -86,7 +93,8 @@ export type LessonStep = { lessonId: string; lessonTitle: string; kind: StepKind
 /**
  * A course as a list of steps for the lesson screen: each lesson's content
  * (video / notes), then its quiz, then its assignment. Videos never block;
- * the assignment opens after the quiz is passed.
+ * the assignment opens after the quiz is passed (or the lesson is marked
+ * complete) and is done once the teacher approves it.
  */
 export function courseSteps(lessons: Awaited<ReturnType<typeof lessonsWithProgress>>): LessonStep[] {
   const steps: LessonStep[] = [];
@@ -96,12 +104,11 @@ export function courseSteps(lessons: Awaited<ReturnType<typeof lessonsWithProgre
     const push = (kind: StepKind, state: StepState) => steps.push({ lessonId: l.id, lessonTitle: l.title, kind, state: locked ? "locked" : state, key: `${l.id}:${kind}` });
     push("video", l.watched || l.quizPassed ? "done" : "open");
     if (hasQuiz) push("quiz", l.quizPassed ? "done" : "open");
-    if (l.assignment) push("assignment", l.submitted ? "done" : hasQuiz && !l.quizPassed ? "locked" : "open");
+    if (l.assignment) push("assignment", l.approved ? "done" : !l.quizPassed ? "locked" : "open");
   }
   return steps;
 }
 
-/** Marks the course complete when every lesson is done and opens the next one; returns true if it just happened. */
 /** What the "course complete" popup shows: the finished course and the one that opened. */
 export type CourseCompletion = {
   course: { title: string; slug: string };
@@ -235,7 +242,7 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
     }
     if (course.state === "current") completion = await completeCourseIfDone(user, course.id);
   }
-  const assignmentPending = passed && !!lesson.assignment && !lesson.submitted;
+  const assignmentPending = passed && !!lesson.assignment && !lesson.approved;
   return {
     ok: true, score, passed, wrong, total, courseCompleted: !!completion, completion, assignmentPending,
     correct: Object.fromEntries(lesson.questions.map((q) => [q.id, q.answer])),
@@ -248,4 +255,14 @@ export async function pathProgress(userId: string, courses: PathCourse[]) {
   const reached = courses.filter((c) => c.state !== "locked");
   const rows = await Promise.all(reached.map((c) => lessonsWithProgress(userId, c.id)));
   return new Map(reached.map((c, i) => [c.id, { done: rows[i].filter((l) => l.state === "done").length, total: rows[i].length }]));
+}
+
+/** A course finished while the student was away (a teacher approved the last assignment): shown once, then cleared. */
+export async function pendingCelebration(userId: string): Promise<CourseCompletion | null> {
+  const e = await enrollments().findOne({ userId }, { projection: { celebrate: 1 } });
+  return (e?.celebrate as CourseCompletion | undefined) ?? null;
+}
+
+export async function clearCelebration(userId: string) {
+  await enrollments().updateOne({ userId }, { $unset: { celebrate: "" } });
 }

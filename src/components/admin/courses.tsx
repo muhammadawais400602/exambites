@@ -324,7 +324,7 @@ export function LessonEditor({ lesson }: { lesson: LessonFields }) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-display text-lg font-black uppercase tracking-tight text-ink">Assignment</h2>
-            <p className="text-xs text-ink-soft">Optional. Students hand in text, a link or files; the course&apos;s teachers grade it out of 100.</p>
+            <p className="text-xs text-ink-soft">Optional. Students hand in text, a link or files; a teacher of the course approves it before the next lesson opens, or rejects it for a redo.</p>
           </div>
           <label className="flex cursor-pointer items-center gap-2.5 text-sm font-semibold text-ink">
             <input type="checkbox" checked={!!v.assignment} onChange={(e) => set({ assignment: e.target.checked ? { instructions: "", required: true } : null })} className="size-4 accent-[var(--color-brand-600)]" />

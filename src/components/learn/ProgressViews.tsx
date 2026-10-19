@@ -66,9 +66,9 @@ export function LessonProgressList({ lessons }: { lessons: LessonProgress[] }) {
                   ? `Best ${l.bestScore}% · last ${l.lastScore}% · ${l.attempts} attempt${l.attempts === 1 ? "" : "s"}`
                   : "Marked as watched"}
               {l.assignment && (
-                <span className={l.assignment.status === "graded" ? "text-emerald-600 dark:text-emerald-400" : l.assignment.status === "submitted" ? "text-brand-700" : ""}>
+                <span className={l.assignment.status === "approved" ? "text-emerald-600 dark:text-emerald-400" : l.assignment.status === "submitted" ? "text-brand-700" : l.assignment.status === "rejected" ? "text-red-500" : ""}>
                   {" · Assignment: "}
-                  {l.assignment.status === "graded" ? `${l.assignment.score}/100` : l.assignment.status === "submitted" ? "to grade" : l.assignment.status === "returned" ? "redo asked" : "not handed in"}
+                  {l.assignment.status === "approved" ? "approved" : l.assignment.status === "submitted" ? "to review" : l.assignment.status === "rejected" ? "rejected" : "not handed in"}
                 </span>
               )}
             </p>
