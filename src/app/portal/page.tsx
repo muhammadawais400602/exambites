@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { BookOpen, CheckCircle2, Clock, Lock, PlayCircle, XCircle } from "lucide-react";
+import { Award, CheckCircle2, Clock, Lock, PlayCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
-import { ChooseCourse } from "@/components/learn/ChooseCourse";
-import { courses as catalogue } from "@/content/courses";
 import { checkout, type PaymentMethod } from "@/content/enroll";
 import { formatRs } from "@/lib/pricing";
-import { slugify } from "@/lib/server/courses";
-import { studentPath } from "@/lib/server/learning";
+import { pathProgress, studentPath } from "@/lib/server/learning";
+import { getProfile } from "@/lib/server/profile";
+import { CourseGrid } from "@/components/learn/CourseGrid";
+import { CourseIcon } from "@/components/learn/CourseCover";
 import { getEnrollment } from "@/lib/server/queries";
 import { requireRole } from "@/lib/server/session";
 
-export const metadata: Metadata = { title: "My courses · Exambites", robots: { index: false } };
+export const metadata: Metadata = { title: "Dashboard · Exambites", robots: { index: false } };
 
 const card = "rounded-3xl border border-ink/10 bg-surface-card p-6 sm:p-8";
 
@@ -55,56 +55,86 @@ async function StudentPortal() {
   );
 }
 
-const icons = new Map(catalogue.map((c) => [slugify(c.title), c.Icon]));
-
 async function CoursePath({ userId, first }: { userId: string; first: string }) {
-  const path = await studentPath(userId);
+  const [path, profile] = await Promise.all([studentPath(userId), getProfile(userId)]);
   const list = path?.courses ?? [];
-  const choosing = !path?.currentId && list.some((c) => c.state === "choose");
+  const progress = await pathProgress(userId, list);
+  const core = list.filter((c) => !c.bonus);
+  const doneCount = core.filter((c) => c.state === "done").length;
+  const current = list.find((c) => c.state === "current");
+  const currentProgress = current ? progress.get(current.id) : undefined;
+  const pct = core.length ? Math.round((doneCount / core.length) * 100) : 0;
+  let n = 0;
+
   return (
     <>
-      <PageTitle eyebrow="My courses" title={`Welcome, ${first}`}>
-        <p className="max-w-sm text-sm text-ink-soft">
-          {choosing ? "Course finished. Pick what you want to learn next." : "One course at a time. Finish it to pick the next one."}
-        </p>
-      </PageTitle>
-      <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {list.map((c) => {
-          const Icon = icons.get(c.slug) ?? BookOpen;
-          return (
-            <li key={c.id} className={`${card} relative flex flex-col !p-6 ${c.state === "current" ? "border-brand-600/50" : c.state === "locked" ? "opacity-60" : ""}`}>
-              <div className="flex items-center justify-between">
-                <span className="grid size-11 place-items-center rounded-2xl bg-brand-500/10 text-brand-700">
-                  <Icon className="size-5" />
-                </span>
-                <span className="font-label text-[10px] font-bold uppercase tracking-[0.16em] text-muted">
-                  {c.bonus ? "Bonus" : c.state === "current" ? "In progress" : c.state === "done" ? "Completed" : c.category}
-                </span>
+      <div>
+        <h1 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink md:text-4xl">Welcome, {first}</h1>
+        <p className="mt-1 text-sm text-ink-soft">{[profile.city, "Exambites Creative Academy"].filter(Boolean).join(" · ")}</p>
+      </div>
+
+      <section className="mt-8 grid overflow-hidden rounded-3xl border border-ink/10 bg-surface-card lg:grid-cols-[1fr_1.15fr]">
+        <div className="flex flex-col p-6 sm:p-8">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-500/10 text-brand-700"><Award className="size-5" /></span>
+              <div>
+                <h2 className="font-display text-xl font-black uppercase tracking-tight text-ink">AI Skills Program</h2>
+                <p className="text-sm text-ink-soft">One payment covering every course</p>
               </div>
-              <h2 className="mt-5 font-display text-xl font-black uppercase tracking-tight text-ink">{c.title}</h2>
-              <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{c.description || c.category}</p>
-              <div className="mt-auto pt-6">
-                {c.state === "current" && (
-                  <Link href={`/portal/courses/${c.slug}`} className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-brand-700">
-                    <PlayCircle className="size-4" /> Continue
-                  </Link>
-                )}
-                {c.state === "done" && (
-                  <Link href={`/portal/courses/${c.slug}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:underline dark:text-emerald-400">
-                    <CheckCircle2 className="size-4" /> Completed · review
-                  </Link>
-                )}
-                {c.state === "choose" && <ChooseCourse courseId={c.id} title={c.title} />}
-                {c.state === "locked" && (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted">
-                    <Lock className="size-3.5" /> {c.bonus ? "Unlocks after all other courses" : "Unlocks after your current course"}
-                  </span>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+            </div>
+            <span className="shrink-0 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">Approved</span>
+          </div>
+          <p className="mt-5 flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-ink">
+            <CheckCircle2 className="size-4 shrink-0 text-emerald-500" /> You&apos;re enrolled. Courses open one by one as you finish them.
+          </p>
+          <div className="mt-6">
+            <div className="flex justify-between text-xs font-semibold text-ink-soft">
+              <span>{doneCount} of {core.length} courses completed</span><span>{pct}%</span>
+            </div>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-ink/10" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Program progress">
+              <div className="h-full rounded-full bg-gradient-to-r from-brand-700 to-brand-500" style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+          {current && (
+            <Link href={`/portal/courses/${current.slug}`} className="group mt-6 flex items-center justify-between gap-3 rounded-2xl bg-brand-600 px-5 py-4 text-white transition-colors hover:bg-brand-700">
+              <span className="min-w-0">
+                <span className="block text-[11px] font-bold uppercase tracking-[0.14em] text-white/75">{currentProgress?.done ? "Continue" : "Start"}</span>
+                <span className="block truncate font-display text-lg font-black uppercase tracking-tight">{current.title}</span>
+              </span>
+              <PlayCircle className="size-7 shrink-0 transition-transform group-hover:scale-110" />
+            </Link>
+          )}
+        </div>
+        <div className="relative overflow-hidden bg-[#120d08] p-6 sm:p-8">
+          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(80%_70%_at_100%_0%,color-mix(in_srgb,var(--color-brand-500)_40%,transparent),transparent_65%),radial-gradient(70%_60%_at_0%_100%,color-mix(in_srgb,var(--color-brand-800)_60%,transparent),transparent_70%)]" />
+          <div className="relative flex h-full flex-col">
+            <p className="font-label text-[10px] font-bold uppercase tracking-[0.22em] text-brand-300">Your path</p>
+            <p className="mt-1 font-display text-2xl font-black uppercase leading-none tracking-tight text-white">{core.length} skills. One career.</p>
+            <ol className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3 xl:grid-cols-6">
+              {list.map((c) => {
+                const num = c.bonus ? "★" : String(++n).padStart(2, "0");
+                return (
+                  <li key={c.id} className={`flex flex-col items-center rounded-2xl border p-2.5 text-center ${c.state === "current" ? "border-brand-400 bg-white/10" : "border-white/10 bg-white/[0.04]"} ${c.state === "locked" ? "opacity-50" : ""}`}>
+                    <span className="font-label text-[10px] font-bold text-brand-300">{num}</span>
+                    <span className={`mt-1.5 grid size-9 place-items-center rounded-full ${c.state === "done" ? "bg-emerald-500 text-white" : "bg-white/10 text-white"}`}>
+                      {c.state === "done" ? <CheckCircle2 className="size-4" /> : c.state === "locked" ? <Lock className="size-3.5" /> : <CourseIcon slug={c.slug} className="size-4" />}
+                    </span>
+                    <span className="mt-1.5 line-clamp-2 text-[9px] font-bold uppercase leading-tight tracking-wide text-white/80">{c.title}</span>
+                  </li>
+                );
+              })}
+            </ol>
+            <p className="mt-auto pt-8 text-center font-label text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Learn · Practice · Earn · Grow</p>
+          </div>
+        </div>
+      </section>
+
+      <div className="mb-5 mt-12 flex items-end justify-between">
+        <h2 className="font-display text-2xl font-black uppercase tracking-tight text-ink">My courses</h2>
+        <Link href="/portal/courses" className="text-sm font-semibold text-brand-700 hover:underline">All courses →</Link>
+      </div>
+      <CourseGrid courses={list} progress={progress} />
     </>
   );
 }

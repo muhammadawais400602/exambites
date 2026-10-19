@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { AddCourseForm } from "@/components/admin/courses";
+import { AddCourseForm, CourseOrderList } from "@/components/admin/courses";
 import { AddTeacherForm, EnrollmentActions, ReferralActions, ReferralForm, TeacherActions, TeacherCourses } from "@/components/admin/actions";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { formatRs } from "@/lib/pricing";
@@ -139,29 +139,16 @@ async function Courses() {
   const [courses, counts] = await Promise.all([listCourses(), lessonCounts()]);
   return (
     <div className="space-y-4">
-      <ul className={`${card} divide-y divide-ink/10`}>
-        {courses.map((c) => {
+      <p className="text-sm text-ink-soft">Students take courses in this order, one at a time; finishing one opens the next. Bonus courses come after all the others.</p>
+      <CourseOrderList
+        courses={courses.map((c) => {
           const n = counts.get(c.id);
-          return (
-            <li key={c.id}>
-              <Link href={`/admin/courses/${c.id}`} className="flex items-center justify-between gap-4 p-5 transition-colors hover:bg-ink/[0.03]">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-ink">{c.title}</p>
-                    {c.bonus && <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-700">Bonus</span>}
-                    {!c.published && <span className="rounded-full bg-ink/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-soft">Hidden</span>}
-                  </div>
-                  <p className="mt-0.5 text-sm text-ink-soft">
-                    {c.category && <>{c.category} · </>}
-                    {n ? `${n.published} of ${n.total} lessons visible` : "No lessons yet"}
-                  </p>
-                </div>
-                <span className="shrink-0 text-xs font-bold text-brand-700">Edit →</span>
-              </Link>
-            </li>
-          );
+          return {
+            id: c.id, title: c.title, bonus: c.bonus, published: c.published,
+            meta: `${c.category ? `${c.category} · ` : ""}${n ? `${n.published} of ${n.total} lessons visible` : "No lessons yet"}`,
+          };
         })}
-      </ul>
+      />
       <div className={`${card} p-5`}>
         <AddCourseForm />
       </div>

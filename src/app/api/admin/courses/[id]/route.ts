@@ -9,7 +9,7 @@ export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/cour
   return asAdmin(request, async (admin) => {
     const _id = objectIdOrNull((await ctx.params).id);
     if (!_id) return reply({ ok: false, error: "Course not found." }, 404);
-    const body = await readJson<{ title: string; category: string; description: string; published: boolean; bonus: boolean; teacherIds: string[] }>(request);
+    const body = await readJson<{ title: string; category: string; description: string; published: boolean; bonus: boolean; teacherIds: string[]; image: string | null }>(request);
     const set: Record<string, unknown> = {};
     if (body.title !== undefined) {
       const title = String(body.title).trim().slice(0, 80);
@@ -20,6 +20,18 @@ export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/cour
     if (body.description !== undefined) set.description = String(body.description).trim().slice(0, 600);
     if (body.published !== undefined) set.published = !!body.published;
     if (body.bonus !== undefined) set.bonus = !!body.bonus;
+    if (body.image !== undefined) {
+      const image = body.image ? String(body.image) : null;
+      if (image) {
+        let ok = false;
+        try {
+          const u = new URL(image);
+          ok = u.protocol === "https:" && u.hostname.endsWith(".blob.vercel-storage.com") && u.pathname.startsWith(`/covers/${String(_id)}/`);
+        } catch {}
+        if (!ok) return reply({ ok: false, error: "Upload not recognised." }, 422);
+      }
+      set.image = image;
+    }
     if (body.teacherIds !== undefined) {
       const ids = Array.isArray(body.teacherIds) ? [...new Set(body.teacherIds.map(String))].slice(0, 50) : [];
       const valid = ids.filter((id) => objectIdOrNull(id));

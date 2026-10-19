@@ -40,7 +40,7 @@ export function Quiz({ lessonId, questions, passMark, done, courseSlug }: { less
         </div>
         <p className="mt-2 text-sm text-ink-soft">
           {result.courseCompleted
-            ? "You finished the course! Pick your next course from My courses."
+            ? "You finished the course! Your next course is now open."
             : result.passed
               ? result.assignmentPending
                 ? "Now submit the assignment below to unlock the next lesson."
@@ -53,7 +53,7 @@ export function Quiz({ lessonId, questions, passMark, done, courseSlug }: { less
           )}
           {(result.courseCompleted || (result.passed && !result.nextLessonId && !result.assignmentPending)) && (
             <Link href={result.courseCompleted ? "/portal" : `/portal/courses/${courseSlug}`} className="rounded-full bg-brand-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-700">
-              {result.courseCompleted ? "Choose next course →" : "Back to course"}
+              {result.courseCompleted ? "Go to my next course →" : "Back to course"}
             </Link>
           )}
           {!result.passed && (

@@ -7,16 +7,22 @@ import type { AppUser } from "./session";
 
 /**
  * How a student moves through the academy: one payment covers every course,
- * but only one course is open at a time. The first core course is mandatory;
- * after each completed course the student picks the next one. Bonus courses
- * open once every core course is done.
+ * but only one course is open at a time, in the order the admin sets.
+ * Finishing a course opens the next one automatically. Bonus courses come
+ * after every core course.
  */
-export type CourseState = "current" | "done" | "choose" | "locked";
+export type CourseState = "current" | "done" | "locked";
 export type LessonState = "done" | "open" | "locked";
 
 export type PathCourse = Course & { state: CourseState };
 
 const enrollments = () => db().collection("enrollments");
+
+/** The course a student should be on next: the first unfinished core course, then bonus ones. */
+function nextCourse(courses: Course[], completed: string[]) {
+  const open = (c: Course) => !completed.includes(c.id);
+  return courses.find((c) => !c.bonus && open(c)) ?? courses.find((c) => c.bonus && open(c)) ?? null;
+}
 
 export async function studentPath(userId: string) {
   const enrollment = await enrollments().findOne({ userId, status: "approved" });
@@ -24,25 +30,20 @@ export async function studentPath(userId: string) {
   const courses = await listCourses({ publishedOnly: true });
   const completed: string[] = enrollment.completedCourseIds ?? [];
   let current: string | null = enrollment.currentCourseId ?? null;
-  const core = courses.filter((c) => !c.bonus);
+  // A course that was hidden or deleted can't stay current.
+  if (current && !courses.some((c) => c.id === current)) current = null;
 
-  if (!current && completed.length === 0 && core[0]) {
-    current = core[0].id;
-    await enrollments().updateOne({ _id: enrollment._id, currentCourseId: null }, { $set: { currentCourseId: current } });
+  if (!current) {
+    const next = nextCourse(courses, completed);
+    if (next) {
+      current = next.id;
+      await enrollments().updateOne({ _id: enrollment._id }, { $set: { currentCourseId: current } });
+    }
   }
-  const coreDone = core.every((c) => completed.includes(c.id));
-  const path: PathCourse[] = courses.map((c) => {
-    const state: CourseState = completed.includes(c.id)
-      ? "done"
-      : c.id === current
-        ? "current"
-        : current
-          ? "locked"
-          : c.bonus && !coreDone
-            ? "locked"
-            : "choose";
-    return { ...c, state };
-  });
+  const path: PathCourse[] = courses.map((c) => ({
+    ...c,
+    state: completed.includes(c.id) ? "done" : c.id === current ? "current" : "locked",
+  }));
   return { courses: path, currentId: current, completed };
 }
 
@@ -75,17 +76,21 @@ export async function lessonsWithProgress(userId: string, courseId: string) {
   });
 }
 
-/** Marks the course complete when every lesson is done; returns true if it just happened. */
+/** Marks the course complete when every lesson is done and opens the next one; returns true if it just happened. */
 export async function completeCourseIfDone(user: AppUser, courseId: string) {
   const lessons = await lessonsWithProgress(user.id, courseId);
   if (!lessons.length || !lessons.every((l) => l.state === "done")) return false;
+  const enrollment = await enrollments().findOne({ userId: user.id, status: "approved", currentCourseId: courseId });
+  if (!enrollment) return false;
+  const completed = [...new Set([...(enrollment.completedCourseIds ?? []), courseId])];
+  const next = nextCourse(await listCourses({ publishedOnly: true }), completed);
   const res = await enrollments().updateOne(
-    { userId: user.id, status: "approved", currentCourseId: courseId },
-    { $set: { currentCourseId: null }, $addToSet: { completedCourseIds: courseId } },
+    { _id: enrollment._id, currentCourseId: courseId },
+    { $set: { currentCourseId: next?.id ?? null, completedCourseIds: completed } },
   );
   if (!res.modifiedCount) return false;
   const course = await getCourse(courseId);
-  await audit(user, "student.course_completed", `${user.name} completed ${course?.title ?? "a course"}`, { courseId });
+  await audit(user, "student.course_completed", `${user.name} completed ${course?.title ?? "a course"}${next ? `; ${next.title} is open` : ""}`, { courseId, nextCourseId: next?.id ?? null });
   return true;
 }
 
@@ -192,17 +197,9 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
   };
 }
 
-/** Starts the course the student picked after finishing their last one. */
-export async function chooseNextCourse(user: AppUser, courseId: string) {
-  const path = await studentPath(user.id);
-  const course = path?.courses.find((c) => c.id === courseId);
-  if (!course || course.state !== "choose") return { ok: false as const, error: "You can't start this course right now." };
-  const res = await enrollments().updateOne(
-    { userId: user.id, status: "approved", currentCourseId: null },
-    { $set: { currentCourseId: course.id } },
-  );
-  if (!res.modifiedCount) return { ok: false as const, error: "Finish your current course first." };
-  await audit(user, "student.course_started", `${user.name} started ${course.title}`, { courseId: course.id });
-  return { ok: true as const, slug: course.slug };
+/** Lessons done / total per course the student has reached (for course cards). */
+export async function pathProgress(userId: string, courses: PathCourse[]) {
+  const reached = courses.filter((c) => c.state !== "locked");
+  const rows = await Promise.all(reached.map((c) => lessonsWithProgress(userId, c.id)));
+  return new Map(reached.map((c, i) => [c.id, { done: rows[i].filter((l) => l.state === "done").length, total: rows[i].length }]));
 }
-

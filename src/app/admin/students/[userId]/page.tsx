@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Student · Exambites", robots: { ind
 
 type Params = PageProps<"/admin/students/[userId]">["params"];
 
-const STATE_LABEL = { current: "In progress", done: "Completed", choose: "Not started", locked: "Locked" } as const;
+const STATE_LABEL = { current: "In progress", done: "Completed", locked: "Not started" } as const;
 
 export default function Page({ params }: { params: Params }) {
   return (

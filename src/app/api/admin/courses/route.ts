@@ -1,6 +1,6 @@
 import { asAdmin, readJson, reply } from "@/lib/server/admin-api";
 import { audit } from "@/lib/server/audit";
-import { courseCol, ensureCourses, slugify } from "@/lib/server/courses";
+import { courseCol, ensureCourses, objectIdOrNull, slugify } from "@/lib/server/courses";
 
 /** Creates a course (unpublished until the admin adds lessons and publishes it). */
 export async function POST(request: Request) {
@@ -23,5 +23,17 @@ export async function POST(request: Request) {
       if ((err as { code?: number }).code === 11000) return reply({ ok: false, error: "A course with this title already exists." }, 409);
       throw err;
     }
+  });
+}
+
+/** Saves the order students take courses in: `ids` lists every course, first to last. */
+export async function PUT(request: Request) {
+  return asAdmin(request, async (admin) => {
+    const { ids } = await readJson<{ ids: string[] }>(request);
+    const oids = Array.isArray(ids) ? ids.map((id) => objectIdOrNull(String(id))) : [];
+    if (!oids.length || oids.some((id) => !id)) return reply({ ok: false, error: "Invalid order." }, 422);
+    await courseCol().bulkWrite(oids.map((_id, i) => ({ updateOne: { filter: { _id: _id! }, update: { $set: { order: i + 1 } } } })));
+    await audit(admin, "course.updated", "Changed the course order");
+    return reply({ ok: true });
   });
 }
