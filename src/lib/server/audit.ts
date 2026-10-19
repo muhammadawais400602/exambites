@@ -24,6 +24,10 @@ export type AuditAction =
   | "student.course_started"
   | "student.file_downloaded"
   | "student.assignment_submitted"
+  | "student.updated"
+  | "student.password_set"
+  | "student.disabled"
+  | "student.restored"
   | "assignment.graded"
   | "assignment.returned";
 

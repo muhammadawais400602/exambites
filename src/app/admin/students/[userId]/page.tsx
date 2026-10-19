@@ -6,6 +6,8 @@ import { LessonProgressList } from "@/components/learn/ProgressViews";
 import { Avatar } from "@/components/portal/Avatar";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { getProfile } from "@/lib/server/profile";
+import { studentRecord } from "@/lib/server/students";
+import { StudentActions } from "@/components/staff/StudentTable";
 import { studentPath } from "@/lib/server/learning";
 import { studentBasics, studentCourseProgress } from "@/lib/server/progress";
 import { requireRole } from "@/lib/server/session";
@@ -29,8 +31,12 @@ async function Student({ params }: { params: Params }) {
   const { userId } = await params;
   const student = await studentBasics(userId);
   if (!student) notFound();
-  const [path, profile] = await Promise.all([studentPath(userId), getProfile(userId)]);
+  const [path, profile, record] = await Promise.all([studentPath(userId), getProfile(userId), studentRecord(userId)]);
   const details = [
+    ["Reg No", record?.regNo ?? ""],
+    ["Campus", record?.campus ?? ""],
+    ["Class", record?.className ?? ""],
+    ["Section", record?.section ?? ""],
     ["City", profile.city],
     ["About", profile.bio],
     ["Skills", profile.skills],
@@ -52,6 +58,12 @@ async function Student({ params }: { params: Params }) {
           </div>
         </PageTitle>
       </div>
+      {record && (
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          {record.disabled && <span className="rounded-full bg-red-500/15 px-2.5 py-1 text-[11px] font-bold text-red-500">Disabled</span>}
+          <StudentActions student={record} />
+        </div>
+      )}
       {details.length > 0 && (
         <dl className="mb-8 grid gap-x-6 gap-y-3 rounded-3xl border border-ink/10 bg-surface-card p-5 sm:grid-cols-2">
           {details.map(([k, v]) => (

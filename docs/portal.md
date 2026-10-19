@@ -46,11 +46,20 @@ One payment covers all courses, but one course is open at a time, in the order s
 
 ## Profiles
 
-Everyone (students, teachers, admin) has a profile on the **Settings** page (`/settings`), opened from the ⚙️ icon or their name in the top bar. The **name and picture are public**: they show wherever the person appears (teacher views now, the community later). Phone, city, bio, skills and social links are **private**: only the person and the admin see them (Admin → Students → Progress). Teachers see students' names and pictures only, not their email or details. Pictures are cropped to a 256px square in the browser and stored in MongoDB (about 30 KB each). The settings page also has **Change password**.
+Everyone (students, teachers, admin) has a profile on the **Settings** page (`/settings`), opened from the ⚙️ icon or their name in the top bar. The **name and picture are public**: they show wherever the person appears (teacher views now, the community later). Phone, city, bio, skills and social links are **private**: only the person and the admin see them (Admin → Students → Progress). Teachers see the name, picture, email and school details of students on their courses (see **Teacher: Students** below), but not the rest of the private profile. Pictures are cropped to a 256px square in the browser and stored in MongoDB (about 30 KB each). The settings page also has **Change password**.
 
 ### Videos on YouTube (temporary)
 
 Until Bunny Stream is set up, lessons can use YouTube. Upload each video as **Unlisted** (not Private, which can't be embedded), keep **Allow embedding** on, and paste its link into the lesson. The player hides related videos and shows the student's email as a watermark. Unlisted videos can still be shared and downloaded by anyone who gets the link, so move paid content to Bunny when you can: paste the Bunny video ID into the same field, one lesson at a time.
+
+## Teacher: Students
+
+Teachers get a **Students** tab listing every student on, or finished with, one of their courses: Name, Reg No, Class (with section and campus), Email, Course and Status (Studying / Completed / Disabled). Search by name, Reg No or email; filter by class or status; sort by name or Reg No.
+
+- Tap ✏️ next to a Reg No to edit it in place (Enter saves, Esc cancels).
+- **⋯** on a row: **View progress**, **Edit profile** (name, Reg No, campus, class, section), **Reset password** (teacher sets a new one and gives it to the student; other devices are signed out) and **Disable / Enable account** (a disabled student is signed out and can't log in; progress is kept).
+- The admin has the same buttons on **Admin → Students → (student)**. Students can't change their own school details.
+- Every change is recorded in the activity log.
 
 ## Lesson files (PDF, Word, PowerPoint…)
 
