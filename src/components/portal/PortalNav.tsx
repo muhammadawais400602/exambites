@@ -1,18 +1,25 @@
 "use client";
 
-import { BookOpen, LayoutDashboard, UserRound } from "lucide-react";
+import { BookOpen, LayoutDashboard, UserRound, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const TABS = [
+const STUDENT_TABS = [
   { href: "/portal", label: "Dashboard", Icon: LayoutDashboard, match: (p: string) => p === "/portal" },
   { href: "/portal/courses", label: "Courses", Icon: BookOpen, match: (p: string) => p.startsWith("/portal/courses") || p.startsWith("/portal/lessons") },
   { href: "/settings", label: "Profile", Icon: UserRound, match: (p: string) => p.startsWith("/settings") },
 ];
 
-/** Student portal tabs under the top bar. */
-export function PortalNav() {
+const TEACHER_TABS = [
+  { href: "/teacher", label: "My courses", Icon: BookOpen, match: (p: string) => p === "/teacher" || p.startsWith("/teacher/courses") },
+  { href: "/teacher/students", label: "Students", Icon: Users, match: (p: string) => p.startsWith("/teacher/students") },
+  { href: "/settings", label: "Profile", Icon: UserRound, match: (p: string) => p.startsWith("/settings") },
+];
+
+/** Portal tabs under the top bar (students and teachers). */
+export function PortalNav({ role = "student" }: { role?: "student" | "teacher" }) {
   const path = usePathname();
+  const TABS = role === "teacher" ? TEACHER_TABS : STUDENT_TABS;
   return (
     <nav aria-label="Portal" className="border-b border-ink/10 bg-surface/85 backdrop-blur-xl">
       <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4">

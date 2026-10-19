@@ -8,6 +8,8 @@ import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/Porta
 import { getCourse } from "@/lib/server/courses";
 import { courseRoster, studentCourseProgress } from "@/lib/server/progress";
 import { requireRole } from "@/lib/server/session";
+import { studentRecord } from "@/lib/server/students";
+import { StudentActions } from "@/components/staff/StudentTable";
 
 export const metadata: Metadata = { title: "Student progress · Exambites", robots: { index: false } };
 
@@ -29,7 +31,8 @@ async function Student({ params }: { params: Params }) {
   // Teachers only see students who are on, or finished, one of their courses.
   const student = (await courseRoster(course.id)).find((r) => r.userId === userId);
   if (!student) notFound();
-  const lessons = await studentCourseProgress(userId, course.id);
+  const [lessons, record] = await Promise.all([studentCourseProgress(userId, course.id), studentRecord(userId)]);
+  const school = record ? [record.regNo && `Reg No ${record.regNo}`, record.className, record.section && `Section ${record.section}`, record.campus].filter(Boolean).join(" · ") : "";
   return (
     <PortalShell role="teacher" user={user}>
       <Link href={`/teacher/courses/${course.id}`} className="text-xs font-semibold text-muted hover:text-brand-700">← {course.title}</Link>
@@ -38,6 +41,12 @@ async function Student({ params }: { params: Params }) {
           <Avatar name={student.name} image={student.image} size={56} />
         </PageTitle>
       </div>
+      {record && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-ink-soft">{school || "No school details yet."} {record.disabled && <span className="ml-1 rounded-full bg-red-500/15 px-2 py-0.5 text-[11px] font-bold text-red-500">Disabled</span>}</p>
+          <StudentActions student={record} />
+        </div>
+      )}
       <LessonProgressList lessons={lessons} />
     </PortalShell>
   );

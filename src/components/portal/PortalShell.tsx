@@ -35,7 +35,7 @@ export function PortalShell({ role, user, children }: { role: Role; user: { name
             <SignOutButton to={LOGIN[role]} />
           </div>
         </div>
-        {role === "student" && <PortalNav />}
+        {role !== "admin" && <PortalNav role={role} />}
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 md:py-12">{children}</main>
     </div>
