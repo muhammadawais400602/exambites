@@ -3,7 +3,6 @@ import { BookOpen, CheckCircle2, Clock, Lock, PlayCircle, XCircle } from "lucide
 import Link from "next/link";
 import { Suspense } from "react";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
-import { ChooseCourse } from "@/components/learn/ChooseCourse";
 import { courses as catalogue } from "@/content/courses";
 import { checkout, type PaymentMethod } from "@/content/enroll";
 import { formatRs } from "@/lib/pricing";
@@ -60,12 +59,12 @@ const icons = new Map(catalogue.map((c) => [slugify(c.title), c.Icon]));
 async function CoursePath({ userId, first }: { userId: string; first: string }) {
   const path = await studentPath(userId);
   const list = path?.courses ?? [];
-  const choosing = !path?.currentId && list.some((c) => c.state === "choose");
+  const allDone = list.length > 0 && list.every((c) => c.state === "done");
   return (
     <>
       <PageTitle eyebrow="My courses" title={`Welcome, ${first}`}>
         <p className="max-w-sm text-sm text-ink-soft">
-          {choosing ? "Course finished. Pick what you want to learn next." : "One course at a time. Finish it to pick the next one."}
+          {allDone ? "You've finished every course. Amazing work!" : "One course at a time. Finishing it opens the next one."}
         </p>
       </PageTitle>
       <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -94,10 +93,9 @@ async function CoursePath({ userId, first }: { userId: string; first: string }) 
                     <CheckCircle2 className="size-4" /> Completed · review
                   </Link>
                 )}
-                {c.state === "choose" && <ChooseCourse courseId={c.id} title={c.title} />}
                 {c.state === "locked" && (
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted">
-                    <Lock className="size-3.5" /> {c.bonus ? "Unlocks after all other courses" : "Unlocks after your current course"}
+                    <Lock className="size-3.5" /> {c.bonus ? "Unlocks after all other courses" : "Opens after the course before it"}
                   </span>
                 )}
               </div>

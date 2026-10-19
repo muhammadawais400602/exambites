@@ -65,6 +65,56 @@ export function AddCourseForm() {
   );
 }
 
+type CourseRow = { id: string; title: string; bonus: boolean; published: boolean; meta: string };
+
+/** Courses in the order students take them, with up/down to reorder. */
+export function CourseOrderList({ courses }: { courses: CourseRow[] }) {
+  const router = useRouter();
+  const [rows, setRows] = useState(courses);
+  const [seen, setSeen] = useState(courses);
+  const [error, setError] = useState("");
+  if (seen !== courses) {
+    setSeen(courses);
+    setRows(courses);
+  }
+  async function move(i: number, by: -1 | 1) {
+    const next = [...rows];
+    [next[i], next[i + by]] = [next[i + by], next[i]];
+    setRows(next);
+    setError("");
+    const r = await send("/api/admin/courses", "PUT", { ids: next.map((c) => c.id) });
+    if (!r.ok) {
+      setError(r.error);
+      setRows(rows);
+    } else router.refresh();
+  }
+  return (
+    <div>
+      <ol className="divide-y divide-ink/10 rounded-3xl border border-ink/10 bg-surface-card">
+        {rows.map((c, i) => (
+          <li key={c.id} className="flex items-center gap-3 p-4 sm:p-5">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full border border-ink/15 font-label text-xs font-bold text-ink-soft">{i + 1}</span>
+            <Link href={`/admin/courses/${c.id}`} className="min-w-0 flex-1">
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-ink hover:text-brand-700">{c.title}</span>
+                {c.bonus && <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-700">Bonus</span>}
+                {!c.published && <span className="rounded-full bg-ink/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink-soft">Hidden</span>}
+              </span>
+              <span className="mt-0.5 block text-sm text-ink-soft">{c.meta}</span>
+            </Link>
+            <div className="flex shrink-0 gap-1">
+              <button type="button" aria-label={`Move ${c.title} up`} disabled={i === 0} onClick={() => move(i, -1)} className={`${ghost} !px-2.5 disabled:opacity-30`}><ArrowUp className="size-3.5" /></button>
+              <button type="button" aria-label={`Move ${c.title} down`} disabled={i === rows.length - 1} onClick={() => move(i, 1)} className={`${ghost} !px-2.5 disabled:opacity-30`}><ArrowDown className="size-3.5" /></button>
+              <Link href={`/admin/courses/${c.id}`} className={ghost}>Edit</Link>
+            </div>
+          </li>
+        ))}
+      </ol>
+      {error && <p role="alert" className="mt-2 text-xs font-medium text-red-500">{error}</p>}
+    </div>
+  );
+}
+
 type CourseFields = { id: string; title: string; category: string; description: string; published: boolean; bonus: boolean; teacherIds: string[] };
 
 export function CourseForm({ course, teachers }: { course: CourseFields; teachers: { id: string; name: string }[] }) {

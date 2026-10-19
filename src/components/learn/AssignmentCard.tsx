@@ -106,7 +106,7 @@ export function AssignmentCard({ lessonId, userId, instructions, required, submi
 
       {state.done && (
         <p className="mt-4 text-sm text-emerald-600 dark:text-emerald-400" role="status">
-          Submitted! {state.done.completed ? <Link href="/portal" className="font-bold underline">Choose your next course →</Link> : state.done.next ? <Link href={`/portal/lessons/${state.done.next}`} className="font-bold underline">Next lesson →</Link> : null}
+          Submitted! {state.done.completed ? <Link href="/portal" className="font-bold underline">Your next course is open →</Link> : state.done.next ? <Link href={`/portal/lessons/${state.done.next}`} className="font-bold underline">Next lesson →</Link> : null}
         </p>
       )}
 

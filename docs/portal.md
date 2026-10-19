@@ -42,7 +42,7 @@ It only works while no admin exists. Afterwards delete `ADMIN_SETUP_TOKEN` from 
 
 ## How students move through courses
 
-One payment covers all courses, but one course is open at a time. AI Basics is first. When a course is finished, the student picks the next one. The bonus course opens after all the others. Videos are signed per viewer (links expire after 4 hours) and show the student's email as a moving watermark.
+One payment covers all courses, but one course is open at a time, in the order set in **Admin → Courses** (↑ ↓ to reorder). Finishing a course opens the next one automatically; bonus courses come after all the others. Hidden courses are skipped, so hide a course until its lessons are ready, or students reaching it will wait on an empty course. Videos are signed per viewer (links expire after 4 hours) and show the student's email as a moving watermark.
 
 ## Profiles
 
