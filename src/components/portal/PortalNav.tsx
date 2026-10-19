@@ -3,6 +3,7 @@
 import { BookOpen, LayoutDashboard, Trophy, UserRound, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 
 const STUDENT_TABS = [
   { href: "/portal", label: "Dashboard", Icon: LayoutDashboard, match: (p: string) => p === "/portal" },
@@ -22,8 +23,20 @@ const TEACHER_TABS = [
  * Portal tabs (students and teachers). `inline` sits in the middle of the
  * header on wide screens; otherwise it's a row under the header.
  */
-export function PortalNav({ role = "student", inline = false }: { role?: "student" | "teacher"; inline?: boolean }) {
-  const path = usePathname();
+export function PortalNav(props: { role?: "student" | "teacher"; inline?: boolean }) {
+  // The tabs show straight away; the active one is marked once the URL is known.
+  return (
+    <Suspense fallback={<Tabs {...props} path="" />}>
+      <WithPath {...props} />
+    </Suspense>
+  );
+}
+
+function WithPath(props: { role?: "student" | "teacher"; inline?: boolean }) {
+  return <Tabs {...props} path={usePathname()} />;
+}
+
+function Tabs({ role = "student", inline = false, path }: { role?: "student" | "teacher"; inline?: boolean; path: string }) {
   const TABS = role === "teacher" ? TEACHER_TABS : STUDENT_TABS;
   return (
     <nav aria-label="Portal" className={inline ? "h-full" : "border-t border-ink/10"}>

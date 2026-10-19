@@ -15,7 +15,7 @@ export const offer = {
   terms: "One-time fee · Lifetime access",
   body: "A complete, step-by-step program built for Pakistani students, creators and freelancers to learn AI skills and get paid in dollars by clients at home and abroad.",
   features: [
-    { Icon: FileText, title: "5 courses + bonus", body: "AI Basics, Content Creation, Digital Marketing, Web Development and Selling, plus AI Filmmaking." },
+    { Icon: FileText, title: "6 courses", body: "AI Basics, Graphic Design, Video Editing & Filmmaking, Web Development, Digital Marketing, and Freelancing & Portfolio Building." },
     { Icon: Zap, title: "Income playbooks", body: "Tested ways to find, pitch and keep clients in Pakistan, the Gulf, UK and US." },
     { Icon: Wallet, title: "Get paid in USD", body: "Step-by-step setup for Payoneer, Wise, Fiverr and Upwork withdrawals." },
     { Icon: Bot, title: "Prompt library", body: "Ready-made prompts for ChatGPT, Claude, Midjourney and more, organised by course." },
@@ -24,7 +24,7 @@ export const offer = {
   ] satisfies { Icon: LucideIcon; title: string; body: string }[],
   // DEMO quote: replace with a real student's words.
   quote: {
-    text: "Closed a $1,400 monthly client in Dubai within 22 days of finishing the AI Content Creation course.",
+    text: "Closed a $1,400 monthly client in Dubai within 22 days of finishing the AI Graphic Design course.",
     name: "Ahmed Z.",
     note: "Batch 02 · Karachi",
   },
@@ -57,7 +57,7 @@ export const checkout = {
 
 export const syllabus = {
   eyebrow: "Syllabus",
-  title: { lead: "Five courses", highlight: "+ a bonus" },
+  title: { lead: "Six courses,", highlight: "one path" },
   body: "Built for paid client work from day one: learn the tools, make the work, then sell it.",
 };
 

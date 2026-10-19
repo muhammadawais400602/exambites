@@ -1,6 +1,6 @@
 import "server-only";
 import { ObjectId } from "mongodb";
-import { courses as catalogue } from "@/content/courses";
+import { courses as catalogue, renamedCourses } from "@/content/courses";
 import { db } from "./db";
 import { slugify } from "@/lib/slug";
 
@@ -76,7 +76,45 @@ const toLesson = (d: LessonDoc): Lesson => ({
 
 let seeded: Promise<void> | null = null;
 
-/** Creates the six catalogue courses the first time, and the indexes. */
+/** Bump when the catalogue's course list changes in a way existing databases should pick up. */
+const CATALOGUE_VERSION = 2;
+
+/**
+ * Version 2: the six-course list (AI Basics, AI Graphic Design, AI Video
+ * Editing & Filmmaking, AI Web Development, AI Digital Marketing, Freelancing &
+ * Portfolio Building). Renames the old rows in place (same ids, so lessons,
+ * progress and enrollments stay), sets the new order, drops "bonus", and adds
+ * any missing course as hidden until it has lessons. Courses the admin added
+ * themselves go after these. Runs once per database.
+ */
+async function applyCatalogueUpdate() {
+  const meta = db().collection<{ _id: string; version?: number }>("meta");
+  const claimed = await meta.updateOne({ _id: "catalogue", version: { $lt: CATALOGUE_VERSION } }, { $set: { version: CATALOGUE_VERSION } });
+  if (!claimed.matchedCount) {
+    // No record yet means an older database: claim it (another instance may win the race).
+    const inserted = await meta.insertOne({ _id: "catalogue", version: CATALOGUE_VERSION }).then(() => true, () => false);
+    if (!inserted) return;
+  }
+  const rows = await courseCol().find().toArray();
+  const oldSlugFor = Object.fromEntries(Object.entries(renamedCourses).map(([from, to]) => [to, from]));
+  const used = new Set<string>();
+  const now = new Date();
+  for (const [i, c] of catalogue.entries()) {
+    const slug = slugify(c.title);
+    const row = rows.find((r) => r.slug === slug) ?? rows.find((r) => r.slug === oldSlugFor[slug]);
+    const fields = { slug, title: c.title, category: c.category, description: c.body, order: i + 1, bonus: false };
+    if (row) {
+      used.add(String(row._id));
+      await courseCol().updateOne({ _id: row._id }, { $set: fields }).catch((err) => console.error("[catalogue] couldn't update", slug, err));
+    } else {
+      await courseCol().insertOne({ _id: new ObjectId(), ...fields, published: false, createdAt: now }).catch((err) => console.error("[catalogue] couldn't add", slug, err));
+    }
+  }
+  const extras = rows.filter((r) => !used.has(String(r._id))).sort((a, b) => a.order - b.order);
+  for (const [i, r] of extras.entries()) await courseCol().updateOne({ _id: r._id }, { $set: { order: catalogue.length + i + 1 } });
+}
+
+/** Creates the catalogue courses the first time, and the indexes. */
 export function ensureCourses() {
   seeded ??= (async () => {
     await Promise.all([
@@ -87,7 +125,11 @@ export function ensureCourses() {
       db().collection("submissions").createIndex({ userId: 1, lessonId: 1 }, { unique: true }),
       db().collection("submissions").createIndex({ courseId: 1, status: 1, submittedAt: 1 }),
     ]);
-    if ((await courseCol().estimatedDocumentCount()) > 0) return;
+    if ((await courseCol().estimatedDocumentCount()) > 0) {
+      await applyCatalogueUpdate();
+      return;
+    }
+    await db().collection("meta").updateOne({ _id: "catalogue" as unknown as ObjectId }, { $set: { version: CATALOGUE_VERSION } }, { upsert: true });
     const now = new Date();
     await courseCol()
       .insertMany(

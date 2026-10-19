@@ -6,7 +6,7 @@ import { Header } from "@/components/home/Header";
 
 export const metadata: Metadata = {
   title: "Enroll · School of Tomorrow",
-  description: "Lock your seat: 5 AI courses plus a bonus, lifetime access and the School of Tomorrow community, from Rs. 5,000 with a referral code.",
+  description: "Lock your seat: 6 AI courses, lifetime access and the School of Tomorrow community, from Rs. 5,000 with a referral code.",
 };
 
 export default function EnrollPage() {

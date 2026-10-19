@@ -16,14 +16,14 @@ import { useEffect, useId, useRef, useState } from "react";
 const SKILLS = [
   { Icon: Sparkles, track: "Welcome", label: "AI Skills That Pay" },
   { Icon: Brain, track: "AI Basics", label: "Prompts & Tools" },
-  { Icon: Palette, track: "Content", label: "Canva Designs" },
-  { Icon: Clapperboard, track: "Content", label: "CapCut Reels" },
+  { Icon: Palette, track: "Design", label: "Canva Designs" },
+  { Icon: Clapperboard, track: "Video", label: "CapCut Reels" },
+  { Icon: Film, track: "Video", label: "AI Filmmaking" },
+  { Icon: Globe, track: "Web", label: "Websites" },
   { Icon: Megaphone, track: "Marketing", label: "Social Media" },
   { Icon: Search, track: "Marketing", label: "SEO" },
   { Icon: Target, track: "Marketing", label: "Paid Ads" },
-  { Icon: Globe, track: "Web", label: "Websites" },
-  { Icon: Handshake, track: "Selling", label: "Client Pitching" },
-  { Icon: Film, track: "Bonus", label: "AI Filmmaking" },
+  { Icon: Handshake, track: "Freelancing", label: "Client Pitching" },
 ];
 
 const CYCLE_MS = 2400;

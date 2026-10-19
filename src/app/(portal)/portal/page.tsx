@@ -122,7 +122,7 @@ async function CoursePath({ userId, first }: { userId: string; first: string }) 
                     <span className={`mt-1.5 grid size-9 place-items-center rounded-full ${c.state === "done" ? "bg-emerald-500 text-white" : "bg-white/10 text-white"}`}>
                       {c.state === "done" ? <CheckCircle2 className="size-4" /> : c.state === "locked" ? <Lock className="size-3.5" /> : <CourseIcon slug={c.slug} className="size-4" />}
                     </span>
-                    <span className="mt-1.5 line-clamp-2 text-[9px] font-bold uppercase leading-tight tracking-wide text-white/80">{c.title}</span>
+                    <span className="mt-1.5 line-clamp-3 break-words text-[9px] font-bold uppercase leading-tight tracking-wide text-white/80">{c.title}</span>
                   </li>
                 );
               })}
