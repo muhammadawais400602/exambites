@@ -1,5 +1,5 @@
 // Course catalogue: the homepage stack and the enroll syllabus read from here.
-import { Brain, Clapperboard, Film, Globe, Handshake, type LucideIcon, Target } from "lucide-react";
+import { Brain, Briefcase, Clapperboard, Globe, type LucideIcon, Palette, Target } from "lucide-react";
 
 export type Course = {
   title: string;
@@ -19,10 +19,11 @@ export type Course = {
 
 export const coursesSection = {
   eyebrow: "The Courses",
-  title: { lead: "Five courses + a bonus.", highlight: "One AI career." },
+  title: { lead: "Six courses.", highlight: "One AI career." },
   scrollCue: "Scroll to advance",
 };
 
+/** In teaching order: students take them one at a time, top to bottom. */
 export const courses: Course[] = [
   {
     title: "AI Basics",
@@ -34,22 +35,22 @@ export const courses: Course[] = [
     Icon: Brain,
   },
   {
-    title: "AI Content Creation",
-    category: "Canva + CapCut",
-    body: "Design posts, carousels and thumbnails in Canva and edit reels and shorts in CapCut, with AI doing the heavy lifting on ideas, scripts and captions.",
-    tag: "Content engine",
+    title: "AI Graphic Design",
+    category: "Design",
+    body: "Design social posts, carousels, thumbnails, logos and brand kits in Canva and AI image tools, and learn the design basics clients pay for.",
+    tag: "Design that sells",
     weeks: 4,
-    tools: ["Canva", "CapCut", "ChatGPT"],
-    Icon: Clapperboard,
+    tools: ["Canva", "Midjourney", "Adobe Firefly"],
+    Icon: Palette,
   },
   {
-    title: "AI Digital Marketing",
-    category: "Marketing",
-    body: "Run social media, SEO and paid ads on Meta and Google for real businesses. Plan content, read the numbers and report results clients understand.",
-    tag: "Growth & ads",
+    title: "AI Video Editing & Filmmaking",
+    category: "Video",
+    body: "Edit reels and shorts in CapCut, then make short films and ads with AI: consistent characters, cinematic shots, voiceover and lip-synced dialogue.",
+    tag: "Reels to films",
     weeks: 4,
-    tools: ["Meta Ads", "Google Ads", "Search Console"],
-    Icon: Target,
+    tools: ["CapCut", "Runway", "ElevenLabs"],
+    Icon: Clapperboard,
   },
   {
     title: "AI Web Development",
@@ -61,22 +62,31 @@ export const courses: Course[] = [
     Icon: Globe,
   },
   {
-    title: "Selling & Client Communication",
-    category: "Freelancing",
-    body: "Find clients, pitch with confidence, price your work, write proposals and keep clients happy. Includes Fiverr, Upwork and getting paid in dollars.",
-    tag: "Land the client",
-    weeks: 3,
-    tools: ["Fiverr", "Upwork", "LinkedIn"],
-    Icon: Handshake,
+    title: "AI Digital Marketing",
+    category: "Marketing",
+    body: "Run social media, SEO and paid ads on Meta and Google for real businesses. Plan content, read the numbers and report results clients understand.",
+    tag: "Growth & ads",
+    weeks: 4,
+    tools: ["Meta Ads", "Google Ads", "Search Console"],
+    Icon: Target,
   },
   {
-    title: "AI Filmmaking",
-    category: "Bonus course",
-    body: "Turn one idea into a short film or ad: consistent characters, cinematic shots, voiceover and lip-synced dialogue, all made with AI.",
-    tag: "Cinematic AI",
+    title: "Freelancing & Portfolio Building",
+    category: "Freelancing",
+    body: "Turn your course projects into a portfolio, set up Fiverr, Upwork and LinkedIn, pitch and price your work, keep clients happy and get paid in dollars.",
+    tag: "Land the client",
     weeks: 3,
-    tools: ["Runway", "Kling", "ElevenLabs"],
-    Icon: Film,
-    bonus: true,
+    tools: ["Fiverr", "Upwork", "Behance"],
+    Icon: Briefcase,
   },
 ];
+
+/**
+ * Old course slugs and the course they became when the list changed to the
+ * six above (the database rows are renamed, so lessons and progress stay).
+ */
+export const renamedCourses: Record<string, string> = {
+  "ai-content-creation": "ai-graphic-design",
+  "ai-filmmaking": "ai-video-editing-and-filmmaking",
+  "selling-and-client-communication": "freelancing-and-portfolio-building",
+};
