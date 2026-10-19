@@ -176,7 +176,12 @@ export function publicQuestions(lesson: Lesson) {
 }
 
 export type SubmitResult =
-  | { ok: true; score: number; passed: boolean; wrong: string[]; courseCompleted: boolean; assignmentPending: boolean; nextLessonId: string | null }
+  | {
+      ok: true; score: number; passed: boolean; wrong: string[]; total: number;
+      /** Correct option per question, so a failed attempt can be reviewed. */
+      correct: Record<string, number>;
+      courseCompleted: boolean; assignmentPending: boolean; nextLessonId: string | null;
+    }
   | { ok: false; error: string; status: number };
 
 /** Marks a quiz (or a lesson without one) and moves the student on when they pass. */
@@ -214,7 +219,8 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
   }
   const assignmentPending = passed && !!lesson.assignment && !lesson.submitted;
   return {
-    ok: true, score, passed, wrong, courseCompleted, assignmentPending,
+    ok: true, score, passed, wrong, total, courseCompleted, assignmentPending,
+    correct: Object.fromEntries(lesson.questions.map((q) => [q.id, q.answer])),
     nextLessonId: passed && !assignmentPending ? (lessons[index + 1]?.id ?? null) : null,
   };
 }

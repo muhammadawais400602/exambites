@@ -1,12 +1,12 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, CheckCircle2, CircleHelp, LoaderCircle, RotateCcw, XCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, CircleHelp, LoaderCircle, RotateCcw, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type Q = { id: string; prompt: string; options: string[] };
-type Result = { score: number; passed: boolean; wrong: string[]; courseCompleted: boolean; assignmentPending?: boolean; nextLessonId: string | null };
+type Result = { score: number; passed: boolean; wrong: string[]; total: number; correct: Record<string, number>; courseCompleted: boolean; assignmentPending?: boolean; nextLessonId: string | null };
 
 /**
  * The lesson quiz, one question at a time. Passing (80%) is required to move
@@ -61,17 +61,8 @@ export function Quiz({ lessonId, questions, passMark, passed, bestScore, continu
           body={result.courseCompleted ? "You finished the course! Your next course is now open." : result.assignmentPending ? "Next, hand in the assignment for this lesson." : "The next lesson is unlocked."} />
       );
     }
-    return (
-      <div role="status" className={`${card} text-center`}>
-        <XCircle className="mx-auto size-10 text-red-500" />
-        <p className="mt-3 font-display text-2xl font-black uppercase tracking-tight text-ink">{result.score}% · Not yet</p>
-        <p className="mt-1 text-sm text-ink-soft">You need {passMark}% to move on. {result.wrong.length} answer{result.wrong.length === 1 ? " was" : "s were"} wrong.</p>
-        <button type="button" onClick={() => { setResult(null); setAnswers({}); setI(0); }}
-          className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink-soft hover:text-ink">
-          <RotateCcw className="size-4" /> Try again
-        </button>
-      </div>
-    );
+    const retry = () => { setResult(null); setAnswers({}); setI(0); };
+    return <Review questions={questions} answers={answers} result={result} passMark={passMark} onRetry={retry} />;
   }
 
   const q = questions[i];
@@ -132,6 +123,73 @@ function Done({ title, body, href }: { title: string; body: string; href: string
           Continue <ArrowRight className="size-4" />
         </Link>
       )}
+    </div>
+  );
+}
+
+function RetryButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick}
+      className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-700">
+      <RotateCcw className="size-4" /> Retry quiz
+    </button>
+  );
+}
+
+/** Failed attempt: score, then every question with the right answer and the student's pick. */
+function Review({ questions, answers, result, passMark, onRetry }: {
+  questions: Q[]; answers: Record<string, number>; result: Result; passMark: number; onRetry: () => void;
+}) {
+  const total = result.total || questions.length;
+  const right = total - result.wrong.length;
+  return (
+    <div role="status" className="rounded-3xl border border-ink/10 bg-surface-card p-6 sm:p-8">
+      <h2 className="flex items-center gap-2 font-display text-xl font-black uppercase tracking-tight text-ink">
+        <AlertCircle className="size-5 text-red-500" /> Quiz results
+      </h2>
+      <div className="mt-5 rounded-2xl border border-ink/10 bg-ink/[0.03] p-5">
+        <p className="font-display text-4xl font-black text-ink">{right}/{total}</p>
+        <p className="mt-1 text-sm text-ink-soft">{result.score}% correct</p>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/15 px-3 py-1.5 text-xs font-bold text-red-500">
+            <XCircle className="size-4" /> Failed — {passMark}% required to proceed
+          </span>
+          <RetryButton onClick={onRetry} />
+        </div>
+      </div>
+
+      <ol className="mt-6 grid gap-4">
+        {questions.map((q, n) => {
+          const picked = answers[q.id];
+          const correct = result.correct?.[q.id];
+          const isWrong = result.wrong.includes(q.id);
+          return (
+            <li key={q.id} className={`rounded-2xl border p-4 sm:p-5 ${isWrong ? "border-red-500/30 bg-red-500/[0.06]" : "border-emerald-500/25 bg-emerald-500/[0.04]"}`}>
+              <div className="flex items-start gap-2">
+                {isWrong
+                  ? <AlertCircle aria-label="Wrong" className="mt-0.5 size-5 shrink-0 text-red-500" />
+                  : <CheckCircle2 aria-label="Correct" className="mt-0.5 size-5 shrink-0 text-emerald-500" />}
+                <p className="font-semibold text-ink">{n + 1}. {q.prompt}</p>
+              </div>
+              <ul className="mt-3 grid gap-1.5 pl-7 text-sm">
+                {q.options.map((o, k) => {
+                  const isCorrect = k === correct;
+                  const isPickedWrong = k === picked && !isCorrect;
+                  return (
+                    <li key={k} className={isCorrect ? "font-bold text-emerald-500" : isPickedWrong ? "text-red-500 line-through" : "text-ink-soft"}>
+                      <span className="mr-1 font-bold">{String.fromCharCode(65 + k)}.</span> {o}
+                      {isCorrect && <span className="sr-only"> (correct answer)</span>}
+                      {isPickedWrong && <span className="sr-only"> (your answer)</span>}
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          );
+        })}
+      </ol>
+
+      <div className="mt-6 flex justify-center"><RetryButton onClick={onRetry} /></div>
     </div>
   );
 }
