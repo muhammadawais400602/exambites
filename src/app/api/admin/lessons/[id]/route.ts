@@ -27,7 +27,7 @@ export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/less
     if (!_id) return reply({ ok: false, error: "Lesson not found." }, 404);
     const body = await readJson<{ title: string; summary: string; videoId: string; notes: string; questions: unknown; published: boolean; assignment: { instructions?: string; required?: boolean } | null }>(request);
     const instructions = String(body.assignment?.instructions ?? "").trim().slice(0, 5000);
-    const assignment = instructions ? { instructions, required: !!body.assignment?.required } : null;
+    const assignment = instructions ? { instructions, required: true } : null;
     const title = String(body.title ?? "").trim().slice(0, 120);
     if (title.length < 2) return reply({ ok: false, error: "Enter a lesson title." }, 422);
     const rawVideo = String(body.videoId ?? "").trim();

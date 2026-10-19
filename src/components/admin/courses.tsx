@@ -264,7 +264,7 @@ export function LessonList({ courseId, lessons }: { courseId: string; lessons: L
 type Q = { id: string; prompt: string; options: string[]; answer: number };
 type LessonFields = {
   id: string; courseId: string; title: string; summary: string; videoId: string; notes: string; questions: Q[]; published: boolean;
-  assignment: { instructions: string; required: boolean } | null;
+  assignment: { instructions: string; required?: boolean } | null;
 };
 
 let tempId = 0;
@@ -327,7 +327,7 @@ export function LessonEditor({ lesson }: { lesson: LessonFields }) {
             <p className="text-xs text-ink-soft">Optional. Students hand in text, a link or files; the course&apos;s teachers grade it out of 100.</p>
           </div>
           <label className="flex cursor-pointer items-center gap-2.5 text-sm font-semibold text-ink">
-            <input type="checkbox" checked={!!v.assignment} onChange={(e) => set({ assignment: e.target.checked ? { instructions: "", required: false } : null })} className="size-4 accent-[var(--color-brand-600)]" />
+            <input type="checkbox" checked={!!v.assignment} onChange={(e) => set({ assignment: e.target.checked ? { instructions: "", required: true } : null })} className="size-4 accent-[var(--color-brand-600)]" />
             Add an assignment
           </label>
         </div>
@@ -339,10 +339,7 @@ export function LessonEditor({ lesson }: { lesson: LessonFields }) {
                 onChange={(e) => set({ assignment: { ...v.assignment!, instructions: e.target.value } })}
                 placeholder="e.g. Design an Instagram post for a local café in Canva and share the link or upload the PNG." className={`${field} mt-1.5`} />
             </label>
-            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-ink">
-              <input type="checkbox" checked={v.assignment.required} onChange={(e) => set({ assignment: { ...v.assignment!, required: e.target.checked } })} className="size-4 accent-[var(--color-brand-600)]" />
-              Required: the next lesson opens only after the student submits it
-            </label>
+            <p className="text-xs text-muted">Students must submit it (after passing the quiz) before the next lesson opens.</p>
           </>
         )}
       </section>
@@ -351,7 +348,7 @@ export function LessonEditor({ lesson }: { lesson: LessonFields }) {
         <div className="flex items-end justify-between gap-3">
           <div>
             <h2 className="font-display text-lg font-black uppercase tracking-tight text-ink">Quiz</h2>
-            <p className="text-xs text-ink-soft">Students need 80% to unlock the next lesson. With no questions, they mark the lesson done after watching.</p>
+            <p className="text-xs text-ink-soft">Students must pass with 80% to move on (videos can be skipped). With no questions, they mark the lesson complete.</p>
           </div>
           <button type="button" onClick={() => set({ questions: [...v.questions, blankQuestion()] })} className={`${ghost} shrink-0`}>
             <Plus className="size-3.5" /> Add question

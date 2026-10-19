@@ -38,7 +38,7 @@ It only works while no admin exists. Afterwards delete `ADMIN_SETUP_TOKEN` from 
 - **Activity**: every admin action and sign-up is logged.
 - **Courses**: the six courses are created automatically. Open one to edit its text, add lessons, reorder them and publish. A course or lesson is only visible to students once **Visible to students** is ticked.
 - **Teachers on a course**: tap course chips under each teacher in the Teachers tab, or tick teachers on the course page. They see that course's students (on it now or finished) with lesson-by-lesson progress and quiz scores; the admin sees every student via **Students → Progress**.
-- **Lessons**: title, video (a YouTube link for now: upload as **Unlisted**, with embedding allowed; or a Bunny video ID later), notes and a multiple-choice quiz. Students must watch the video before the quiz opens (the player counts only seconds actually played, at least 90%, and the server also checks that enough real time has passed), then need 80% to unlock the next lesson; a lesson without questions is marked done after watching. Lessons have Previous / Next buttons; Next unlocks once the lesson is passed.
+- **Lessons**: title, video (a YouTube link for now: upload as **Unlisted**, with embedding allowed; or a Bunny video ID later), notes and a multiple-choice quiz. Each lesson has steps (Video, Quiz, Assignment) listed in **Course content** beside the lesson. Videos can be skipped; the quiz must be passed (80%, one question at a time) and the assignment submitted before moving on. A lesson without questions has a **Mark as complete** button.
 
 ## How students move through courses
 
@@ -60,7 +60,7 @@ In a lesson, **Files → Upload files** sends files straight from the browser to
 
 ## Assignments
 
-In any lesson, tick **Add an assignment** and write what students should do. Optionally tick **Required** so the next lesson opens only after the student hands it in. Students submit text, a link and/or up to 5 files (50 MB each; files need Vercel Blob). They can edit until it's graded.
+In any lesson, tick **Add an assignment** and write what students should do. It opens after the lesson's quiz is passed, and the next lesson opens only after it's handed in. Students submit text, a link and/or up to 5 files (50 MB each; files need Vercel Blob). They can edit until it's graded.
 
 Teachers of the course see **Assignments** on the course page (waiting ones first, and a count on their home page). They give a score out of 100 with feedback, or **Ask to resubmit** with a note, which reopens it for the student. Grades show to the student on the lesson, and in teacher and admin progress views. Every submission and grade is logged in Activity.
 

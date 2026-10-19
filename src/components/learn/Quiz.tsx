@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, LoaderCircle, RotateCcw, XCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, CircleHelp, LoaderCircle, RotateCcw, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -8,17 +8,22 @@ import { useState } from "react";
 type Q = { id: string; prompt: string; options: string[] };
 type Result = { score: number; passed: boolean; wrong: string[]; courseCompleted: boolean; assignmentPending?: boolean; nextLessonId: string | null };
 
-/** The lesson quiz, or a "mark as done" button for lessons without one. */
-export function Quiz({ lessonId, questions, passMark, done, courseSlug }: { lessonId: string; questions: Q[]; passMark: number; done: boolean; courseSlug: string }) {
+/**
+ * The lesson quiz, one question at a time. Passing (80%) is required to move
+ * on; once passed it shows as completed. Lessons without questions get a
+ * "mark as complete" button instead.
+ */
+export function Quiz({ lessonId, questions, passMark, passed, bestScore, continueHref }: {
+  lessonId: string; questions: Q[]; passMark: number; passed: boolean; bestScore: number | null; continueHref: string | null;
+}) {
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [i, setI] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<Result | null>(null);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (questions.some((q) => answers[q.id] === undefined)) return setError("Answer every question first.");
+  async function submit() {
     setBusy(true);
     setError("");
     const res = await fetch(`/api/portal/lessons/${lessonId}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ answers }) }).catch(() => null);
@@ -29,81 +34,104 @@ export function Quiz({ lessonId, questions, passMark, done, courseSlug }: { less
     router.refresh();
   }
 
-  if (result) {
-    return (
-      <div role="status" className={`rounded-3xl border p-6 ${result.passed ? "border-emerald-500/40 bg-emerald-500/10" : "border-red-500/30 bg-red-500/[0.07]"}`}>
-        <div className="flex items-center gap-3">
-          {result.passed ? <CheckCircle2 className="size-7 text-emerald-500" /> : <XCircle className="size-7 text-red-500" />}
-          <p className="font-display text-2xl font-black uppercase tracking-tight text-ink">
-            {questions.length ? `${result.score}% · ${result.passed ? "Passed" : "Not yet"}` : "Lesson done"}
-          </p>
-        </div>
-        <p className="mt-2 text-sm text-ink-soft">
-          {result.courseCompleted
-            ? "You finished the course! Your next course is now open."
-            : result.passed
-              ? result.assignmentPending
-                ? "Now submit the assignment below to unlock the next lesson."
-                : result.nextLessonId ? "The next lesson is unlocked." : "Nice work."
-              : `You need ${passMark}% to move on. ${result.wrong.length} answer${result.wrong.length === 1 ? " was" : "s were"} wrong. Rewatch the video and try again.`}
-        </p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {result.passed && result.nextLessonId && (
-            <Link href={`/portal/lessons/${result.nextLessonId}`} className="rounded-full bg-brand-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-700">Next lesson →</Link>
-          )}
-          {(result.courseCompleted || (result.passed && !result.nextLessonId && !result.assignmentPending)) && (
-            <Link href={result.courseCompleted ? "/portal" : `/portal/courses/${courseSlug}`} className="rounded-full bg-brand-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-700">
-              {result.courseCompleted ? "Go to my next course →" : "Back to course"}
-            </Link>
-          )}
-          {!result.passed && (
-            <button type="button" onClick={() => { setResult(null); setAnswers({}); }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-ink/15 px-4 py-2.5 text-xs font-bold text-ink-soft hover:text-ink">
-              <RotateCcw className="size-3.5" /> Try again
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
+  const card = "rounded-3xl border border-ink/10 bg-surface-card p-6 sm:p-8";
 
   if (!questions.length) {
-    return done ? (
-      <p className="flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400"><CheckCircle2 className="size-4" /> Lesson done</p>
+    return passed ? (
+      <Done title="Lesson complete" body="You've finished this lesson." href={continueHref} />
     ) : (
-      <form onSubmit={submit}>
-        <button type="submit" disabled={busy} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-3 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-60">
-          {busy ? <LoaderCircle className="size-4 animate-spin" /> : <><CheckCircle2 className="size-4" /> I&apos;ve watched it, mark as done</>}
+      <div className={card}>
+        <p className="text-sm text-ink-soft">This lesson has no quiz. Mark it complete when you&apos;re ready to move on.</p>
+        <button type="button" disabled={busy} onClick={submit} className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-3 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+          {busy ? <LoaderCircle className="size-4 animate-spin" /> : <><CheckCircle2 className="size-4" /> Mark as complete</>}
         </button>
         {error && <p role="alert" className="mt-2 text-xs font-medium text-red-500">{error}</p>}
-      </form>
+      </div>
     );
   }
 
-  return (
-    <form onSubmit={submit} className="space-y-4">
-      <div className="flex items-end justify-between gap-3">
-        <h2 className="font-display text-xl font-black uppercase tracking-tight text-ink">Quiz</h2>
-        <p className="text-xs text-muted">{done ? "Passed · you can retake it" : `${passMark}% to unlock the next lesson`}</p>
+  if (passed && !result) {
+    return <Done title="Quiz completed" body={`You passed this quiz${bestScore !== null ? ` with ${bestScore}%` : ""}.`} href={continueHref} />;
+  }
+
+  if (result) {
+    if (result.passed) {
+      return (
+        <Done title={`${result.score}% · Passed`} href={continueHref}
+          body={result.courseCompleted ? "You finished the course! Your next course is now open." : result.assignmentPending ? "Next, hand in the assignment for this lesson." : "The next lesson is unlocked."} />
+      );
+    }
+    return (
+      <div role="status" className={`${card} text-center`}>
+        <XCircle className="mx-auto size-10 text-red-500" />
+        <p className="mt-3 font-display text-2xl font-black uppercase tracking-tight text-ink">{result.score}% · Not yet</p>
+        <p className="mt-1 text-sm text-ink-soft">You need {passMark}% to move on. {result.wrong.length} answer{result.wrong.length === 1 ? " was" : "s were"} wrong.</p>
+        <button type="button" onClick={() => { setResult(null); setAnswers({}); setI(0); }}
+          className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink-soft hover:text-ink">
+          <RotateCcw className="size-4" /> Try again
+        </button>
       </div>
-      {questions.map((q, i) => (
-        <fieldset key={q.id} className="rounded-3xl border border-ink/10 bg-surface-card p-5">
-          <legend className="sr-only">Question {i + 1}</legend>
-          <p className="font-semibold text-ink"><span className="mr-2 font-label text-xs text-muted">{i + 1}.</span>{q.prompt}</p>
-          <div className="mt-3 grid gap-2">
-            {q.options.map((o, k) => (
-              <label key={k} className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition-colors ${answers[q.id] === k ? "border-brand-600 bg-brand-500/10 text-ink" : "border-ink/10 text-ink-soft hover:border-ink/25"}`}>
-                <input type="radio" name={q.id} checked={answers[q.id] === k} onChange={() => { setAnswers((a) => ({ ...a, [q.id]: k })); setError(""); }} className="size-4 accent-[var(--color-brand-600)]" />
-                {o}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      ))}
-      {error && <p role="alert" className="text-sm font-medium text-red-500">{error}</p>}
-      <button type="submit" disabled={busy} className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 px-6 py-3.5 text-sm font-bold uppercase tracking-[0.1em] text-white disabled:opacity-60">
-        {busy ? <LoaderCircle className="size-4 animate-spin" /> : "Submit answers"}
-      </button>
-    </form>
+    );
+  }
+
+  const q = questions[i];
+  const last = i === questions.length - 1;
+  const answered = answers[q.id] !== undefined;
+  return (
+    <div className={card}>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 font-display text-xl font-black uppercase tracking-tight text-ink"><CircleHelp className="size-5 text-brand-700" /> Quiz</h2>
+        <span className="font-label text-sm font-bold text-ink-soft">{i + 1} / {questions.length}</span>
+      </div>
+      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-ink/10" role="progressbar" aria-valuenow={i + 1} aria-valuemin={1} aria-valuemax={questions.length} aria-label="Question">
+        <div className="h-full rounded-full bg-gradient-to-r from-brand-700 to-brand-500 transition-[width]" style={{ width: `${((i + 1) / questions.length) * 100}%` }} />
+      </div>
+      <fieldset className="mt-6">
+        <legend className="text-lg font-semibold text-ink">
+          {i + 1}. {q.prompt} <span className="ml-1 rounded-full border border-ink/15 px-2 py-0.5 align-middle font-label text-[10px] font-bold text-ink-soft">MCQ</span>
+        </legend>
+        <div className="mt-4 grid gap-2.5">
+          {q.options.map((o, k) => (
+            <label key={k} className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3.5 text-sm transition-colors ${answers[q.id] === k ? "border-brand-600 bg-brand-500/10 text-ink" : "border-ink/10 text-ink-soft hover:border-ink/25"}`}>
+              <input type="radio" name={q.id} checked={answers[q.id] === k} onChange={() => { setAnswers((a) => ({ ...a, [q.id]: k })); setError(""); }} className="size-4 accent-[var(--color-brand-600)]" />
+              <span><span className="mr-1 font-bold">{String.fromCharCode(65 + k)}.</span> {o}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      {error && <p role="alert" className="mt-3 text-sm font-medium text-red-500">{error}</p>}
+      <div className="mt-6 flex items-center justify-between gap-3">
+        <button type="button" disabled={i === 0} onClick={() => setI(i - 1)}
+          className="inline-flex items-center gap-1.5 rounded-full border border-ink/15 px-4 py-2.5 text-sm font-bold text-ink-soft hover:text-ink disabled:opacity-40">
+          <ArrowLeft className="size-4" /> Previous
+        </button>
+        {last ? (
+          <button type="button" disabled={busy || !answered || questions.some((x) => answers[x.id] === undefined)} onClick={submit}
+            className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-50">
+            {busy ? <LoaderCircle className="size-4 animate-spin" /> : "Submit answers"}
+          </button>
+        ) : (
+          <button type="button" disabled={!answered} onClick={() => setI(i + 1)}
+            className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-50">
+            Next <ArrowRight className="size-4" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Done({ title, body, href }: { title: string; body: string; href: string | null }) {
+  return (
+    <div role="status" className="rounded-3xl border border-emerald-500/30 bg-surface-card p-8 text-center">
+      <CheckCircle2 className="mx-auto size-11 text-emerald-500" />
+      <p className="mt-3 font-display text-2xl font-black uppercase tracking-tight text-ink">{title}</p>
+      <p className="mt-1 text-sm text-ink-soft">{body}</p>
+      {href && (
+        <Link href={href} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-700">
+          Continue <ArrowRight className="size-4" />
+        </Link>
+      )}
+    </div>
   );
 }

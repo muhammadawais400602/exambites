@@ -49,31 +49,56 @@ export async function studentPath(userId: string) {
 
 /**
  * Lessons of a course with the student's progress. A lesson is done once its
- * quiz is passed (or it's marked watched) and, when its assignment is
- * required, the assignment is submitted. Each opens once the one before is done.
+ * quiz is passed (or, without a quiz, it's marked complete) and its
+ * assignment, if it has one, is submitted. Videos can be skipped. Each lesson
+ * opens once the one before is done.
  */
 export async function lessonsWithProgress(userId: string, courseId: string) {
-  const [lessons, passed, submitted] = await Promise.all([
+  const [lessons, progress, submitted] = await Promise.all([
     listLessons(courseId, { publishedOnly: true }),
-    progressCol()
-      .find({ userId, courseId, passed: true }, { projection: { lessonId: 1 } })
-      .toArray()
-      .then((rows) => new Set(rows.map((r) => String(r.lessonId)))),
+    progressCol().find({ userId, courseId }, { projection: { lessonId: 1, passed: 1, watchedAt: 1, bestScore: 1 } }).toArray(),
     db()
       .collection("submissions")
       .find({ userId, courseId }, { projection: { lessonId: 1 } })
       .toArray()
       .then((rows) => new Set(rows.map((r) => String(r.lessonId)))),
   ]);
+  const byLesson = new Map(progress.map((p) => [String(p.lessonId), p]));
   let open = true;
   return lessons.map((l) => {
-    const quizPassed = passed.has(l.id);
-    const assignmentDone = !l.assignment?.required || submitted.has(l.id);
+    const p = byLesson.get(l.id);
+    const quizPassed = !!p?.passed;
+    const assignmentDone = !l.assignment || submitted.has(l.id);
     const done = quizPassed && assignmentDone;
     const state: LessonState = done ? "done" : open ? "open" : "locked";
     if (!done) open = false;
-    return { ...l, state, quizPassed, submitted: submitted.has(l.id) };
+    return {
+      ...l, state, quizPassed, submitted: submitted.has(l.id),
+      watched: !!p?.watchedAt, bestScore: typeof p?.bestScore === "number" ? (p.bestScore as number) : null,
+    };
   });
+}
+
+export type StepKind = "video" | "quiz" | "assignment";
+export type StepState = "done" | "open" | "locked";
+export type LessonStep = { lessonId: string; lessonTitle: string; kind: StepKind; state: StepState; key: string };
+
+/**
+ * A course as a list of steps for the lesson screen: each lesson's content
+ * (video / notes), then its quiz, then its assignment. Videos never block;
+ * the assignment opens after the quiz is passed.
+ */
+export function courseSteps(lessons: Awaited<ReturnType<typeof lessonsWithProgress>>): LessonStep[] {
+  const steps: LessonStep[] = [];
+  for (const l of lessons) {
+    const hasQuiz = l.questions.length > 0;
+    const locked = l.state === "locked";
+    const push = (kind: StepKind, state: StepState) => steps.push({ lessonId: l.id, lessonTitle: l.title, kind, state: locked ? "locked" : state, key: `${l.id}:${kind}` });
+    push("video", l.watched || l.quizPassed ? "done" : "open");
+    if (hasQuiz) push("quiz", l.quizPassed ? "done" : "open");
+    if (l.assignment) push("assignment", l.submitted ? "done" : hasQuiz && !l.quizPassed ? "locked" : "open");
+  }
+  return steps;
 }
 
 /** Marks the course complete when every lesson is done and opens the next one; returns true if it just happened. */
@@ -159,9 +184,6 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
   const found = await lessonForStudent(user.id, lessonId);
   if (!found) return { ok: false, error: "This lesson isn't open for you yet.", status: 403 };
   const { course, lesson, lessons, index } = found;
-  if (!lesson.quizPassed && needsWatching(lesson) && !(await hasWatched(user.id, lesson.id))) {
-    return { ok: false, error: "Watch the video first. The quiz opens when you've seen it.", status: 409 };
-  }
 
   const wrong = lesson.questions.filter((q) => answers[q.id] !== q.answer).map((q) => q.id);
   const total = lesson.questions.length;
@@ -190,7 +212,7 @@ export async function submitLesson(user: AppUser, lessonId: string, answers: Rec
     }
     if (course.state === "current") courseCompleted = await completeCourseIfDone(user, course.id);
   }
-  const assignmentPending = passed && !!lesson.assignment?.required && !lesson.submitted;
+  const assignmentPending = passed && !!lesson.assignment && !lesson.submitted;
   return {
     ok: true, score, passed, wrong, courseCompleted, assignmentPending,
     nextLessonId: passed && !assignmentPending ? (lessons[index + 1]?.id ?? null) : null,
