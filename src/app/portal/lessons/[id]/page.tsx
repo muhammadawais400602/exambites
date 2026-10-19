@@ -87,11 +87,11 @@ async function Lesson({ params, searchParams }: Props) {
       </div>
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[300px_1fr]">
-        <details open className="group order-2 rounded-3xl border border-ink/10 bg-surface-card lg:order-1 lg:sticky lg:top-32 [&_summary::-webkit-details-marker]:hidden">
+        <details open className="group order-2 rounded-3xl border border-ink/10 bg-surface-card lg:order-1 lg:sticky lg:top-32 xl:top-24 [&_summary::-webkit-details-marker]:hidden">
           <summary className="flex cursor-pointer items-center justify-between px-5 py-4 font-display text-base font-black uppercase tracking-tight text-ink lg:cursor-default">
             Course content <span className="text-xs font-semibold text-muted lg:hidden">{done}/{steps.length}</span>
           </summary>
-          <nav aria-label="Course content" className="max-h-[70vh] overflow-y-auto px-2 pb-4">
+          <nav aria-label="Course content" data-lenis-prevent className="max-h-[70vh] overflow-y-auto overscroll-contain px-2 pb-4 lg:max-h-[calc(100dvh-14rem)] xl:max-h-[calc(100dvh-12rem)]">
             {lessons.map((l, n) => (
               <div key={l.id} className="mt-2">
                 <p className="truncate px-3 py-1.5 font-label text-[10px] font-bold uppercase tracking-[0.16em] text-muted">{n + 1}. {l.title}</p>
