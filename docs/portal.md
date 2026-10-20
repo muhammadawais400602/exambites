@@ -65,6 +65,15 @@ Teachers get a **Students** tab listing every student on, or finished with, one 
 - The admin has the same buttons on **Admin → Students → (student)**. Students can't change their own school details.
 - Every change is recorded in the activity log.
 
+### Checking work inside the site
+
+On an assignment or capstone review page the student's work is shown right there, next to Approve / Reject (which stays in view while scrolling):
+
+- **Links**: YouTube, Google Drive (files and folders), Google Docs / Sheets / Slides / Forms, Canva, Figma, Loom and Vimeo play or preview inline. They must be shared publicly ("Anyone with the link"); the student forms remind them. Other websites usually block being shown inside another site, so they get an **Open** button.
+- **Files**: images show full size; PDF, text and CSV open in the browser's viewer; Word, PowerPoint and Excel open in Microsoft's free Office viewer (it reads the file from its storage address). ZIP files are download-only.
+
+Every item also has **Open** for a full view in a new tab.
+
 ## Capstone
 
 Students have a **Capstone** tab. It unlocks once every core course is finished (bonus courses aren't needed); the dashboard shows a "Capstone unlocked" banner. The student picks **Project** (something they made) or **Proof of earning** (their first income), adds a title, a description, a link and/or up to 5 screenshots (PNG, JPG, WebP or PDF, 10 MB each; screenshots need Vercel Blob), and submits. They can edit while it's waiting.

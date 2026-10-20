@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Link2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Shots } from "@/components/learn/CapstoneForm";
+import { WorkViewer } from "@/components/learn/WorkViewer";
 import { GradeForm } from "@/components/learn/GradeForm";
 import { when } from "@/components/learn/ProgressViews";
 import { Avatar } from "@/components/portal/Avatar";
@@ -42,11 +41,10 @@ async function Review({ params }: { params: Params }) {
           <p className="font-label text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Submitted {when(cap.submittedAt)}</p>
           <h2 className="font-display text-2xl font-black uppercase tracking-tight text-ink">{cap.title}</h2>
           {cap.description && <p className="whitespace-pre-wrap break-words text-sm text-ink">{cap.description}</p>}
-          {cap.link && <a href={cap.link} target="_blank" rel="noopener noreferrer nofollow" className="flex items-center gap-1.5 break-all text-sm font-semibold text-brand-700 hover:underline"><Link2 className="size-4 shrink-0" /> {cap.link}</a>}
-          <Shots files={cap.files.map((f) => ({ ...f, href: `/api/capstones/${cap.id}/files/${f.id}` }))} />
+          <WorkViewer link={cap.link} files={cap.files} openHref={(fid) => `/api/capstones/${cap.id}/files/${fid}`} />
         </section>
-        <GradeForm id={cap.id} endpoint="/api/capstones" status={cap.status} feedback={cap.status === "submitted" ? "" : cap.feedback}
-          backHref="/teacher/capstones" approveHint="Approving marks the student's program as complete." />
+        <div className="lg:sticky lg:top-32 lg:self-start xl:top-24"><GradeForm id={cap.id} endpoint="/api/capstones" status={cap.status} feedback={cap.status === "submitted" ? "" : cap.feedback}
+          backHref="/teacher/capstones" approveHint="Approving marks the student's program as complete." /></div>
       </div>
     </PortalShell>
   );

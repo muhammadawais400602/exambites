@@ -132,6 +132,7 @@ export function CapstoneForm({ userId, capstone, uploadsReady }: { userId: strin
             {kind === "earning" ? "Link (optional): profile, order or client's page" : "Project link"}
             <input value={link} onChange={(e) => setLink(e.target.value)} maxLength={500} placeholder="https://…" className={`${field} mt-1.5`} />
           </label>
+          <p className="-mt-3 text-[11px] text-muted">Google Drive, Docs, Canva or Figma? Set sharing to <span className="font-semibold">Anyone with the link</span> so your teacher can see it.</p>
           <div>
             <p className="text-xs font-semibold text-ink-soft">Screenshots <span className="font-normal text-muted">(up to {MAX_FILES}, PNG/JPG/WebP/PDF, 10 MB each)</span></p>
             {files.length > 0 && (

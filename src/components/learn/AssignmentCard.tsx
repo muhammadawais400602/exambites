@@ -114,6 +114,7 @@ export function AssignmentCard({ lessonId, userId, instructions, required, submi
         <form onSubmit={submit} className="mt-5 space-y-3 border-t border-ink/10 pt-4">
           <textarea aria-label="Your answer" rows={4} maxLength={5000} value={text} onChange={(e) => setText(e.target.value)} placeholder="Write your answer or describe your work…" className={field} />
           <input aria-label="Link to your work" value={link} onChange={(e) => setLink(e.target.value)} placeholder="Link (Canva, Google Drive, YouTube, website…)" className={field} />
+          <p className="text-[11px] text-muted">Google Drive, Docs, Canva or Figma? Set sharing to <span className="font-semibold">Anyone with the link</span> so your teacher can see it.</p>
           {files.length > 0 && (
             <ul className="space-y-1.5">
               {files.map((f) => (
