@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { FileText, Link2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { WorkViewer } from "@/components/learn/WorkViewer";
 import { GradeForm } from "@/components/learn/GradeForm";
 import { when } from "@/components/learn/ProgressViews";
 import { Avatar } from "@/components/portal/Avatar";
@@ -11,7 +11,6 @@ import { canReview, getSubmissionById } from "@/lib/server/assignments";
 import { getCourse, getLesson } from "@/lib/server/courses";
 import { studentBasics } from "@/lib/server/progress";
 import { requireRole } from "@/lib/server/session";
-import { formatBytes } from "@/lib/files";
 
 export const metadata: Metadata = { title: "Review assignment · School of Tomorrow", robots: { index: false } };
 
@@ -51,15 +50,10 @@ async function Review({ params }: { params: Params }) {
           <section className="space-y-3 rounded-3xl border border-ink/10 bg-surface-card p-5 sm:p-6">
             <h2 className="font-label text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Student&apos;s work · {when(sub.submittedAt)}</h2>
             {sub.text && <p className="whitespace-pre-wrap break-words text-sm text-ink">{sub.text}</p>}
-            {sub.link && <a href={sub.link} target="_blank" rel="noopener noreferrer nofollow" className="flex items-center gap-1.5 break-all text-sm font-semibold text-brand-700 hover:underline"><Link2 className="size-4 shrink-0" /> {sub.link}</a>}
-            {sub.files.map((f) => (
-              <a key={f.id} href={`/api/submissions/${sub.id}/files/${f.id}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-2xl border border-ink/10 p-3 text-sm hover:border-brand-600/40">
-                <FileText className="size-5 text-brand-700" /> <span className="min-w-0 flex-1 truncate font-semibold text-ink">{f.name}</span> <span className="text-xs text-muted">{formatBytes(f.size)}</span>
-              </a>
-            ))}
+            <WorkViewer link={sub.link} files={sub.files} openHref={(fid) => `/api/submissions/${sub.id}/files/${fid}`} />
           </section>
         </div>
-        <GradeForm id={sub.id} status={sub.status} feedback={sub.status === "submitted" ? "" : sub.feedback} backHref={back} />
+        <div className="lg:sticky lg:top-32 lg:self-start xl:top-24"><GradeForm id={sub.id} status={sub.status} feedback={sub.status === "submitted" ? "" : sub.feedback} backHref={back} /></div>
       </div>
     </PortalShell>
   );
