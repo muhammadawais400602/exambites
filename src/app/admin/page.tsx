@@ -6,8 +6,10 @@ import { AddTeacherForm, EnrollmentActions, ReferralActions, ReferralForm, Teach
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { formatRs } from "@/lib/pricing";
 import { lessonCounts, listCourses } from "@/lib/server/courses";
-import { adminStats, listAudit, listEnrollments, listReferralCodes, listTeachers, type EnrollmentStatus } from "@/lib/server/queries";
+import { adminStats, listAudit, monthlyGrowth, listEnrollments, listReferralCodes, listTeachers, type EnrollmentStatus } from "@/lib/server/queries";
 import { requireRole } from "@/lib/server/session";
+import { GrowthChart } from "@/components/admin/GrowthChart";
+import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 
 export const metadata: Metadata = { title: "Admin · School of Tomorrow", robots: { index: false } };
 
@@ -59,7 +61,7 @@ async function AdminDashboard({ searchParams }: { searchParams: PageProps<"/admi
         </ul>
       </nav>
       <div className="mt-6">
-        {tab === "overview" && <Overview stats={stats} />}
+        {tab === "overview" && <Overview stats={stats} growth={await monthlyGrowth(12)} />}
         {tab === "payments" && <Enrollments status="pending" />}
         {tab === "courses" && <Courses />}
         {tab === "students" && <Enrollments />}
@@ -71,12 +73,33 @@ async function AdminDashboard({ searchParams }: { searchParams: PageProps<"/admi
   );
 }
 
-function Overview({ stats }: { stats: Awaited<ReturnType<typeof adminStats>> }) {
+/** Change vs last month: arrow + signed % (never color alone). */
+function Delta({ now, before }: { now: number; before: number }) {
+  if (!before) return <span className="text-xs text-muted">{now ? "first month with sales" : "no change"} vs last month</span>;
+  const pct = Math.round(((now - before) / before) * 100);
+  const [Icon, tone] = pct > 0 ? [ArrowUpRight, "text-emerald-600 dark:text-emerald-400"] : pct < 0 ? [ArrowDownRight, "text-red-500"] : [Minus, "text-muted"];
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${tone}`}>
+      <Icon className="size-3.5" /> {pct > 0 ? "+" : ""}{pct}% <span className="font-normal text-muted">vs last month</span>
+    </span>
+  );
+}
+
+function Overview({ stats, growth }: { stats: Awaited<ReturnType<typeof adminStats>>; growth: Awaited<ReturnType<typeof monthlyGrowth>> }) {
   const tiles = [
     { label: "Payments to check", value: stats.pending, href: "/admin?tab=payments" },
     { label: "Active students", value: stats.approved, href: "/admin?tab=students" },
     { label: "Teachers", value: stats.teachers, href: "/admin?tab=teachers" },
     { label: "Live referral codes", value: stats.codes, href: "/admin?tab=referrals" },
+  ];
+  const m = growth.months;
+  const [prev, cur] = [m[m.length - 2], m[m.length - 1]];
+  const month = (label: string) => label.split(" ")[0];
+  const kpis = [
+    { label: `New students in ${month(cur.label)} (so far)`, value: cur.students.toLocaleString("en-US"), delta: <Delta now={cur.students} before={prev.students} /> },
+    { label: `Earnings in ${month(cur.label)} (so far)`, value: formatRs(cur.earnings), delta: <Delta now={cur.earnings} before={prev.earnings} /> },
+    { label: "Students, all time", value: growth.totalStudents.toLocaleString("en-US"), delta: <span className="text-xs text-muted">{prev.students} joined in {month(prev.label)}</span> },
+    { label: "Earnings, all time", value: formatRs(growth.totalEarnings), delta: <span className="text-xs text-muted">{formatRs(prev.earnings)} in {month(prev.label)}</span> },
   ];
   return (
     <div className="space-y-6">
@@ -88,6 +111,29 @@ function Overview({ stats }: { stats: Awaited<ReturnType<typeof adminStats>> }) 
           </Link>
         ))}
       </div>
+
+      <section aria-labelledby="growth-title" className="space-y-3">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <h2 id="growth-title" className="font-label text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Growth · last 12 months</h2>
+          <p className="text-[11px] text-muted">Counted when a payment is approved · Pakistan time</p>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {kpis.map((k) => (
+            <div key={k.label} className={`${card} p-5`}>
+              <p className="text-xs font-semibold text-ink-soft">{k.label}</p>
+              <p className="mt-1 font-display text-2xl font-black tracking-tight text-ink sm:text-3xl">{k.value}</p>
+              <div className="mt-1">{k.delta}</div>
+            </div>
+          ))}
+        </div>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <GrowthChart title="New students" subtitle="Payments approved per month" unit="count"
+            points={m.map((x) => ({ label: x.label, short: x.label.slice(0, 3), value: x.students, note: `${x.totalStudents.toLocaleString("en-US")} students in total` }))} />
+          <GrowthChart title="Earnings" subtitle="Rs received per month (approved payments)" unit="rs"
+            points={m.map((x) => ({ label: x.label, short: x.label.slice(0, 3), value: x.earnings }))} />
+        </div>
+      </section>
+
       <section>
         <h2 className="mb-3 font-label text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Recent activity</h2>
         <Activity limit={8} />

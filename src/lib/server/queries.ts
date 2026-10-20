@@ -129,3 +129,52 @@ export async function adminStats() {
   ]);
   return { pending, approved, teachers, codes };
 }
+
+export type GrowthMonth = {
+  /** "2026-10" */
+  key: string;
+  /** "Oct 2026" */
+  label: string;
+  /** Students whose payment was approved this month. */
+  students: number;
+  /** All approved students by the end of the month. */
+  totalStudents: number;
+  /** Rs received (approved payments) this month. */
+  earnings: number;
+};
+
+const TZ = "Asia/Karachi";
+
+/**
+ * Month-by-month growth for the last `months` months (current month last, so
+ * far), counted by when the payment was approved, in Pakistan time.
+ */
+export async function monthlyGrowth(months = 12): Promise<{ months: GrowthMonth[]; totalEarnings: number; totalStudents: number }> {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit" }).formatToParts(new Date());
+  const year = Number(parts.find((p) => p.type === "year")!.value);
+  const month = Number(parts.find((p) => p.type === "month")!.value);
+  const keys = Array.from({ length: months }, (_, i) => {
+    const d = new Date(Date.UTC(year, month - 1 - (months - 1 - i), 1));
+    return { key: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`, label: d.toLocaleString("en-GB", { month: "short", year: "numeric", timeZone: "UTC" }) };
+  });
+  const rows = await db()
+    .collection("enrollments")
+    .aggregate<{ _id: string; students: number; earnings: number }>([
+      { $match: { status: "approved" } },
+      { $project: { amount: 1, month: { $dateToString: { format: "%Y-%m", date: { $ifNull: ["$decidedAt", "$createdAt"] }, timezone: TZ } } } },
+      { $group: { _id: "$month", students: { $sum: 1 }, earnings: { $sum: { $ifNull: ["$amount", 0] } } } },
+    ])
+    .toArray();
+  const byMonth = new Map(rows.map((r) => [r._id, r]));
+  let total = rows.filter((r) => r._id < keys[0].key).reduce((s, r) => s + r.students, 0);
+  const list = keys.map(({ key, label }) => {
+    const r = byMonth.get(key);
+    total += r?.students ?? 0;
+    return { key, label, students: r?.students ?? 0, totalStudents: total, earnings: r?.earnings ?? 0 };
+  });
+  return {
+    months: list,
+    totalStudents: rows.reduce((s, r) => s + r.students, 0),
+    totalEarnings: rows.reduce((s, r) => s + r.earnings, 0),
+  };
+}
