@@ -40,6 +40,10 @@ It only works while no admin exists. Afterwards delete `ADMIN_SETUP_TOKEN` from 
 - **Teachers on a course**: tap course chips under each teacher in the Teachers tab, or tick teachers on the course page. They see that course's students (on it now or finished) with lesson-by-lesson progress and quiz scores; the admin sees every student via **Students → Progress**.
 - **Lessons**: title, video (a YouTube link for now: upload as **Unlisted**, with embedding allowed; or a Bunny video ID later), notes and a multiple-choice quiz. Each lesson has steps (Video, Quiz, Assignment) listed in **Course content** beside the lesson. Videos can be skipped; the quiz must be passed (80%, one question at a time) and the assignment approved by a teacher before moving on. After a failed attempt students see every question with the right answer in green and their wrong pick struck through in red, then **Retry quiz**. A lesson without questions has a **Mark as complete** button.
 
+## Growth charts
+
+**Admin → Overview** shows the last 12 months: new students and earnings this month (so far) with the change vs last month, all-time totals, and two column charts, **New students** and **Earnings (Rs)** per month. Hover a month for its exact value (and running student total), or press **Table** to see every month. A student counts in the month their payment was **approved**, in Pakistan time; earnings are the approved payment amounts.
+
 ## How students move through courses
 
 One payment covers all courses, but one course is open at a time, in the order set in **Admin → Courses** (↑ ↓ to reorder). Finishing a course opens the next one automatically and shows a congratulations popup with a button to start it; bonus courses come after all the others. Hidden courses are skipped, so hide a course until its lessons are ready, or students reaching it will wait on an empty course. Videos are signed per viewer (links expire after 4 hours) and show the student's email as a moving watermark.
