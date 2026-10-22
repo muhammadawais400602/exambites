@@ -13,7 +13,7 @@ export default function Page({ searchParams }: PageProps<"/verify">) {
       <section className="rounded-3xl border border-ink/10 bg-surface-card p-6 sm:p-8">
         <p className="font-label text-[11px] font-bold uppercase tracking-[0.2em] text-brand-700">Certificate check</p>
         <h1 className="mt-1 font-display text-3xl font-black uppercase tracking-tight text-ink">Verify a certificate</h1>
-        <p className="mt-2 text-sm text-ink-soft">Scan the QR code on the certificate, or type the ID printed on it.</p>
+        <p className="mt-2 text-sm text-ink-soft">Scan the QR code on the certificate, or type its ID and the name printed on it. Both must match our records.</p>
         <div className="mt-5">
           <Suspense fallback={<VerifyForm />}>
             <Lookup searchParams={searchParams} />
@@ -25,13 +25,14 @@ export default function Page({ searchParams }: PageProps<"/verify">) {
 }
 
 async function Lookup({ searchParams }: { searchParams: PageProps<"/verify">["searchParams"] }) {
-  const raw = (await searchParams).code;
-  const typed = typeof raw === "string" ? raw : "";
+  const sp = await searchParams;
+  const typed = typeof sp.code === "string" ? sp.code : "";
+  const name = typeof sp.name === "string" ? sp.name.trim().slice(0, 80) : "";
   const code = typed ? normaliseCode(typed) : null;
-  if (code) redirect(`/verify/${code}`);
+  if (code) redirect(`/verify/${code}${name ? `?name=${encodeURIComponent(name)}` : ""}`);
   return (
     <>
-      <VerifyForm value={typed} />
+      <VerifyForm code={typed} name={name} />
       {typed && <p role="alert" className="mt-3 text-sm font-medium text-red-500">That doesn&apos;t look like a certificate ID. It looks like SOT-26-XXXX-XXXX.</p>}
     </>
   );
