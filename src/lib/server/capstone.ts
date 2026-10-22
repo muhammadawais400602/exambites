@@ -4,6 +4,7 @@ import { audit } from "./audit";
 import { toId } from "./auth";
 import { objectIdOrNull } from "./courses";
 import { db } from "./db";
+import { issueCertificateIfEarned } from "./certificates";
 import { studentPath } from "./learning";
 import type { AppUser } from "./session";
 
@@ -131,6 +132,8 @@ export async function reviewCapstone(reviewer: AppUser, id: string, input: { act
   });
   const student = await db().collection("user").findOne({ _id: toId(cap.userId) }, { projection: { name: 1 } });
   await audit(reviewer, approve ? "capstone.approved" : "capstone.rejected", `${reviewer.name} ${approve ? "approved" : "rejected"} ${student?.name ?? "a student"}'s capstone “${cap.title}”`, { capstoneId: id });
+  // Every core course is already done (the capstone only opens then), so approval earns the certificate.
+  if (approve) await issueCertificateIfEarned(cap.userId, reviewer);
   return { ok: true as const };
 }
 

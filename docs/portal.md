@@ -80,6 +80,16 @@ Students have a **Capstone** tab. It unlocks once every core course is finished 
 
 Every teacher has a **Capstones** tab listing all students' capstones (waiting first), since the capstone covers the whole program. They open one and **Approve** it (the student sees "Capstone approved — you've completed the whole program") or **Reject** it with feedback (the student updates it and submits again). Decisions are logged in Activity.
 
+## Certificates
+
+When a teacher approves a student's capstone (which only opens after every course is done), the student gets a **certificate** automatically. Students who were approved before certificates existed get theirs the first time they open it.
+
+- Students find it under **Capstone → View your certificate** or the "Program complete" banner on the dashboard (`/portal/certificate`). **Download PDF** saves it as one landscape A4 page (the browser's "Save as PDF"); **Copy verify link** copies its public check link.
+- Each certificate has a random ID like `SOT-26-7K3Q-9XHD` and a **QR code** that opens `/verify/<ID>`. Anyone (an employer, a client) can scan it, or type the ID at **/verify**, and see whether it's **genuine**, with the name, program, courses, capstone and issue date. Unknown IDs say "Not a valid certificate".
+- Details are a snapshot from the day it was issued.
+- **Withdraw**: Admin → Students → (student) shows the certificate with **Withdraw** / **Restore**. A withdrawn certificate's verify page says it's no longer valid.
+- The QR code uses the site address (`BETTER_AUTH_URL`, or the Vercel production domain), so set `BETTER_AUTH_URL=https://www.schooloftomorrow.si` in Vercel before issuing real certificates.
+
 ## Lesson files (PDF, Word, PowerPoint…)
 
 Needs Vercel Blob: Vercel → **Storage** → **Create** → **Blob** → choose **Public** access → connect it to the exambites project (Production and Preview). Vercel adds `BLOB_READ_WRITE_TOKEN` itself; redeploy afterwards.

@@ -1,7 +1,8 @@
 "use client";
 
 import { upload } from "@vercel/blob/client";
-import { BadgeDollarSign, CheckCircle2, Hourglass, ImagePlus, Link2, LoaderCircle, Rocket, Send, Trash2, XCircle } from "lucide-react";
+import { Award, BadgeDollarSign, CheckCircle2, Hourglass, ImagePlus, Link2, LoaderCircle, Rocket, Send, Trash2, XCircle } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { formatBytes, safeName } from "@/lib/files";
@@ -81,6 +82,9 @@ export function CapstoneForm({ userId, capstone, uploadsReady }: { userId: strin
           <p className="mt-1 text-sm text-ink-soft">Congratulations — you&apos;ve completed the whole program.</p>
           {capstone!.feedback && <p className="mt-3 whitespace-pre-wrap text-sm text-ink">{capstone!.feedback}</p>}
           {capstone!.reviewedByName && <p className="mt-2 text-xs text-muted">By {capstone!.reviewedByName}</p>}
+          <Link href="/portal/certificate" className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-700">
+            <Award className="size-4" /> View your certificate
+          </Link>
         </div>
       )}
       {status === "rejected" && (
