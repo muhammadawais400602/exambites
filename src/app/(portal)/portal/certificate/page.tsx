@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CertificateActions } from "@/components/learn/CertificateActions";
 import { CertificateCard } from "@/components/learn/CertificateCard";
+import { CertificateShare } from "@/components/learn/CertificateShare";
+import { brand } from "@/content/home";
 import { PageTitle, PortalLoading } from "@/components/portal/PortalShell";
 import { certificateQr, issueCertificateIfEarned, verifyUrl } from "@/lib/server/certificates";
 import { capstoneProgress, getCapstone } from "@/lib/server/capstone";
@@ -51,12 +53,15 @@ async function Certificate() {
     <>
       <div className="print:hidden">
         <PageTitle eyebrow="Your achievement" title="Certificate">
-          <CertificateActions verifyLink={link} />
+          <CertificateActions />
         </PageTitle>
         <p className="mt-2 text-sm text-ink-soft">Anyone can check it by scanning the QR code or opening <a href={link} className="font-semibold text-brand-700 hover:underline">{link.replace(/^https?:\/\//, "")}</a>.</p>
       </div>
       <div className="mx-auto mt-6 max-w-5xl print:m-0 print:max-w-none">
         <CertificateCard cert={cert} qrSvg={await certificateQr(cert.code)} verifyHost={new URL(link).host.replace(/^www\./, "")} />
+      </div>
+      <div className="mx-auto mt-6 max-w-5xl">
+        <CertificateShare verifyLink={link} code={cert.code} program={cert.program} org={brand.name} issuedAt={cert.issuedAt} />
       </div>
     </>
   );
