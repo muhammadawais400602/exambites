@@ -3,7 +3,7 @@ import { brand } from "@/content/home";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 /** Centered, distraction-free frame for staff login, password reset and setup. */
-export function AuthFrame({ children }: { children: React.ReactNode }) {
+export function AuthFrame({ children, wide = false }: { children: React.ReactNode; wide?: boolean }) {
   return (
     <div className="relative grid min-h-dvh place-items-center overflow-hidden bg-surface px-4 py-16">
       <div
@@ -13,7 +13,7 @@ export function AuthFrame({ children }: { children: React.ReactNode }) {
       <div className="absolute right-4 top-4">
         <ThemeToggle />
       </div>
-      <div className="relative w-full max-w-md">
+      <div className={`relative w-full ${wide ? "max-w-3xl" : "max-w-md"}`}>
         <Link href="/" className="mb-6 block text-center font-display text-2xl font-black tracking-tight text-ink">
           {brand.short}
           <span className="text-brand-600">.</span>

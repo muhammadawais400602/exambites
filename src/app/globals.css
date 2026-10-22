@@ -124,3 +124,25 @@ section[id] {
   75% { top: 82%; left: 12%; }
   100% { top: 12%; left: 48%; }
 }
+
+/* Certificate "Download PDF": print only the certificate, one landscape A4 page. */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+  body:has(#certificate) * {
+    visibility: hidden;
+  }
+  body:has(#certificate) #certificate,
+  body:has(#certificate) #certificate * {
+    visibility: visible;
+  }
+  body:has(#certificate) #certificate {
+    position: fixed;
+    inset: 0;
+    width: 297mm;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

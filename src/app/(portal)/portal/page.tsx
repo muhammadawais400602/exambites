@@ -8,6 +8,7 @@ import { formatRs } from "@/lib/pricing";
 import { pathProgress, pendingCelebration, studentPath } from "@/lib/server/learning";
 import { PendingCelebration } from "@/components/learn/CourseCompleteDialog";
 import { getProfile } from "@/lib/server/profile";
+import { certificateFor } from "@/lib/server/certificates";
 import { CourseGrid } from "@/components/learn/CourseGrid";
 import { CourseIcon } from "@/components/learn/CourseCover";
 import { getEnrollment } from "@/lib/server/queries";
@@ -57,7 +58,7 @@ async function StudentPortal() {
 }
 
 async function CoursePath({ userId, first }: { userId: string; first: string }) {
-  const [path, profile, celebrate] = await Promise.all([studentPath(userId), getProfile(userId), pendingCelebration(userId)]);
+  const [path, profile, celebrate, cert] = await Promise.all([studentPath(userId), getProfile(userId), pendingCelebration(userId), certificateFor(userId)]);
   const list = path?.courses ?? [];
   const progress = await pathProgress(userId, list);
   const core = list.filter((c) => !c.bonus);
@@ -132,7 +133,16 @@ async function CoursePath({ userId, first }: { userId: string; first: string }) 
         </div>
       </section>
 
-      {core.length > 0 && doneCount === core.length && (
+      {cert ? (
+        <Link href="/portal/certificate" className="mt-6 flex items-center gap-4 rounded-3xl border border-emerald-500/40 bg-gradient-to-r from-emerald-500/10 to-transparent p-5 transition-colors hover:border-emerald-500">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-emerald-600 text-white"><Award className="size-6" /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-black uppercase tracking-tight text-ink">Program complete</span>
+            <span className="block text-sm text-ink-soft">Your certificate is ready. Download it or share its verify link.</span>
+          </span>
+          <span className="shrink-0 text-sm font-bold text-emerald-600 dark:text-emerald-400">View →</span>
+        </Link>
+      ) : core.length > 0 && doneCount === core.length && (
         <Link href="/portal/capstone" className="mt-6 flex items-center gap-4 rounded-3xl border border-brand-600/40 bg-gradient-to-r from-brand-500/15 to-transparent p-5 transition-colors hover:border-brand-600">
           <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-brand-600 text-white"><Trophy className="size-6" /></span>
           <span className="min-w-0 flex-1">

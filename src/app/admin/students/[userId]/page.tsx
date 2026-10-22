@@ -6,6 +6,8 @@ import { LessonProgressList } from "@/components/learn/ProgressViews";
 import { Avatar } from "@/components/portal/Avatar";
 import { PageTitle, PortalLoading, PortalShell } from "@/components/portal/PortalShell";
 import { getProfile } from "@/lib/server/profile";
+import { certificateFor } from "@/lib/server/certificates";
+import { CertificateAdmin } from "@/components/admin/CertificateAdmin";
 import { studentRecord } from "@/lib/server/students";
 import { StudentActions } from "@/components/staff/StudentTable";
 import { studentPath } from "@/lib/server/learning";
@@ -31,7 +33,7 @@ async function Student({ params }: { params: Params }) {
   const { userId } = await params;
   const student = await studentBasics(userId);
   if (!student) notFound();
-  const [path, profile, record] = await Promise.all([studentPath(userId), getProfile(userId), studentRecord(userId)]);
+  const [path, profile, record, cert] = await Promise.all([studentPath(userId), getProfile(userId), studentRecord(userId), certificateFor(userId)]);
   const details = [
     ["Reg No", record?.regNo ?? ""],
     ["Campus", record?.campus ?? ""],
@@ -64,6 +66,7 @@ async function Student({ params }: { params: Params }) {
           <StudentActions student={record} />
         </div>
       )}
+      {cert && <CertificateAdmin code={cert.code} revoked={cert.revoked} issued={new Date(cert.issuedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Karachi" })} />}
       {details.length > 0 && (
         <dl className="mb-8 grid gap-x-6 gap-y-3 rounded-3xl border border-ink/10 bg-surface-card p-5 sm:grid-cols-2">
           {details.map(([k, v]) => (
