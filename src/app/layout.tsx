@@ -30,7 +30,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   // Absolute base for link-preview images (e.g. shared certificate links).
   metadataBase: new URL(process.env.BETTER_AUTH_URL || "https://www.schooloftomorrow.si"),
-  title: "School of Tomorrow · Crack With AI",
+  title: "School of Tomorrow · Earn With AI",
   description:
     "AI courses for students: AI Basics, AI Graphic Design, AI Video Editing & Filmmaking, AI Web Development, AI Digital Marketing, and Freelancing & Portfolio Building. Learn the tools, land clients and earn with AI in 90 days.",
 };
